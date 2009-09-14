@@ -4,7 +4,7 @@ Tags: slideshow,featured,posts,jquery,slider,content,css,simple,thumbnail,image
 Donate link: http://clickonf5.org/go/paypal/smooth-slider/ 
 Requires at least: 2.7
 Tested up to: 2.8.4
-Stable tag: 1.0.1
+Stable tag: 1.1
 
 == Description ==
 

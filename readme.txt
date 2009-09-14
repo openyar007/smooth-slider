@@ -4,13 +4,14 @@ Tags: slideshow,featured,posts,jquery,slider,content,css,simple,thumbnail,image
 Donate link: http://clickonf5.org/go/paypal/smooth-slider/ 
 Requires at least: 2.7
 Tested up to: 2.8.4
-Stable tag: 1.0
+Stable tag: 1.0.1
 
 == Description ==
 
-Smooth Slider is a Wordpress Plugin for creating a dynamic slideshow for featured posts on a blog. The slideshow created by Smooth Slider are JavaScript and Text based, that’s why bloggers will get full benefit of Search Engine Optimization as the texts are readable by Search Engines. Below are the details related to this plugin, by clicking on each tab you can see that particular detail as well.
+Smooth Slider is a Wordpress Plugin for creating a dynamic slideshow for featured posts on a blog. The slideshow created by Smooth Slider are JavaScript and Text based, that is why bloggers will get full benefit of Search Engine Optimization as the texts are readable by Search Engines. You can choose some of your posts as featured posts and show them into a slideshow on your blog’s home page (i.e. Index) as well as in Sidebar.
 
-== Features ==
+Features:
+
 1. Search Engine Optimized Slideshow
 2. Fully Customizable CSS
 3. Choose Posts as Featured Posts on Single Click
@@ -21,13 +22,16 @@ Smooth Slider is a Wordpress Plugin for creating a dynamic slideshow for feature
 8. Full Support Available
 9. Readable by search engine as you can see the screenshot on Lynx browser aavailable on our blog
 
+[Demo](http://www.clickonf5.org/) |
+[Plugin Information](http://www.clickonf5.org/smooth-slider)
+
 == Installation ==
 
 This plugin is easy to install like other plug-ins of Wordpress as you need to just follow the below mentioned steps:
 
-1. Copy Folder “Smooth Slider” from the downloaded and extracted file.
+1. Copy Folder Smooth Slider from the downloaded and extracted file.
 
-2. Paste it in “wp-Content/plugins” folder on your Wordpress Installation 
+2. Paste it in wp-Content/plugins folder on your Wordpress Installation 
 
 3. Activate the plugin from Dashboard / Plugins window.
 
@@ -35,7 +39,7 @@ This plugin is easy to install like other plug-ins of Wordpress as you need to j
 
 == Usage ==
 
-1. If you want the slideshow on your home page, then open Index.php file from “Dashboard” by clicking on Tab “Appearance / Editor” and paste the following piece of code at the suitable place. 
+1. If you want the slideshow on your home page, then open Index.php file from Dashboard by clicking on Tab Appearance / Editor and paste the following piece of code at the suitable place. 
 
 if ( function_exists( 'get_smooth_slider' ) ) {
      get_smooth_slider(); }If you want to put the slider before the list of articles on your Wordpress blog homepage, put the above piece of code before the Wordpress Loop (the code is a php code, so ensure that it is enclosed within the php tags). Wordpress loop code is shown below:
@@ -71,4 +75,7 @@ Visit the plugin page (http://www.clickonf5.org/smooth-slider) and screenshot-po
 
 == Changelog ==
 
-Visit the plugin page (http://www.clickonf5.org/smooth-slider) to see the changelog. Since this is our first release of this plugin, we wil update the changelog in future over here as well.
+Version 1.0.1 (09/14/2009)
+New - Active Slide in the slideshow will now be highlighted with bolder and bigger navigation number
+Fixed - Added No Script tag brosers not supporting JavaScript for showing the slideshow
+Fixed - Issues with Wordpress MU Smooth Slider Options update from setting page

@@ -3,7 +3,7 @@
 Plugin Name: Smooth Slider
 Plugin URI: http://www.clickonf5.org/smooth-slider
 Description: Smooth Slider adds a smooth content and image slideshow with customizable background and slide intervals to any location of your blog
-Version: 1.0	
+Version: 1.1	
 Author: Tejaswini Deshpande, Sanjeev Mishra
 Author URI: http://www.clickonf5.org
 Wordpress version supported: 2.7 and above

@@ -306,12 +306,7 @@ stepcarousel.setup({
 				$sldr_nav_width = $width/2;
 	  ?>
 	  var nav_width = <?php global $sldr_nav_width; echo $sldr_nav_width; ?>;
-	  var prev_slide;
-	  if(imageA=="1")
-	   prev_slide = imageC;
-	  else
-	   prev_slide = imageA - 1;
-	  jQuery("#sldr"+prev_slide).css("backgroundPosition", "0 0");
+	  jQuery("#smooth_sliderc_nav a").css("backgroundPosition", "0 0");
 	  jQuery("#sldr"+curr_slide).css("backgroundPosition", "-"+nav_width+"px 0");
 	  <?php } ?>
 	  

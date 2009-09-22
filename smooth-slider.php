@@ -3,7 +3,7 @@
 Plugin Name: Smooth Slider
 Plugin URI: http://www.clickonf5.org/smooth-slider
 Description: Smooth Slider adds a smooth content and image slideshow with customizable background and slide intervals to any location of your blog
-Version: 1.1	
+Version: 1.2	
 Author: Tejaswini Deshpande, Sanjeev Mishra
 Author URI: http://www.clickonf5.org
 Wordpress version supported: 2.7 and above
@@ -25,6 +25,7 @@ Wordpress version supported: 2.7 and above
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+//Please visit Plugin page http://www.clickonf5.org/smooth-slider for Changelog
 //on activation
 function install_smooth_slider() {
 	
@@ -69,7 +70,10 @@ function install_smooth_slider() {
 	add_option('smooth_slider_content_fstyle','normal');
 	add_option('smooth_slider_content_fcolor','#333333');
 	add_option('smooth_slider_content_from','content');	
-	add_option('smooth_slider_content_chars','300');	
+	add_option('smooth_slider_content_chars','300');
+	add_option('smooth_slider_bg','0');	
+	add_option('smooth_slider_clear','0');	
+	add_option('smooth_slider_image_only','0');	
 }
 
 //This adds the post to the slider
@@ -224,8 +228,8 @@ function carousel_posts_on_slider($max_posts, $offset=0) {
 		$permalink = get_permalink($data->ID);
 		
 		$post_id = $data->ID;
-		$html .= '<div class="board_item">
-			<!-- board_item -->';
+		$html .= '<div class="smooth_slideri">
+			<!-- smooth_slideri -->';
 			
 		$thumbnail = get_post_meta($post_id, 'slider_thumbnail', true);
 		
@@ -241,13 +245,20 @@ function carousel_posts_on_slider($max_posts, $offset=0) {
 		$slider_content = strip_tags($slider_content);
 				
 		if( isset($thumbnail) && !empty($thumbnail) ):
-			$html .= '<img class="smooth_slider_thumbnail" src="'.$thumbnail.'" alt="'.$post_title.'" />';
+			$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$thumbnail.'" alt="'.$post_title.'" /></a>';
 		endif;
 		
-		$html .= '<h2 ><a href="'.$permalink.'">'.$post_title.'</a></h2><span> '.get_string_limit($slider_content,get_option('smooth_slider_content_chars')).'</span>
-			<p class="more"><a href="'.$permalink.'">Read more</a></p>
-			<!-- /board_item -->
-		</div>';
+		if (get_option('smooth_slider_image_only') == '1') { 
+			$html .= '<!-- /smooth_slideri -->
+			</div>';
+		}
+		else {
+			$html .= '<h2 ><a href="'.$permalink.'">'.$post_title.'</a></h2><span> '.get_string_limit($slider_content,get_option('smooth_slider_content_chars')).'</span>
+				<p class="more"><a href="'.$permalink.'">Read more</a></p>
+			
+				<!-- /smooth_slideri -->
+			</div>';
+		}
 	}
 	echo $html;
 	return $coint_i;
@@ -255,7 +266,7 @@ function carousel_posts_on_slider($max_posts, $offset=0) {
 
 function smooth_slider_css() {
 ?>
-<style type="text/css" media="screen">#board{width:<?php echo get_option('smooth_slider_width'); ?>px;height:<?php echo get_option('smooth_slider_height'); ?>px;overflow:hidden;background-color:<?php echo get_option('smooth_slider_bg_color'); ?>;border:<?php echo get_option('smooth_slider_border'); ?>px solid <?php echo get_option('smooth_slider_brcolor'); ?>;margin: 10px auto 10px auto;line-height:18px;}#board a{text-decoration:none;}#board_items{width:100%;padding:10px <?php if (get_option('smooth_slider_prev_next') == 1) {echo "18";} else {echo "12";} ?>px 0px <?php if (get_option('smooth_slider_prev_next') == 1) {echo "26";} else {echo "12";} ?>px;}#board_body{width:100%;}#board_carusel{width:<?php if (get_option('smooth_slider_prev_next') == 1) {echo (get_option('smooth_slider_width') - 44);} else {echo (get_option('smooth_slider_width') - 24);} ?>px;height:<?php $sldr_title = get_option('smooth_slider_title_text'); if(!empty($sldr_title)) { $extra_height = get_option('smooth_slider_title_fsize') + get_option('smooth_slider_content_fsize') + 5 + 18; } else { $extra_height = get_option('smooth_slider_content_fsize') + 5 + 5 + 18;  } echo (get_option('smooth_slider_height') - $extra_height); ?>px;position:relative;text-align:justify;}#board_carusel .belt{position:absolute;/*dont change this value*/left:0;top:0;}.board_item{width:<?php if (get_option('smooth_slider_prev_next') == 1) {echo (get_option('smooth_slider_width') - 54);} else {echo (get_option('smooth_slider_width') - 24);} ?>px;padding-right:10px;height:<?php $sldr_title = get_option('smooth_slider_title_text'); if(!empty($sldr_title)) { $extra_height = get_option('smooth_slider_title_fsize') + get_option('smooth_slider_content_fsize') + 5 + 18; } else { $extra_height = get_option('smooth_slider_content_fsize') + 5 + 5 + 18;  } echo (get_option('smooth_slider_height') - $extra_height); ?>px;overflow:hidden;line-height:18px;}.sldr_title{color:#000;font-family:<?php echo get_option('smooth_slider_title_font'); ?>, Arial, Helvetica, sans-serif;font-size:<?php echo get_option('smooth_slider_title_fsize'); ?>px;font-weight:<?php if (get_option('smooth_slider_title_fstyle') == "bold" or get_option('smooth_slider_title_fstyle') == "bold italic" ){echo "bold";} else { echo "normal"; } ?>;font-style:<?php if (get_option('smooth_slider_title_fstyle') == "italic" or get_option('smooth_slider_title_fstyle') == "bold italic" ){echo "italic";} else {echo "normal";} ?>;color:<?php echo get_option('smooth_slider_title_fcolor'); ?>;margin:0;}#board_body h2{font-family:<?php echo get_option('smooth_slider_ptitle_font'); ?>, Arial, Helvetica, sans-serif;font-size:<?php echo get_option('smooth_slider_ptitle_fsize'); ?>px;font-weight:<?php if (get_option('smooth_slider_ptitle_fstyle') == "bold" or get_option('smooth_slider_ptitle_fstyle') == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if (get_option('smooth_slider_ptitle_fstyle') == "italic" or get_option('smooth_slider_ptitle_fstyle') == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo get_option('smooth_slider_ptitle_fcolor'); ?>;display:block;margin:<?php $sldr_title = get_option('smooth_slider_title_text'); if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px 0 5px 0;}#board_body h2 a{color:<?php echo get_option('smooth_slider_ptitle_fcolor'); ?>;}.slider_item {padding-left:1px;}#board_body span{font-family:<?php echo get_option('smooth_slider_content_font'); ?>, Arial, Helvetica, sans-serif;font-size:<?php echo get_option('smooth_slider_content_fsize'); ?>px;font-weight:<?php if (get_option('smooth_slider_content_fstyle') == "bold" or get_option('smooth_slider_content_fstyle') == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if (get_option('smooth_slider_content_fstyle')=="italic" or get_option('smooth_slider_content_fstyle') == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo get_option('smooth_slider_content_fcolor'); ?>;}.smooth_slider_thumbnail{float:<?php echo get_option('smooth_slider_img_align'); ?>;margin:12px <?php if(get_option('smooth_slider_img_align') == "left") {echo "5";} else {echo "0";} ?>px 0 <?php if(get_option('smooth_slider_img_align') == "right") {echo "5";} else {echo "0";} ?>px;width:<?php echo get_option('smooth_slider_img_width'); ?>px;height:<?php echo get_option('smooth_slider_img_height'); ?>px;border:<?php echo get_option('smooth_slider_img_border'); ?>px solid <?php echo get_option('smooth_slider_img_brcolor'); ?>;}#board_body p.more a{text-decoration:underline;color:<?php echo get_option('smooth_slider_ptitle_fcolor'); ?>;float:right;font-family:<?php echo get_option('smooth_slider_content_font'); ?>, Arial, Helvetica, sans-serif;font-size:<?php echo get_option('smooth_slider_content_fsize'); ?>px;}#board_body p.more a:hover{text-decoration:none;}#board_carusel_nav{float:left;width:70%;overflow:hidden;padding:0;margin:2px 0 0 0;}#board_carusel_nav li{float:left;margin:0 5px 0 0;display:block;border:1px solid <?php echo get_option('smooth_slider_content_fcolor'); ?>;background-color:<?php echo get_option('smooth_slider_bg_color'); ?>;line-height:14px;font-size:<?php echo get_option('smooth_slider_content_fsize'); ?>px;font-family:<?php echo get_option('smooth_slider_content_font'); ?>, Arial, Helvetica, sans-serif;}#board_carusel_nav li a{diaplay:block;padding:1px 5px 1px 5px;color:<?php echo get_option('smooth_slider_ptitle_fcolor'); ?>;outline:none;}.sldrlink{font-size:8px;float:right;padding-right:<?php if (get_option('smooth_slider_prev_next') == 1) {echo "40";} else {echo "25";} ?>px;margin-top:7px;font-family:Verdana, Helvetica, sans-serif;}.sldrlink a{color:<?php echo get_option('smooth_slider_content_fcolor'); ?>;}</style>
+<style type="text/css" media="screen">#smooth_sldr div,#smooth_sldr p,#smooth_sldr li,#smooth_sldr a,#smooth_sldr span,#smooth_sldr img,#smooth_sldr h2,#smooth_sldr ul{list-style:none;background:transparent;vertical-align:baseline;}#smooth_sldr div{display:block;}#smooth_sldr span{display:inline;}#smooth_sldr{width:<?php echo get_option('smooth_slider_width'); ?>px;height:<?php echo get_option('smooth_slider_height'); ?>px;overflow:hidden;background-color:<?php if (get_option('smooth_slider_bg') == '1') { echo "transparent";} else { echo get_option('smooth_slider_bg_color'); } ?>;border:<?php echo get_option('smooth_slider_border'); ?>px solid <?php echo get_option('smooth_slider_brcolor'); ?>;margin: 10px auto;line-height:18px;}#smooth_sldr a{text-decoration:none;}#smooth_sldr_items{width:100%;padding:10px <?php if (get_option('smooth_slider_prev_next') == 1) {echo "18";} else {echo "12";} ?>px 0px <?php if (get_option('smooth_slider_prev_next') == 1) {echo "26";} else {echo "12";} ?>px;}#smooth_sldr_body{width:100%;}#smooth_sliderc{width:<?php if (get_option('smooth_slider_prev_next') == 1) {echo (get_option('smooth_slider_width') - 44);} else {echo (get_option('smooth_slider_width') - 24);} ?>px;height:<?php if (get_option('smooth_slider_goto_slide') == "1"){$nav_size = get_option('smooth_slider_content_fsize');} elseif (get_option('smooth_slider_goto_slide') == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = get_option('smooth_slider_title_text'); if(!empty($sldr_title)) { $extra_height = get_option('smooth_slider_title_fsize') + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo (get_option('smooth_slider_height') - $extra_height); ?>px;position:relative;text-align:justify;}#smooth_sliderc .smooth_sliderb{position:absolute;/*dont change this value*/left:0;top:0;}.smooth_slideri{width:<?php if (get_option('smooth_slider_prev_next') == 1) {echo (get_option('smooth_slider_width') - 54);} else {echo (get_option('smooth_slider_width') - 24);} ?>px;padding-right:10px;height:<?php if (get_option('smooth_slider_goto_slide') == "1"){$nav_size = get_option('smooth_slider_content_fsize');} elseif (get_option('smooth_slider_goto_slide') == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = get_option('smooth_slider_title_text'); if(!empty($sldr_title)) { $extra_height = get_option('smooth_slider_title_fsize') + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo (get_option('smooth_slider_height') - $extra_height); ?>px;overflow:hidden;line-height:18px;}.sldr_title{color:#000;font-family:<?php echo get_option('smooth_slider_title_font'); ?>, Arial, Helvetica, sans-serif;font-size:<?php echo get_option('smooth_slider_title_fsize'); ?>px;font-weight:<?php if (get_option('smooth_slider_title_fstyle') == "bold" or get_option('smooth_slider_title_fstyle') == "bold italic" ){echo "bold";} else { echo "normal"; } ?>;font-style:<?php if (get_option('smooth_slider_title_fstyle') == "italic" or get_option('smooth_slider_title_fstyle') == "bold italic" ){echo "italic";} else {echo "normal";} ?>;color:<?php echo get_option('smooth_slider_title_fcolor'); ?>;margin:0;}#smooth_sldr_body h2{clear:none;line-height:<?php echo (get_option('smooth_slider_ptitle_fsize') + 3); ?>px;font-family:<?php echo get_option('smooth_slider_ptitle_font'); ?>, Arial, Helvetica, sans-serif;font-size:<?php echo get_option('smooth_slider_ptitle_fsize'); ?>px;font-weight:<?php if (get_option('smooth_slider_ptitle_fstyle') == "bold" or get_option('smooth_slider_ptitle_fstyle') == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if (get_option('smooth_slider_ptitle_fstyle') == "italic" or get_option('smooth_slider_ptitle_fstyle') == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo get_option('smooth_slider_ptitle_fcolor'); ?>;display:block;margin:<?php $sldr_title = get_option('smooth_slider_title_text'); if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px 0 5px 0;padding:0px;}#smooth_sldr_body h2 a{color:<?php echo get_option('smooth_slider_ptitle_fcolor'); ?>;}.slider_item {padding-left:1px;}#smooth_sldr_body span{font-family:<?php echo get_option('smooth_slider_content_font'); ?>, Arial, Helvetica, sans-serif;font-size:<?php echo get_option('smooth_slider_content_fsize'); ?>px;font-weight:<?php if (get_option('smooth_slider_content_fstyle') == "bold" or get_option('smooth_slider_content_fstyle') == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if (get_option('smooth_slider_content_fstyle')=="italic" or get_option('smooth_slider_content_fstyle') == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo get_option('smooth_slider_content_fcolor'); ?>;}.smooth_slider_thumbnail{float:<?php echo get_option('smooth_slider_img_align'); ?>;margin:<?php $sldr_title = get_option('smooth_slider_title_text'); if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px <?php if(get_option('smooth_slider_img_align') == "left") {echo "5";} else {echo "0";} ?>px 0 <?php if(get_option('smooth_slider_img_align') == "right") {echo "5";} else {echo "0";} ?>px;width:<?php echo get_option('smooth_slider_img_width'); ?>px;height:<?php echo get_option('smooth_slider_img_height'); ?>px;border:<?php echo get_option('smooth_slider_img_border'); ?>px solid <?php echo get_option('smooth_slider_img_brcolor'); ?>;}#smooth_sldr_body p.more a{text-decoration:underline;color:<?php echo get_option('smooth_slider_ptitle_fcolor'); ?>;float:right;font-family:<?php echo get_option('smooth_slider_content_font'); ?>, Arial, Helvetica, sans-serif;font-size:<?php echo get_option('smooth_slider_content_fsize'); ?>px;}#smooth_sldr_body p.more a:hover{text-decoration:none;}#smooth_sliderc_nav{float:left;width:70%;overflow:hidden;padding:0;margin:2px 0 0 0;}a.smooth_sliderc_nav{margin:0 5px 0 0;display:block;float:left;background-repeat:no-repeat;background-position:center;}#smooth_sliderc_nav li{float:left;margin:0 5px 0 0;display:block;border:1px solid <?php echo get_option('smooth_slider_content_fcolor'); ?>;background-color:transparent;line-height:14px;font-size:<?php echo get_option('smooth_slider_content_fsize'); ?>px;font-family:<?php echo get_option('smooth_slider_content_font'); ?>, Arial, Helvetica, sans-serif;}#smooth_sliderc_nav li a{display:block;padding:1px 5px 1px 5px;color:<?php echo get_option('smooth_slider_ptitle_fcolor'); ?>;outline:none;}.sldrbr{line-height:1px;}.sldrlink{clear:both;display:block;font-size:8px;float:right;padding-right:<?php if (get_option('smooth_slider_prev_next') == 1) {echo "40";} else {echo "25";} ?>px;margin-top:-8px;font-family:Verdana, Helvetica, sans-serif;}.sldrlink a{color:<?php echo get_option('smooth_slider_content_fcolor'); ?>;}</style>
 <?php
 }
 
@@ -274,51 +285,76 @@ function get_smooth_slider() {
 ?>
 <script type="text/javascript">
 stepcarousel.setup({
-	galleryid: 'board_carusel', //id of carousel DIV
-	beltclass: 'belt', //class of inner "belt" DIV containing all the panel DIVs
-	panelclass: 'board_item', //class of panel DIVs each holding content
+	galleryid: 'smooth_sliderc', //id of carousel DIV
+	beltclass: 'smooth_sliderb', //class of inner "belt" DIV containing all the panel DIVs
+	panelclass: 'smooth_slideri', //class of panel DIVs each holding content
 	autostep: {enable: true, moveby:1, pause:<?php echo get_option('smooth_slider_speed')*1000; ?>},
 	panelbehavior: {speed:500, wraparound:false, persist:false},
-	defaultbuttons: {enable: <?php if (get_option('smooth_slider_prev_next') == 1) {echo "true";} else {echo "false";} ?>, moveby: 1, leftnav: ['<?php echo smooth_slider_plugin_url( 'images/button_prev.png' ); ?>', -25, 60], rightnav: ['<?php echo smooth_slider_plugin_url( 'images/button_next.png' ); ?>', 0, 60]},
+	defaultbuttons: {enable: <?php if (get_option('smooth_slider_prev_next') == 1) {echo "true";} else {echo "false";} ?>, moveby: 1, leftnav: ['<?php echo smooth_slider_plugin_url( 'images/button_prev.png' ); ?>', -25, <?php $sldr_title = get_option('smooth_slider_title_text'); if(!empty($sldr_title)) { $extra_height = get_option('smooth_slider_title_fsize') + get_option('smooth_slider_content_fsize') + 5 + 18; } else { $extra_height = get_option('smooth_slider_content_fsize') + 5 + 5 + 18;  } echo ((get_option('smooth_slider_height') - $extra_height)/2); ?>], rightnav: ['<?php echo smooth_slider_plugin_url( 'images/button_next.png' ); ?>', 0, <?php $sldr_title = get_option('smooth_slider_title_text'); if(!empty($sldr_title)) { $extra_height = get_option('smooth_slider_title_fsize') + get_option('smooth_slider_content_fsize') + 5 + 18; } else { $extra_height = get_option('smooth_slider_content_fsize') + 5 + 5 + 18;  } echo ((get_option('smooth_slider_height') - $extra_height)/2); ?>]},
 	statusvars: ['imageA', 'imageB', 'imageC'], //register 3 variables that contain current panel (start), current panel (last), and total panels
 	contenttype: ['inline'], //content setting ['inline'] or ['external', 'path_to_external_file']
 	onslide:function(){
-	  jQuery("#board_carusel_nav li a").css("fontWeight", "normal");
-	  jQuery("#board_carusel_nav li a").css("fontSize", "<?php echo get_option('smooth_slider_content_fsize'); ?>px");
+	  jQuery("#smooth_sliderc_nav li a").css("fontWeight", "normal");
+	  jQuery("#smooth_sliderc_nav li a").css("fontSize", "<?php echo get_option('smooth_slider_content_fsize'); ?>px");
 	  var curr_slide = imageA;
-	  jQuery("#sldr"+curr_slide).css("fontWeight", "bolder");
+  	  jQuery("#sldr"+curr_slide).css("fontWeight", "bolder");
 	  jQuery("#sldr"+curr_slide).css("fontSize", "<?php echo (get_option('smooth_slider_content_fsize') + 5); ?>px");
+	  
+	  <?php if (get_option('smooth_slider_goto_slide') == 2) { 
+ 				list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");
+				global $sldr_nav_width;
+				$sldr_nav_width = $width/2;
+	  ?>
+	  var nav_width = <?php global $sldr_nav_width; echo $sldr_nav_width; ?>;
+	  var prev_slide;
+	  if(imageA=="1")
+	   prev_slide = imageC;
+	  else
+	   prev_slide = imageA - 1;
+	  jQuery("#sldr"+prev_slide).css("backgroundPosition", "0 0");
+	  jQuery("#sldr"+curr_slide).css("backgroundPosition", "-"+nav_width+"px 0");
+	  <?php } ?>
+	  
   }
 })
 </script>
 <noscript><strong>This page is having a slideshow that uses Javascript. Your browser either doesn't support Javascript or you have it turned off. To see this page as it is meant to appear please use a Javascript enabled browser.</strong></noscript>
-    	<div id="board">
-		<div id="board_items">
-			<div id="board_body">
+    	<div id="smooth_sldr">
+		<div id="smooth_sldr_items">
+			<div id="smooth_sldr_body">
 				<?php $sldr_title = get_option('smooth_slider_title_text'); if(!empty($sldr_title)) { ?><div class="sldr_title"><?php echo get_option('smooth_slider_title_text'); ?></div> <?php } ?>
-				<div id="board_carusel">
-					<div class="belt">
+				<div id="smooth_sliderc">
+					<div class="smooth_sliderb">
 					<?php global $coint_i; $coint_i = carousel_posts_on_slider(get_option('smooth_slider_no_posts')); ?>
 					</div>
 				</div>
 			</div>
             <?php if (get_option('smooth_slider_goto_slide') == 1) { ?>
-            <ul id="board_carusel_nav">
+            <ul id="smooth_sliderc_nav">
                 <?php global $coint_i; for($i=1; $i<=$coint_i; $i++) { 
-				echo "<li><a id=\"sldr".$i."\" title=\"".$i."\" href=\"#\" >".$i."</a></li>\n";
+				echo "<li><a id=\"sldr".$i."\" href=\"#\" >".$i."</a></li>\n";
                  } ?>
 			</ul>
+            <?php } 
+			if (get_option('smooth_slider_goto_slide') == 2) { ?>
+            <div id="smooth_sliderc_nav">
+                <?php global $coint_i; for($i=1; $i<=$coint_i; $i++) { 
+				list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide".$i.".png");
+				$width = $width/2;
+				echo "<a class=\"smooth_sliderc_nav\" id=\"sldr".$i."\" style=\"background-image:url(".smooth_slider_plugin_url( 'images/' )."slide".$i.".png);background-position:0 0;width:".$width."px;height:".$height."px;\" href=\"javascript:stepcarousel.stepTo('smooth_sliderc', ".$i.")\" ></a>\n";
+                 } ?>
+			</div>
             <?php } ?>
-            <span class="sldrlink"><a href="http://www.clickonf5.org/smooth-slider" target="_blank">Smooth Slider</a></span>
+            <br class="sldrbr" />
+            <div class="sldrlink"><a href="http://www.clickonf5.org/smooth-slider" target="_blank">Smooth Slider</a></div>
 		</div>
 	</div>
 <script type="text/javascript">
 	jQuery(document).ready(function(){
-	jQuery('#board_carusel_nav a').click(function() {
-		var title = jQuery(this).attr('title');
+	jQuery('#smooth_sliderc_nav a').click(function() {
 		var id = jQuery(this).attr('id');
-		var step_size = title - imageA;
-        document.getElementById(id).href = "javascript:stepcarousel.stepBy('board_carusel', "+step_size+")";
+        var step_to_slide = id.replace(/sldr/, "");
+        document.getElementById(id).href = "javascript:stepcarousel.stepTo('smooth_sliderc', "+step_to_slide+")";
     });
 	});
 </script>    
@@ -330,6 +366,20 @@ if ( is_admin() ){ // admin actions
   add_action('admin_menu', 'smooth_slider_settings');
   add_action( 'admin_init', 'register_mysettings' ); 
 } 
+
+function smooth_slider_admin_scripts() {
+  if ( is_admin() ){ // admin actions
+   
+  // Settings page only
+	if ( isset($_GET['page']) && 'smooth-slider.php' == $_GET['page'] ) {
+	wp_register_script('jquery', false, false, false, false);
+	wp_enqueue_script( 'stepcarousel', smooth_slider_plugin_url( 'js/stepcarousel.js' ),
+		array('jquery'), false, false); 
+	}
+  }
+}
+
+add_action( 'admin_init', 'smooth_slider_admin_scripts' );
 
 function smooth_slider_admin_head() {
 if ( is_admin() ){ // admin actions
@@ -455,6 +505,8 @@ jQuery(document).ready(function() {
 		z-index: 1000;
 	}
 </style>
+<style type="text/css" media="screen">#smooth_sldr div,#smooth_sldr p,#smooth_sldr li,#smooth_sldr span,#smooth_sldr img,#smooth_sldr h2,#smooth_sldr ul{list-style:none;background:transparent;vertical-align:baseline;}#smooth_sldr div{display:block;}#smooth_sldr span{display:inline;}#smooth_sldr{width:<?php echo get_option('smooth_slider_width'); ?>px;height:<?php echo get_option('smooth_slider_height'); ?>px;overflow:hidden;background-color:<?php if (get_option('smooth_slider_bg') == '1') { echo "transparent";} else { echo get_option('smooth_slider_bg_color'); } ?>;border:<?php echo get_option('smooth_slider_border'); ?>px solid <?php echo get_option('smooth_slider_brcolor'); ?>;margin: 10px auto;line-height:18px;}#smooth_sldr a{text-decoration:none;}#smooth_sldr_items{width:100%;padding:10px <?php if (get_option('smooth_slider_prev_next') == 1) {echo "18";} else {echo "12";} ?>px 0px <?php if (get_option('smooth_slider_prev_next') == 1) {echo "26";} else {echo "12";} ?>px;}#smooth_sldr_body{width:100%;}#smooth_sliderc{width:<?php if (get_option('smooth_slider_prev_next') == 1) {echo (get_option('smooth_slider_width') - 44);} else {echo (get_option('smooth_slider_width') - 24);} ?>px;height:<?php if (get_option('smooth_slider_goto_slide') == "1"){$nav_size = get_option('smooth_slider_content_fsize');} elseif (get_option('smooth_slider_goto_slide') == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = get_option('smooth_slider_title_text'); if(!empty($sldr_title)) { $extra_height = get_option('smooth_slider_title_fsize') + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo (get_option('smooth_slider_height') - $extra_height); ?>px;position:relative;text-align:justify;}#smooth_sliderc .smooth_sliderb{position:absolute;/*dont change this value*/left:0;top:0;}.smooth_slideri{width:<?php if (get_option('smooth_slider_prev_next') == 1) {echo (get_option('smooth_slider_width') - 54);} else {echo (get_option('smooth_slider_width') - 24);} ?>px;padding-right:10px;height:<?php if (get_option('smooth_slider_goto_slide') == "1"){$nav_size = get_option('smooth_slider_content_fsize');} elseif (get_option('smooth_slider_goto_slide') == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = get_option('smooth_slider_title_text'); if(!empty($sldr_title)) { $extra_height = get_option('smooth_slider_title_fsize') + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo (get_option('smooth_slider_height') - $extra_height); ?>px;overflow:hidden;line-height:18px;}.sldr_title{color:#000;font-family:<?php echo get_option('smooth_slider_title_font'); ?>, Arial, Helvetica, sans-serif;font-size:<?php echo get_option('smooth_slider_title_fsize'); ?>px;font-weight:<?php if (get_option('smooth_slider_title_fstyle') == "bold" or get_option('smooth_slider_title_fstyle') == "bold italic" ){echo "bold";} else { echo "normal"; } ?>;font-style:<?php if (get_option('smooth_slider_title_fstyle') == "italic" or get_option('smooth_slider_title_fstyle') == "bold italic" ){echo "italic";} else {echo "normal";} ?>;color:<?php echo get_option('smooth_slider_title_fcolor'); ?>;margin:0;}#smooth_sldr_body h2{clear:none;line-height:<?php echo (get_option('smooth_slider_ptitle_fsize') + 3); ?>px;font-family:<?php echo get_option('smooth_slider_ptitle_font'); ?>, Arial, Helvetica, sans-serif;font-size:<?php echo get_option('smooth_slider_ptitle_fsize'); ?>px;font-weight:<?php if (get_option('smooth_slider_ptitle_fstyle') == "bold" or get_option('smooth_slider_ptitle_fstyle') == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if (get_option('smooth_slider_ptitle_fstyle') == "italic" or get_option('smooth_slider_ptitle_fstyle') == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo get_option('smooth_slider_ptitle_fcolor'); ?>;display:block;margin:<?php $sldr_title = get_option('smooth_slider_title_text'); if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px 0 5px 0;padding:0px;}#smooth_sldr_body h2 a{color:<?php echo get_option('smooth_slider_ptitle_fcolor'); ?>;}.slider_item {padding-left:1px;}#smooth_sldr_body span{font-family:<?php echo get_option('smooth_slider_content_font'); ?>, Arial, Helvetica, sans-serif;font-size:<?php echo get_option('smooth_slider_content_fsize'); ?>px;font-weight:<?php if (get_option('smooth_slider_content_fstyle') == "bold" or get_option('smooth_slider_content_fstyle') == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if (get_option('smooth_slider_content_fstyle')=="italic" or get_option('smooth_slider_content_fstyle') == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo get_option('smooth_slider_content_fcolor'); ?>;}.smooth_slider_thumbnail{float:<?php echo get_option('smooth_slider_img_align'); ?>;margin:<?php $sldr_title = get_option('smooth_slider_title_text'); if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px <?php if(get_option('smooth_slider_img_align') == "left") {echo "5";} else {echo "0";} ?>px 0 <?php if(get_option('smooth_slider_img_align') == "right") {echo "5";} else {echo "0";} ?>px;width:<?php echo get_option('smooth_slider_img_width'); ?>px;height:<?php echo get_option('smooth_slider_img_height'); ?>px;border:<?php echo get_option('smooth_slider_img_border'); ?>px solid <?php echo get_option('smooth_slider_img_brcolor'); ?>;}#smooth_sldr_body p.more a{text-decoration:underline;color:<?php echo get_option('smooth_slider_ptitle_fcolor'); ?>;float:right;font-family:<?php echo get_option('smooth_slider_content_font'); ?>, Arial, Helvetica, sans-serif;font-size:<?php echo get_option('smooth_slider_content_fsize'); ?>px;}#smooth_sldr_body p.more a:hover{text-decoration:none;}#smooth_sliderc_nav{float:left;width:70%;overflow:hidden;padding:0;margin:2px 0 0 0;}a.smooth_sliderc_nav{margin:0 5px 0 0;display:block;float:left;background-repeat:no-repeat;background-position:center;}#smooth_sliderc_nav li{float:left;margin:0 5px 0 0;display:block;border:1px solid <?php echo get_option('smooth_slider_content_fcolor'); ?>;background-color:transparent;line-height:14px;font-size:<?php echo get_option('smooth_slider_content_fsize'); ?>px;font-family:<?php echo get_option('smooth_slider_content_font'); ?>, Arial, Helvetica, sans-serif;}#smooth_sliderc_nav li a{display:block;padding:1px 5px 1px 5px;color:<?php echo get_option('smooth_slider_ptitle_fcolor'); ?>;outline:none;}.sldrbr{line-height:1px;}.sldrlink{clear:both;display:block;font-size:8px;float:right;padding-right:<?php if (get_option('smooth_slider_prev_next') == 1) {echo "40";} else {echo "25";} ?>px;margin-top:-8px;font-family:Verdana, Helvetica, sans-serif;}.sldrlink a{color:<?php echo get_option('smooth_slider_content_fcolor'); ?>;}
+</style>
 <?php
    } //for smooth slider option page
  }//only for admin
@@ -472,8 +524,10 @@ function smooth_slider_settings() {
 function smooth_slider_settings_page() {
 ?>
 <div class="wrap">
-<h2>Smooth Slider</h2>
-<div id="poststuff" class="metabox-holder has-right-sidebar" style="float:right;" > 
+<h2>Smooth Slider Options</h2>
+
+<form  method="post" action="options.php">
+<div id="poststuff" class="metabox-holder has-right-sidebar" > 
    <div id="side-info-column" class="inner-sidebar"> 
 			<div class="postbox"> 
 			  <h3 class="hndle"><span>About this Plugin:</span></h3> 
@@ -511,17 +565,27 @@ function smooth_slider_settings_page() {
                 </ul> 
               </div> 
 			</div> 
-     </div>
-   
-   
-</div>
+     </div>   
 
-<form style="float:left;" method="post" action="options.php">
-<?php settings_fields('smooth-slider-group'); ?>
+<h2>Preview</h2> 
+<?php settings_fields('smooth-slider-group'); 
+if (get_option('smooth_slider_clear') == '1')
+{
+	global $wpdb, $table_prefix;
+	$table_name = $table_prefix.'slider';
+	$sql = "DELETE FROM $table_name";
+	$wpdb->query($sql);
+	update_option( 'smooth_slider_clear', '0' );
+} ?>
+<div style="width:70%;">
+<?php 
+get_smooth_slider();
+?> </div>
 
-<h3>Slider Box</h3> 
+<h2>Slider Box</h2> 
 <p>Customize the looks of the Slider box wrapping the complete slideshow from here</p> 
 
+<div style="float:left;">
 <table class="form-table">
 
 <tr valign="top">
@@ -536,7 +600,8 @@ function smooth_slider_settings_page() {
 
 <tr valign="top">
 <th scope="row">Background Color</th>
-<td><input type="text" name="smooth_slider_bg_color" id="color_value_1" value="<?php echo get_option('smooth_slider_bg_color'); ?>" />&nbsp; <img id="color_picker_1" src="<?php echo smooth_slider_plugin_url( 'images/color_picker.png' ); ?>" alt="Pick the color of your choice" /><div class="color-picker-wrap" id="colorbox_1"></div></td>
+<td><input type="text" name="smooth_slider_bg_color" id="color_value_1" value="<?php echo get_option('smooth_slider_bg_color'); ?>" />&nbsp; <img id="color_picker_1" src="<?php echo smooth_slider_plugin_url( 'images/color_picker.png' ); ?>" alt="Pick the color of your choice" /><div class="color-picker-wrap" id="colorbox_1"></div> &nbsp; &nbsp; &nbsp; 
+<label for="smooth_slider_bg"><input name="smooth_slider_bg" type="checkbox" id="smooth_slider_bg" value="1" <?php checked('1', get_option('smooth_slider_bg')); ?>  /> Use Transparent Background</label> </td>
 </tr>
  
 <tr valign="top">
@@ -566,13 +631,16 @@ function smooth_slider_settings_page() {
 <label for="smooth_slider_prev_next"> 
 <input name="smooth_slider_prev_next" type="checkbox" id="smooth_slider_prev_next" value="1" <?php checked("1", get_option('smooth_slider_prev_next')); ?> /> 
  Show Prev/Next navigation arrows</label><br /> 
-<label for="smooth_slider_goto_slide"><input name="smooth_slider_goto_slide" type="checkbox" id="smooth_slider_goto_slide" value="1" <?php checked('1', get_option('smooth_slider_goto_slide')); ?>  /> Show go to slide number links at the bottom as 1, 2, 3 etc.</label> 
+<label for="smooth_slider_goto_slide">Show go to slide number links at the bottom as 1, 2, 3 etc. or images</label><br />
+<input name="smooth_slider_goto_slide" type="radio" id="smooth_slider_goto_slide" value="0" <?php checked('0', get_option('smooth_slider_goto_slide')); ?>  /> None &nbsp; &nbsp; 
+<input name="smooth_slider_goto_slide" type="radio" id="smooth_slider_goto_slide" value="1" <?php checked('1', get_option('smooth_slider_goto_slide')); ?>  /> Numbers &nbsp; &nbsp; 
+<input name="smooth_slider_goto_slide" type="radio" id="smooth_slider_goto_slide" value="2" <?php checked('2', get_option('smooth_slider_goto_slide')); ?>  /> Custom Images &nbsp; &nbsp; 
 </fieldset></td> 
 </tr> 
 
 </table>
 
-<h3>Slider Title</h3> 
+<h2>Slider Title</h2> 
 <p>Customize the looks of the main title of the Slideshow from here</p> 
 <table class="form-table">
 
@@ -622,7 +690,7 @@ function smooth_slider_settings_page() {
 </tr>
 </table>
 
-<h3>Post Title</h3> 
+<h2>Post Title</h2> 
 <p>Customize the looks of the title of each of the sliding post here</p> 
 <table class="form-table">
 
@@ -667,7 +735,7 @@ function smooth_slider_settings_page() {
 </tr>
 </table>
 
-<h3>Thumbnail Image</h3> 
+<h2>Thumbnail Image</h2> 
 <p>Customize the looks of the thumbnail image for each of the sliding post here</p> 
 <table class="form-table">
 
@@ -703,7 +771,7 @@ function smooth_slider_settings_page() {
 
 </table>
 
-<h3>Slider Content</h3> 
+<h2>Slider Content</h2> 
 <p>Customize the looks of the content of each of the sliding post here</p> 
 <table class="form-table">
 
@@ -759,17 +827,25 @@ function smooth_slider_settings_page() {
 
 <tr valign="top">
 <th scope="row">Maximum content size</th>
-<td><input type="text" name="smooth_slider_content_chars" id="smooth_slider_content_chars" class="small-text" value="<?php echo get_option('smooth_slider_content_chars'); ?>" />&nbsp;characters</td>
+<td><input type="text" name="smooth_slider_content_chars" id="smooth_slider_content_chars" class="small-text" value="<?php echo get_option('smooth_slider_content_chars'); ?>" />&nbsp;characters &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</td>
 </tr>
 
 </table>
+
+<h2>Miscellaneous</h2> 
+<p>Check the appropriate box for the action, be sure you want to do this!</p> 
+<p><label for="smooth_slider_clear" style="font-weight:bolder;color:#990000;font-size:small;"><input name="smooth_slider_clear" type="checkbox" id="smooth_slider_clear" value="1" <?php checked('1', get_option('smooth_slider_clear')); ?>  /> Remove all the posts from Smooth Slider</label></p>
+<p><label for="smooth_slider_image_only" style="font-weight:bolder;color:#990000;font-size:small;"><input name="smooth_slider_image_only" type="checkbox" id="smooth_slider_image_only" value="1" <?php checked('1', get_option('smooth_slider_image_only')); ?>  /> Make pure Image Slider</label></p>
 
 <p class="submit">
 <input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
 </p>
 <?php check_admin_referer('smooth-slider-group-options');?>
+</div> <!--end of float left -->
+
+</div> <!--end of poststuff -->
 </form>
-</div>	
+</div> <!--end of float wrap -->
 <?php	
 }
 function register_mysettings() { // whitelist options
@@ -802,5 +878,8 @@ function register_mysettings() { // whitelist options
   register_setting( 'smooth-slider-group', 'smooth_slider_content_fcolor' );
   register_setting( 'smooth-slider-group', 'smooth_slider_content_from' );
   register_setting( 'smooth-slider-group', 'smooth_slider_content_chars' );
+  register_setting( 'smooth-slider-group', 'smooth_slider_bg' );
+  register_setting( 'smooth-slider-group', 'smooth_slider_clear' );
+  register_setting( 'smooth-slider-group', 'smooth_slider_image_only' );
 }
 ?>

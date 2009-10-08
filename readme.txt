@@ -11,6 +11,7 @@ Stable tag: 2.0
 Smooth Slider is a Wordpress and Wordpress MU Plugin for creating a dynamic slideshow for featured posts on a blog. The slideshow created by Smooth Slider are JavaScript and Text based, that is why bloggers will get full benefit of Search Engine Optimization as the texts are readable by Search Engines. You can choose some of your posts as featured posts and show them into a slideshow on your blog home page (i.e. Index) as well as in Sidebar.
 
 Features:
+
 1. Search Engine Optimized Slideshow
 2. Fully Customizable CSS
 3. Choose Posts and Pages as Featured Posts/Pages on Single Click
@@ -90,6 +91,7 @@ Visit the plugin page (http://www.clickonf5.org/smooth-slider) and screenshot-po
 
 == Changelog ==
 Version 2.0 (10/08/2009)
+
 1. New - Now you can add pages to Smooth Slider along with posts
 2. New - Images Original Size Option
 3. New - Pick image from content or the custom field
@@ -106,6 +108,7 @@ Version 2.0 (10/08/2009)
 14. New - Smooth Slider complete uninstall on plugin Delete
 
 Version 1.2 (09/22/2009)
+
 1. New - Slider Preview in Smooth Slider setting page
 2. New - Facility to set transparent background to the slider
 3. New - Facility to Convert it to pure Image Slider 
@@ -114,6 +117,7 @@ Version 1.2 (09/22/2009)
 6. Fixed - CSS id names and class name fixed, to avoid probable conflicts with theme styles and other plugin styles
 
 Version 1.1 (09/14/2009)
+
 1. New - Active Slide in the slideshow will now be highlighted with bolder and bigger navigation number
 2. Fixed - Added No Script tag brosers not supporting JavaScript for showing the slideshow
 3. Fixed - Issues with Wordpress MU Smooth Slider Options update from setting page

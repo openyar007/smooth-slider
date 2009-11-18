@@ -1,10 +1,10 @@
 === Smooth Slider ===
 Contributors: Tejaswini Deshpande, Sanjeev Mishra
 Tags: slideshow,featured,posts,jquery,slider,content,css,simple,thumbnail,image,post,sidebar,plugin,page,category,wpmu,site,blogs,style,home,categories,picture,flash,gallery
-Donate link: http://clickonf5.org/go/paypal/smooth-slider/ 
+Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 2.7
 Tested up to: 2.8.4
-Stable tag: 2.0
+Stable tag: 2.1
 
 == Description ==
 
@@ -35,9 +35,8 @@ Features:
 21. Remove posts and pages from Smooth Slider selectively or remove all the posts from the slider at one go from the settings page itself
 22. Option to retain specific html tags in the slider posts
 23. Option to specify custom text or html in place of navigation numbers or buttons
-24. Fixed issue of Smooth Slider settings page with Internet Explorer
-25. Optimized Smooth Slider code internally
-26. Smooth Slider complete uninstall on plugin Delete
+24. Smooth Slider complete uninstall on plugin Delete
+25. A new custom field slide_redirect_url can be added to featured post/page to redirect the slide to anothr url
 
 [Demo](http://www.clickonf5.org/) |
 [Plugin Information](http://www.clickonf5.org/smooth-slider) | 
@@ -88,6 +87,14 @@ Forum link: http://www.clickonf5.org/phpbb/smooth-slider-f12/
 3. Customize the CSS like background colour, width, height etc of Slider Box
 
 Visit the plugin page (http://www.clickonf5.org/smooth-slider) and screenshot-post (http://www.clickonf5.org/wordpress/smooth-slider-featured-posts-slideshow-plugin/4333) to see more about it.
+
+== Changelog ==
+Version 2.1 (11/18/2009)
+
+1. New - Now the images will not be sqashed to fit the size, rather they would be cropped properly. Used timthumb.Caution: Please use the images stored on the same domain on the slider.
+2. New - A new custom field slide_redirect_url can now be specified to redirect the slide to anothr URL than the permalink
+3. Fixed - Admin menu dropdown were getting stuck only on Smooth Slider settings page, fixed that issue
+
 
 == Changelog ==
 Version 2.0 (10/08/2009)

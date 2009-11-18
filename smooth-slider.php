@@ -3,7 +3,7 @@
 Plugin Name: Smooth Slider
 Plugin URI: http://www.clickonf5.org/smooth-slider
 Description: Smooth Slider adds a smooth content and image slideshow with customizable background and slide intervals to any location of your blog
-Version: 2.0	
+Version: 2.1	
 Author: Tejaswini Deshpande, Sanjeev Mishra
 Author URI: http://www.clickonf5.org
 Wordpress version supported: 2.7 and above
@@ -299,6 +299,14 @@ function carousel_posts_on_slider($max_posts, $offset=0) {
 		$permalink = get_permalink($data->ID);
 		
 		$post_id = $data->ID;
+		
+//2.1 changes start
+            $slide_redirect_url = get_post_meta($post_id, 'slide_redirect_url', true);
+			if(!empty($slide_redirect_url) and isset($slide_redirect_url)) {
+			   $permalink = $slide_redirect_url;
+			}
+//2.1 changes end	
+
 		$html .= '<div class="smooth_slideri">
 			<!-- smooth_slideri -->';
 			
@@ -318,21 +326,23 @@ function carousel_posts_on_slider($max_posts, $offset=0) {
 		$slider_content = str_replace("\n","<br />",$slider_content);
         $slider_content = strip_tags($slider_content, $smooth_slider['allowable_tags']);
 		
+		$timthumb_src = smooth_slider_plugin_url('/scripts/timthumb.php');
+		
 		if ( !isset($image_control) or empty($image_control) or $image_control != "x"){
 			if ($smooth_slider['img_pick'] == '1') {
 			  $first_image = smooth_slider_get_first_image($data);
 			  if(!empty($first_image)){ 
-				  $html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$first_image.'" alt="'.$post_title.'" /></a>';
+				  $html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$first_image.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
 			  }
 			  else {
 				  if( isset($thumbnail) && !empty($thumbnail) ):
-					$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$thumbnail.'" alt="'.$post_title.'" /></a>';
+					$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$thumbnail.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
 				  endif;
 			  }
 			}
 			else {
 			  if( isset($thumbnail) && !empty($thumbnail) ):
-				$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$thumbnail.'" alt="'.$post_title.'" /></a>';
+				$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$thumbnail.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
 			  endif;
 			}
 		}
@@ -392,10 +402,18 @@ function carousel_posts_on_slider_cat($max_posts, $catg_slug, $offset=0) {
 			$permalink = get_permalink($post->ID);
 			
 			$post_id = $post->ID;
+//2.1 changes start
+            $slide_redirect_url = get_post_meta($post_id, 'slide_redirect_url', true);
+			if(!empty($slide_redirect_url) or isset($slide_redirect_url)) {
+			   $permalink = $slide_redirect_url;
+			}
+//2.1 changes end	
+			
 			$html .= '<div class="smooth_slideri">
 				<!-- smooth_slideri -->';
 				
 			$thumbnail = get_post_meta($post_id, 'slider_thumbnail', true);
+			$image_control = get_post_meta($post_id, 'slider_image_control', true);
 			
 			if ($smooth_slider['content_from'] == "slider_content") {
 				$slider_content = get_post_meta($post_id, 'slider_content', true);
@@ -410,17 +428,27 @@ function carousel_posts_on_slider_cat($max_posts, $catg_slug, $offset=0) {
 			$slider_content = str_replace("\n","<br />",$slider_content);
             $slider_content = strip_tags($slider_content, $smooth_slider['allowable_tags']);
 			
+	
+			$timthumb_src = smooth_slider_plugin_url('/scripts/timthumb.php');
+		
+		if ( !isset($image_control) or empty($image_control) or $image_control != "x"){
 			if ($smooth_slider['img_pick'] == '1') {
 			  $first_image = smooth_slider_get_first_image($post);
 			  if(!empty($first_image)){ 
-				$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$first_image.'" alt="'.$post_title.'" /></a>';
+				  $html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$first_image.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
+			  }
+			  else {
+				  if( isset($thumbnail) && !empty($thumbnail) ):
+					$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$thumbnail.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
+				  endif;
 			  }
 			}
 			else {
 			  if( isset($thumbnail) && !empty($thumbnail) ):
-				$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$thumbnail.'" alt="'.$post_title.'" /></a>';
+				$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$thumbnail.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
 			  endif;
 			}
+		}		
 			
 			if ($smooth_slider['image_only'] == '1') { 
 				$html .= '<!-- /smooth_slideri -->
@@ -465,13 +493,21 @@ function smooth_slider_wpmu_carousel_posts($max_posts, $offset=0) {
 			$post_title = str_replace('"', '', $post_title);
 			$slider_content = $post->post_content;
 			
-			$permalink = get_permalink($post->ID);
+			$permalink = get_permalink($post->ID);			
 			
 			$post_id = $post->ID;
+
+//2.1 changes start
+            $slide_redirect_url = get_post_meta($post_id, 'slide_redirect_url', true);
+			if(!empty($slide_redirect_url) or isset($slide_redirect_url)) {
+			   $permalink = $slide_redirect_url;
+			}
+//2.1 changes end
 			$html .= '<div class="smooth_slideri">
 				<!-- smooth_slideri -->';
 				
 			$thumbnail = get_post_meta($post_id, 'slider_thumbnail', true);
+			$image_control = get_post_meta($post_id, 'slider_image_control', true);
 			
 			if ($smooth_slider['content_from'] == "slider_content") {
 				$slider_content = get_post_meta($post_id, 'slider_content', true);
@@ -486,16 +522,25 @@ function smooth_slider_wpmu_carousel_posts($max_posts, $offset=0) {
 			$slider_content = str_replace("\n","<br />",$slider_content);
 			$slider_content = strip_tags($slider_content, $smooth_slider['allowable_tags']);
 			
-			if ($smooth_slider['img_pick'] == '1') {
-			  $first_image = smooth_slider_get_first_image($post);
-			  if(!empty($first_image)){ 
-				$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$first_image.'" alt="'.$post_title.'" /></a>';
-			  }
-			}
-			else {
-			  if( isset($thumbnail) && !empty($thumbnail) ):
-				$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$thumbnail.'" alt="'.$post_title.'" /></a>';
-			  endif;
+			$timthumb_src = smooth_slider_plugin_url('/scripts/timthumb.php');
+		
+			if ( !isset($image_control) or empty($image_control) or $image_control != "x"){
+				if ($smooth_slider['img_pick'] == '1') {
+				  $first_image = smooth_slider_get_first_image($post);
+				  if(!empty($first_image)){ 
+					  $html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$first_image.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
+				  }
+				  else {
+					  if( isset($thumbnail) && !empty($thumbnail) ):
+						$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$thumbnail.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
+					  endif;
+				  }
+				}
+				else {
+				  if( isset($thumbnail) && !empty($thumbnail) ):
+					$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$thumbnail.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
+				  endif;
+				}
 			}
 			
 			if ($smooth_slider['image_only'] == '1') { 
@@ -523,7 +568,7 @@ function smooth_slider_wpmu_carousel_posts($max_posts, $offset=0) {
 function smooth_slider_css() {
 global $smooth_slider;
 ?>
-<style type="text/css" media="screen">#smooth_sldr{width:<?php echo $smooth_slider['width']; ?>px;height:<?php echo $smooth_slider['height']; ?>px;background-color:<?php if ($smooth_slider['bg'] == '1') { echo "transparent";} else { echo $smooth_slider['bg_color']; } ?>;border:<?php echo $smooth_slider['border']; ?>px solid <?php echo $smooth_slider['brcolor']; ?>;}#smooth_sldr_items{padding:10px <?php if ($smooth_slider['prev_next'] == 1) {echo "18";} else {echo "12";} ?>px 0px <?php if ($smooth_slider['prev_next'] == 1) {echo "26";} else {echo "12";} ?>px;}#smooth_sliderc{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 44);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.smooth_slideri{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 54);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.sldr_title{font-family:<?php echo $smooth_slider['title_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['title_fsize']; ?>px;font-weight:<?php if ($smooth_slider['title_fstyle'] == "bold" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "bold";} else { echo "normal"; } ?>;font-style:<?php if ($smooth_slider['title_fstyle'] == "italic" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['title_fcolor']; ?>;}#smooth_sldr_body h2{line-height:<?php echo ($smooth_slider['ptitle_fsize'] + 3); ?>px;font-family:<?php echo $smooth_slider['ptitle_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['ptitle_fsize']; ?>px;font-weight:<?php if ($smooth_slider['ptitle_fstyle'] == "bold" or $smooth_slider['ptitle_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['ptitle_fstyle'] == "italic" or $smooth_slider['ptitle_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px 0 5px 0;}#smooth_sldr_body h2 a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}#smooth_sldr_body span{font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-weight:<?php if ($smooth_slider['content_fstyle'] == "bold" or $smooth_slider['content_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['content_fstyle']=="italic" or $smooth_slider['content_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['content_fcolor']; ?>;}.smooth_slider_thumbnail{float:<?php echo $smooth_slider['img_align']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px <?php if($smooth_slider['img_align'] == "left") {echo "5";} else {echo "0";} ?>px 0 <?php if($smooth_slider['img_align'] == "right") {echo "5";} else {echo "0";} ?>px;<?php if ($smooth_slider['img_size'] == 1) { ?>width:<?php echo $smooth_slider['img_width']; ?>px;height:<?php echo $smooth_slider['img_height']; ?>px;<?php } ?> border:<?php echo $smooth_slider['img_border']; ?>px solid <?php echo $smooth_slider['img_brcolor']; ?>;}#smooth_sldr_body p.more a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;}#smooth_sliderc_nav li{border:1px solid <?php echo $smooth_slider['content_fcolor']; ?>;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;}#smooth_sliderc_nav li a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}.sldrlink{padding-right:<?php if ($smooth_slider['prev_next'] == 1) {echo "40";} else {echo "25";} ?>px;}.sldrlink a{color:<?php echo $smooth_slider['content_fcolor']; ?>;}</style>
+<style type="text/css" media="screen">#smooth_sldr{width:<?php echo $smooth_slider['width']; ?>px;height:<?php echo $smooth_slider['height']; ?>px;background-color:<?php if ($smooth_slider['bg'] == '1') { echo "transparent";} else { echo $smooth_slider['bg_color']; } ?>;border:<?php echo $smooth_slider['border']; ?>px solid <?php echo $smooth_slider['brcolor']; ?>;}#smooth_sldr_items{padding:10px <?php if ($smooth_slider['prev_next'] == 1) {echo "18";} else {echo "12";} ?>px 0px <?php if ($smooth_slider['prev_next'] == 1) {echo "26";} else {echo "12";} ?>px;}#smooth_sliderc{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 44);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.smooth_slideri{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 54);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.sldr_title{font-family:<?php echo $smooth_slider['title_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['title_fsize']; ?>px;font-weight:<?php if ($smooth_slider['title_fstyle'] == "bold" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "bold";} else { echo "normal"; } ?>;font-style:<?php if ($smooth_slider['title_fstyle'] == "italic" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['title_fcolor']; ?>;}#smooth_sldr_body h2{line-height:<?php echo ($smooth_slider['ptitle_fsize'] + 3); ?>px;font-family:<?php echo $smooth_slider['ptitle_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['ptitle_fsize']; ?>px;font-weight:<?php if ($smooth_slider['ptitle_fstyle'] == "bold" or $smooth_slider['ptitle_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['ptitle_fstyle'] == "italic" or $smooth_slider['ptitle_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px 0 5px 0;}#smooth_sldr_body h2 a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}#smooth_sldr_body span{font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-weight:<?php if ($smooth_slider['content_fstyle'] == "bold" or $smooth_slider['content_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['content_fstyle']=="italic" or $smooth_slider['content_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['content_fcolor']; ?>;}.smooth_slider_thumbnail{float:<?php echo $smooth_slider['img_align']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px <?php if($smooth_slider['img_align'] == "left") {echo "5";} else {echo "0";} ?>px 0 <?php if($smooth_slider['img_align'] == "right") {echo "5";} else {echo "0";} ?>px;border:<?php echo $smooth_slider['img_border']; ?>px solid <?php echo $smooth_slider['img_brcolor']; ?>;}#smooth_sldr_body p.more a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;}#smooth_sliderc_nav li{border:1px solid <?php echo $smooth_slider['content_fcolor']; ?>;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;}#smooth_sliderc_nav li a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}.sldrlink{padding-right:<?php if ($smooth_slider['prev_next'] == 1) {echo "40";} else {echo "25";} ?>px;}.sldrlink a{color:<?php echo $smooth_slider['content_fcolor']; ?>;}</style>
 <?php
 }
 
@@ -948,7 +993,7 @@ function confirmRemoveAll()
 #sldr_message {background-color:#FEF7DA;clear:both;width:72%;}
 #sldr_close {float:right;} 
 </style>
-<style type="text/css" media="screen">#smooth_sldr{width:<?php echo $smooth_slider['width']; ?>px;height:<?php echo $smooth_slider['height']; ?>px;background-color:<?php if ($smooth_slider['bg'] == '1') { echo "transparent";} else { echo $smooth_slider['bg_color']; } ?>;border:<?php echo $smooth_slider['border']; ?>px solid <?php echo $smooth_slider['brcolor']; ?>;}#smooth_sldr_items{padding:10px <?php if ($smooth_slider['prev_next'] == 1) {echo "18";} else {echo "12";} ?>px 0px <?php if ($smooth_slider['prev_next'] == 1) {echo "26";} else {echo "12";} ?>px;}#smooth_sliderc{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 44);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.smooth_slideri{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 54);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.sldr_title{font-family:<?php echo $smooth_slider['title_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['title_fsize']; ?>px;font-weight:<?php if ($smooth_slider['title_fstyle'] == "bold" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "bold";} else { echo "normal"; } ?>;font-style:<?php if ($smooth_slider['title_fstyle'] == "italic" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['title_fcolor']; ?>;}#smooth_sldr_body h2{line-height:<?php echo ($smooth_slider['ptitle_fsize'] + 3); ?>px;font-family:<?php echo $smooth_slider['ptitle_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['ptitle_fsize']; ?>px;font-weight:<?php if ($smooth_slider['ptitle_fstyle'] == "bold" or $smooth_slider['ptitle_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['ptitle_fstyle'] == "italic" or $smooth_slider['ptitle_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px 0 5px 0;}#smooth_sldr_body h2 a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}#smooth_sldr_body span{font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-weight:<?php if ($smooth_slider['content_fstyle'] == "bold" or $smooth_slider['content_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['content_fstyle']=="italic" or $smooth_slider['content_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['content_fcolor']; ?>;}.smooth_slider_thumbnail{float:<?php echo $smooth_slider['img_align']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px <?php if($smooth_slider['img_align'] == "left") {echo "5";} else {echo "0";} ?>px 0 <?php if($smooth_slider['img_align'] == "right") {echo "5";} else {echo "0";} ?>px;<?php if ($smooth_slider['img_size'] == 1) { ?>width:<?php echo $smooth_slider['img_width']; ?>px;height:<?php echo $smooth_slider['img_height']; ?>px;<?php } ?> border:<?php echo $smooth_slider['img_border']; ?>px solid <?php echo $smooth_slider['img_brcolor']; ?>;}#smooth_sldr_body p.more a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;}#smooth_sliderc_nav li{border:1px solid <?php echo $smooth_slider['content_fcolor']; ?>;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;}#smooth_sliderc_nav li a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}.sldrlink{padding-right:<?php if ($smooth_slider['prev_next'] == 1) {echo "40";} else {echo "25";} ?>px;}.sldrlink a{color:<?php echo $smooth_slider['content_fcolor']; ?>;}</style>
+<style type="text/css" media="screen">#smooth_sldr{width:<?php echo $smooth_slider['width']; ?>px;height:<?php echo $smooth_slider['height']; ?>px;background-color:<?php if ($smooth_slider['bg'] == '1') { echo "transparent";} else { echo $smooth_slider['bg_color']; } ?>;border:<?php echo $smooth_slider['border']; ?>px solid <?php echo $smooth_slider['brcolor']; ?>;}#smooth_sldr_items{padding:10px <?php if ($smooth_slider['prev_next'] == 1) {echo "18";} else {echo "12";} ?>px 0px <?php if ($smooth_slider['prev_next'] == 1) {echo "26";} else {echo "12";} ?>px;}#smooth_sliderc{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 44);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.smooth_slideri{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 54);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.sldr_title{font-family:<?php echo $smooth_slider['title_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['title_fsize']; ?>px;font-weight:<?php if ($smooth_slider['title_fstyle'] == "bold" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "bold";} else { echo "normal"; } ?>;font-style:<?php if ($smooth_slider['title_fstyle'] == "italic" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['title_fcolor']; ?>;}#smooth_sldr_body h2{line-height:<?php echo ($smooth_slider['ptitle_fsize'] + 3); ?>px;font-family:<?php echo $smooth_slider['ptitle_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['ptitle_fsize']; ?>px;font-weight:<?php if ($smooth_slider['ptitle_fstyle'] == "bold" or $smooth_slider['ptitle_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['ptitle_fstyle'] == "italic" or $smooth_slider['ptitle_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px 0 5px 0;}#smooth_sldr_body h2 a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}#smooth_sldr_body span{font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-weight:<?php if ($smooth_slider['content_fstyle'] == "bold" or $smooth_slider['content_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['content_fstyle']=="italic" or $smooth_slider['content_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['content_fcolor']; ?>;}.smooth_slider_thumbnail{float:<?php echo $smooth_slider['img_align']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px <?php if($smooth_slider['img_align'] == "left") {echo "5";} else {echo "0";} ?>px 0 <?php if($smooth_slider['img_align'] == "right") {echo "5";} else {echo "0";} ?>px;border:<?php echo $smooth_slider['img_border']; ?>px solid <?php echo $smooth_slider['img_brcolor']; ?>;}#smooth_sldr_body p.more a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;}#smooth_sliderc_nav li{border:1px solid <?php echo $smooth_slider['content_fcolor']; ?>;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;}#smooth_sliderc_nav li a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}.sldrlink{padding-right:<?php if ($smooth_slider['prev_next'] == 1) {echo "40";} else {echo "25";} ?>px;}.sldrlink a{color:<?php echo $smooth_slider['content_fcolor']; ?>;}</style>
 <?php
    } //for smooth slider option page
  }//only for admin
@@ -1013,6 +1058,7 @@ if (SMOOTH_SLIDER_VER != $plug_api->version) {
                 <li><a href="http://www.dynamicdrive.com" title="Step Carousel jQuery plugin by Dynamic Drive" >Step Carousel Viewer</a></li>
                 <li><a href="http://www.bioxd.com/featureme" title="FeatureMe Wordpress Plugin by Oscar Alcalá" >FeatureMe Wordpress Plugin</a></li>
                 <li><a href="http://acko.net/dev/farbtastic" title="Farbtastic Color Picker by Steven Wittens" >Farbtastic Color Picker</a></li>
+                <li><a href="http://code.google.com/p/timthumb/" title="TimThumb script by Tim McDaniels and Darren Hoyt with tweaks by Ben Gillbanks" >TimThumb script</a></li>
                 <li><a href="http://jquery.com/" title="jQuery JavaScript Library - John Resig" >jQuery JavaScript Library</a></li>
                 </ul> 
               </div> 
@@ -1402,7 +1448,7 @@ if ($_POST['remove_posts_slider']) {
 ?>    
     </tbody></table>
 </form>
-<?php check_admin_referer('smooth-slider-group-options');?>
+<?php // check_admin_referer('smooth-slider-group-options');?>
 </div> <!--end of float wrap -->
 <?php	
 }

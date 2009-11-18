@@ -95,8 +95,6 @@ Version 2.1 (11/18/2009)
 2. New - A new custom field slide_redirect_url can now be specified to redirect the slide to anothr URL than the permalink
 3. Fixed - Admin menu dropdown were getting stuck only on Smooth Slider settings page, fixed that issue
 
-
-== Changelog ==
 Version 2.0 (10/08/2009)
 
 1. New - Now you can add pages to Smooth Slider along with posts

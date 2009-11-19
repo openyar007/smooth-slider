@@ -4,7 +4,7 @@ Tags: slideshow,featured,posts,jquery,slider,content,css,simple,thumbnail,image,
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 2.7
 Tested up to: 2.8.6
-Stable tag: 2.1
+Stable tag: 2.1.1
 
 == Description ==
 
@@ -25,7 +25,7 @@ Features:
 11. Slider Preview in admin panel
 12. Can convert to pure image Slider
 13. Facility to put Custom Images in place of navigation numbers
-14. Images Original Size as well as custom size Option
+14. Images Original Size as well as custom size Option, also an option to crop the images so that they appear in proportion when custom sizes are selected
 15. Pick image from content or the custom field
 16. New custom field implementation, to allow not to display images on selective posts
 17. A new template tag to display Category specific posts on Smooth Slider
@@ -89,6 +89,10 @@ Forum link: http://www.clickonf5.org/phpbb/smooth-slider-f12/
 Visit the plugin page (http://www.clickonf5.org/smooth-slider) and screenshot-post (http://www.clickonf5.org/wordpress/smooth-slider-featured-posts-slideshow-plugin/4333) to see more about it.
 
 == Changelog ==
+Version 2.1.1 (11/19/2009)
+
+1. New - Added an option whether to crop images or not. This was essential after version 2.1 because, some of us use the images from other location than the wordpress installation. In that case timthumb does not operate
+
 Version 2.1 (11/18/2009)
 
 1. New - Now the images will not be sqashed to fit the size, rather they would be cropped properly. Used timthumb.Caution: Please use the images stored on the same domain on the slider.

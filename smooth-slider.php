@@ -3,7 +3,7 @@
 Plugin Name: Smooth Slider
 Plugin URI: http://www.clickonf5.org/smooth-slider
 Description: Smooth Slider adds a smooth content and image slideshow with customizable background and slide intervals to any location of your blog
-Version: 2.1	
+Version: 2.1.1	
 Author: Tejaswini Deshpande, Sanjeev Mishra
 Author URI: http://www.clickonf5.org
 Wordpress version supported: 2.7 and above
@@ -39,8 +39,7 @@ function install_smooth_slider() {
 		$rs = $wpdb->query($sql);
 	}
    // Need to delete the previously created options in old versions and create only one option field for Smooth Slider
-   if (!get_option('smooth_slider_speed')) {
-	$smooth_slider = array('speed'=>'7', 
+   $defualt_slider = array('speed'=>'7', 
 	                       'no_posts'=>'5', 
 						   'bg_color'=>'#ffffff', 
 						   'height'=>'200',
@@ -76,48 +75,22 @@ function install_smooth_slider() {
 						   'img_size'=>'1',
 						   'img_pick'=>'0',
 						   'user_level'=>'5',
-						   'custom_nav'=>''
+						   'custom_nav'=>'',
+						   'crop'=>'0'
 			              );
-	}
+   if (!get_option('smooth_slider_options')) {
+	   add_option('smooth_slider_options',$default_slider);
+   }
 	else {
-	$smooth_slider = array('speed'=>get_option('smooth_slider_speed'), 
-	                       'no_posts'=>get_option('smooth_slider_no_posts'), 
-						   'bg_color'=>get_option('smooth_slider_bg_color'), 
-						   'height'=>get_option('smooth_slider_height'),
-						   'width'=>get_option('smooth_slider_width'),
-						   'border'=>get_option('smooth_slider_border'),
-						   'brcolor'=>get_option('smooth_slider_brcolor'),
-						   'prev_next'=>get_option('smooth_slider_prev_next'),
-						   'goto_slide'=>get_option('smooth_slider_goto_slide'),
-						   'title_text'=>get_option('smooth_slider_title_text'),
-						   'title_font'=>get_option('smooth_slider_title_font'),
-						   'title_fsize'=>get_option('smooth_slider_title_fsize'),
-						   'title_fstyle'=>get_option('smooth_slider_title_fstyle'),
-						   'title_fcolor'=>get_option('smooth_slider_title_fcolor'),
-						   'ptitle_font'=>get_option('smooth_slider_ptitle_font'),
-						   'ptitle_fsize'=>get_option('smooth_slider_ptitle_fsize'),
-						   'ptitle_fstyle'=>get_option('smooth_slider_ptitle_fstyle'),
-						   'ptitle_fcolor'=>get_option('smooth_slider_ptitle_fcolor'),
-						   'img_align'=>get_option('smooth_slider_img_align'),
-						   'img_height'=>get_option('smooth_slider_img_height'),
-						   'img_width'=>get_option('smooth_slider_img_width'),
-						   'img_border'=>get_option('smooth_slider_img_border'),
-						   'img_brcolor'=>get_option('smooth_slider_img_brcolor'),
-						   'content_font'=>get_option('smooth_slider_content_font'),
-						   'content_fsize'=>get_option('smooth_slider_content_fsize'),
-						   'content_fstyle'=>get_option('smooth_slider_content_fstyle'),
-						   'content_fcolor'=>get_option('smooth_slider_content_fcolor'),
-						   'content_from'=>get_option('smooth_slider_content_from'),
-						   'content_chars'=>get_option('smooth_slider_content_chars'),
-						   'bg'=>get_option('smooth_slider_bg'),
-						   'image_only'=>get_option('smooth_slider_image_only'),
-						   'allowable_tags'=>'',
-						   'more'=>'Read More',
-						   'img_size'=>'1',
-						   'img_pick'=>'0',
-						   'user_level'=>'5',
-						   'custom_nav'=>''
-			              );
+	   $smooth_slider = get_option('smooth_slider_options');
+	   foreach($default_slider as $key=>$value) {
+	      if(!$smooth_slider[$key]) {
+		     $smooth_slider[$key] = $value;
+		  }
+	   }
+	   update_option('smooth_slider_options',$smooth_slider);
+	}
+	
 	 delete_option('smooth_slider_speed');
 	 delete_option('smooth_slider_no_posts');
 	 delete_option('smooth_slider_bg_color');
@@ -150,14 +123,12 @@ function install_smooth_slider() {
 	 delete_option('smooth_slider_bg');	
 	 delete_option('smooth_slider_clear');	
 	 delete_option('smooth_slider_image_only');	
-	}
-	add_option('smooth_slider_options',$smooth_slider);
 }
 register_activation_hook( __FILE__, 'install_smooth_slider' );
 //defined global variables and constants here
 global $smooth_slider;
 $smooth_slider = get_option('smooth_slider_options');
-define("SMOOTH_SLIDER_VER","2.0",false);
+define("SMOOTH_SLIDER_VER","2.1.1",false);
 
 //This adds the post to the slider
 function add_to_slider($post_id) {
@@ -332,17 +303,33 @@ function carousel_posts_on_slider($max_posts, $offset=0) {
 			if ($smooth_slider['img_pick'] == '1') {
 			  $first_image = smooth_slider_get_first_image($data);
 			  if(!empty($first_image)){ 
+			   
+			   if($smooth_slider['crop'] == '1'){
 				  $html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$first_image.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
+				}
+				else {
+				  $html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$first_image.'" alt="'.$post_title.'" /></a>';
+				}
 			  }
 			  else {
 				  if( isset($thumbnail) && !empty($thumbnail) ):
+				   if($smooth_slider['crop'] == '1'){
 					$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$thumbnail.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
+					}
+					else {
+					 $html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$thumbnail.'" alt="'.$post_title.'" /></a>';
+					}
 				  endif;
 			  }
 			}
 			else {
 			  if( isset($thumbnail) && !empty($thumbnail) ):
+			   if($smooth_slider['crop'] == '1'){
 				$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$thumbnail.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
+			   }
+			   else {
+			    $html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$thumbnail.'" alt="'.$post_title.'" /></a>';
+			   }
 			  endif;
 			}
 		}
@@ -434,21 +421,38 @@ function carousel_posts_on_slider_cat($max_posts, $catg_slug, $offset=0) {
 		if ( !isset($image_control) or empty($image_control) or $image_control != "x"){
 			if ($smooth_slider['img_pick'] == '1') {
 			  $first_image = smooth_slider_get_first_image($post);
+			  
 			  if(!empty($first_image)){ 
+			   
+			   if($smooth_slider['crop'] == '1'){
 				  $html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$first_image.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
+				}
+				else {
+				  $html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$first_image.'" alt="'.$post_title.'" /></a>';
+				}
 			  }
 			  else {
 				  if( isset($thumbnail) && !empty($thumbnail) ):
+				   if($smooth_slider['crop'] == '1'){
 					$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$thumbnail.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
+					}
+					else {
+					 $html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$thumbnail.'" alt="'.$post_title.'" /></a>';
+					}
 				  endif;
 			  }
 			}
 			else {
 			  if( isset($thumbnail) && !empty($thumbnail) ):
+			   if($smooth_slider['crop'] == '1'){
 				$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$thumbnail.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
+			   }
+			   else {
+			    $html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$thumbnail.'" alt="'.$post_title.'" /></a>';
+			   }
 			  endif;
 			}
-		}		
+		}
 			
 			if ($smooth_slider['image_only'] == '1') { 
 				$html .= '<!-- /smooth_slideri -->
@@ -527,21 +531,38 @@ function smooth_slider_wpmu_carousel_posts($max_posts, $offset=0) {
 			if ( !isset($image_control) or empty($image_control) or $image_control != "x"){
 				if ($smooth_slider['img_pick'] == '1') {
 				  $first_image = smooth_slider_get_first_image($post);
-				  if(!empty($first_image)){ 
-					  $html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$first_image.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
-				  }
-				  else {
-					  if( isset($thumbnail) && !empty($thumbnail) ):
-						$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$thumbnail.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
-					  endif;
-				  }
+				  
+			  if(!empty($first_image)){ 
+			   
+			   if($smooth_slider['crop'] == '1'){
+				  $html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$first_image.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
 				}
 				else {
-				  if( isset($thumbnail) && !empty($thumbnail) ):
-					$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$thumbnail.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
-				  endif;
+				  $html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$first_image.'" alt="'.$post_title.'" /></a>';
 				}
+			  }
+			  else {
+				  if( isset($thumbnail) && !empty($thumbnail) ):
+				   if($smooth_slider['crop'] == '1'){
+					$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$thumbnail.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
+					}
+					else {
+					 $html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$thumbnail.'" alt="'.$post_title.'" /></a>';
+					}
+				  endif;
+			  }
 			}
+			else {
+			  if( isset($thumbnail) && !empty($thumbnail) ):
+			   if($smooth_slider['crop'] == '1'){
+				$html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$timthumb_src.'?src='.$thumbnail.'&amp;h='.$smooth_slider['img_height'].'&amp;w='.$smooth_slider['img_width'].'&amp;zc=1)" alt="'.$post_title.'" /></a>';
+			   }
+			   else {
+			    $html .= '<a href="'.$permalink.'"><img class="smooth_slider_thumbnail" src="'.$thumbnail.'" alt="'.$post_title.'" /></a>';
+			   }
+			  endif;
+			}
+		}
 			
 			if ($smooth_slider['image_only'] == '1') { 
 				$html .= '<!-- /smooth_slideri -->
@@ -568,7 +589,7 @@ function smooth_slider_wpmu_carousel_posts($max_posts, $offset=0) {
 function smooth_slider_css() {
 global $smooth_slider;
 ?>
-<style type="text/css" media="screen">#smooth_sldr{width:<?php echo $smooth_slider['width']; ?>px;height:<?php echo $smooth_slider['height']; ?>px;background-color:<?php if ($smooth_slider['bg'] == '1') { echo "transparent";} else { echo $smooth_slider['bg_color']; } ?>;border:<?php echo $smooth_slider['border']; ?>px solid <?php echo $smooth_slider['brcolor']; ?>;}#smooth_sldr_items{padding:10px <?php if ($smooth_slider['prev_next'] == 1) {echo "18";} else {echo "12";} ?>px 0px <?php if ($smooth_slider['prev_next'] == 1) {echo "26";} else {echo "12";} ?>px;}#smooth_sliderc{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 44);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.smooth_slideri{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 54);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.sldr_title{font-family:<?php echo $smooth_slider['title_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['title_fsize']; ?>px;font-weight:<?php if ($smooth_slider['title_fstyle'] == "bold" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "bold";} else { echo "normal"; } ?>;font-style:<?php if ($smooth_slider['title_fstyle'] == "italic" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['title_fcolor']; ?>;}#smooth_sldr_body h2{line-height:<?php echo ($smooth_slider['ptitle_fsize'] + 3); ?>px;font-family:<?php echo $smooth_slider['ptitle_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['ptitle_fsize']; ?>px;font-weight:<?php if ($smooth_slider['ptitle_fstyle'] == "bold" or $smooth_slider['ptitle_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['ptitle_fstyle'] == "italic" or $smooth_slider['ptitle_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px 0 5px 0;}#smooth_sldr_body h2 a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}#smooth_sldr_body span{font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-weight:<?php if ($smooth_slider['content_fstyle'] == "bold" or $smooth_slider['content_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['content_fstyle']=="italic" or $smooth_slider['content_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['content_fcolor']; ?>;}.smooth_slider_thumbnail{float:<?php echo $smooth_slider['img_align']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px <?php if($smooth_slider['img_align'] == "left") {echo "5";} else {echo "0";} ?>px 0 <?php if($smooth_slider['img_align'] == "right") {echo "5";} else {echo "0";} ?>px;border:<?php echo $smooth_slider['img_border']; ?>px solid <?php echo $smooth_slider['img_brcolor']; ?>;}#smooth_sldr_body p.more a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;}#smooth_sliderc_nav li{border:1px solid <?php echo $smooth_slider['content_fcolor']; ?>;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;}#smooth_sliderc_nav li a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}.sldrlink{padding-right:<?php if ($smooth_slider['prev_next'] == 1) {echo "40";} else {echo "25";} ?>px;}.sldrlink a{color:<?php echo $smooth_slider['content_fcolor']; ?>;}</style>
+<style type="text/css" media="screen">#smooth_sldr{width:<?php echo $smooth_slider['width']; ?>px;height:<?php echo $smooth_slider['height']; ?>px;background-color:<?php if ($smooth_slider['bg'] == '1') { echo "transparent";} else { echo $smooth_slider['bg_color']; } ?>;border:<?php echo $smooth_slider['border']; ?>px solid <?php echo $smooth_slider['brcolor']; ?>;}#smooth_sldr_items{padding:10px <?php if ($smooth_slider['prev_next'] == 1) {echo "18";} else {echo "12";} ?>px 0px <?php if ($smooth_slider['prev_next'] == 1) {echo "26";} else {echo "12";} ?>px;}#smooth_sliderc{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 44);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.smooth_slideri{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 54);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.sldr_title{font-family:<?php echo $smooth_slider['title_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['title_fsize']; ?>px;font-weight:<?php if ($smooth_slider['title_fstyle'] == "bold" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "bold";} else { echo "normal"; } ?>;font-style:<?php if ($smooth_slider['title_fstyle'] == "italic" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['title_fcolor']; ?>;}#smooth_sldr_body h2{line-height:<?php echo ($smooth_slider['ptitle_fsize'] + 3); ?>px;font-family:<?php echo $smooth_slider['ptitle_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['ptitle_fsize']; ?>px;font-weight:<?php if ($smooth_slider['ptitle_fstyle'] == "bold" or $smooth_slider['ptitle_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['ptitle_fstyle'] == "italic" or $smooth_slider['ptitle_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px 0 5px 0;}#smooth_sldr_body h2 a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}#smooth_sldr_body span{font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-weight:<?php if ($smooth_slider['content_fstyle'] == "bold" or $smooth_slider['content_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['content_fstyle']=="italic" or $smooth_slider['content_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['content_fcolor']; ?>;}.smooth_slider_thumbnail{float:<?php echo $smooth_slider['img_align']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px <?php if($smooth_slider['img_align'] == "left") {echo "5";} else {echo "0";} ?>px 0 <?php if($smooth_slider['img_align'] == "right") {echo "5";} else {echo "0";} ?>px;<?php if ($smooth_slider['img_size'] == 1 and $smooth_slider['crop'] != '1') { ?>width:<?php echo $smooth_slider['img_width']; ?>px;height:<?php echo $smooth_slider['img_height']; ?>px;<?php } ?>border:<?php echo $smooth_slider['img_border']; ?>px solid <?php echo $smooth_slider['img_brcolor']; ?>;}#smooth_sldr_body p.more a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;}#smooth_sliderc_nav li{border:1px solid <?php echo $smooth_slider['content_fcolor']; ?>;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;}#smooth_sliderc_nav li a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}.sldrlink{padding-right:<?php if ($smooth_slider['prev_next'] == 1) {echo "40";} else {echo "25";} ?>px;}.sldrlink a{color:<?php echo $smooth_slider['content_fcolor']; ?>;}</style>
 <?php
 }
 
@@ -993,7 +1014,7 @@ function confirmRemoveAll()
 #sldr_message {background-color:#FEF7DA;clear:both;width:72%;}
 #sldr_close {float:right;} 
 </style>
-<style type="text/css" media="screen">#smooth_sldr{width:<?php echo $smooth_slider['width']; ?>px;height:<?php echo $smooth_slider['height']; ?>px;background-color:<?php if ($smooth_slider['bg'] == '1') { echo "transparent";} else { echo $smooth_slider['bg_color']; } ?>;border:<?php echo $smooth_slider['border']; ?>px solid <?php echo $smooth_slider['brcolor']; ?>;}#smooth_sldr_items{padding:10px <?php if ($smooth_slider['prev_next'] == 1) {echo "18";} else {echo "12";} ?>px 0px <?php if ($smooth_slider['prev_next'] == 1) {echo "26";} else {echo "12";} ?>px;}#smooth_sliderc{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 44);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.smooth_slideri{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 54);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.sldr_title{font-family:<?php echo $smooth_slider['title_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['title_fsize']; ?>px;font-weight:<?php if ($smooth_slider['title_fstyle'] == "bold" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "bold";} else { echo "normal"; } ?>;font-style:<?php if ($smooth_slider['title_fstyle'] == "italic" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['title_fcolor']; ?>;}#smooth_sldr_body h2{line-height:<?php echo ($smooth_slider['ptitle_fsize'] + 3); ?>px;font-family:<?php echo $smooth_slider['ptitle_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['ptitle_fsize']; ?>px;font-weight:<?php if ($smooth_slider['ptitle_fstyle'] == "bold" or $smooth_slider['ptitle_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['ptitle_fstyle'] == "italic" or $smooth_slider['ptitle_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px 0 5px 0;}#smooth_sldr_body h2 a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}#smooth_sldr_body span{font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-weight:<?php if ($smooth_slider['content_fstyle'] == "bold" or $smooth_slider['content_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['content_fstyle']=="italic" or $smooth_slider['content_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['content_fcolor']; ?>;}.smooth_slider_thumbnail{float:<?php echo $smooth_slider['img_align']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px <?php if($smooth_slider['img_align'] == "left") {echo "5";} else {echo "0";} ?>px 0 <?php if($smooth_slider['img_align'] == "right") {echo "5";} else {echo "0";} ?>px;border:<?php echo $smooth_slider['img_border']; ?>px solid <?php echo $smooth_slider['img_brcolor']; ?>;}#smooth_sldr_body p.more a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;}#smooth_sliderc_nav li{border:1px solid <?php echo $smooth_slider['content_fcolor']; ?>;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;}#smooth_sliderc_nav li a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}.sldrlink{padding-right:<?php if ($smooth_slider['prev_next'] == 1) {echo "40";} else {echo "25";} ?>px;}.sldrlink a{color:<?php echo $smooth_slider['content_fcolor']; ?>;}</style>
+<style type="text/css" media="screen">#smooth_sldr{width:<?php echo $smooth_slider['width']; ?>px;height:<?php echo $smooth_slider['height']; ?>px;background-color:<?php if ($smooth_slider['bg'] == '1') { echo "transparent";} else { echo $smooth_slider['bg_color']; } ?>;border:<?php echo $smooth_slider['border']; ?>px solid <?php echo $smooth_slider['brcolor']; ?>;}#smooth_sldr_items{padding:10px <?php if ($smooth_slider['prev_next'] == 1) {echo "18";} else {echo "12";} ?>px 0px <?php if ($smooth_slider['prev_next'] == 1) {echo "26";} else {echo "12";} ?>px;}#smooth_sliderc{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 44);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.smooth_slideri{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 54);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.sldr_title{font-family:<?php echo $smooth_slider['title_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['title_fsize']; ?>px;font-weight:<?php if ($smooth_slider['title_fstyle'] == "bold" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "bold";} else { echo "normal"; } ?>;font-style:<?php if ($smooth_slider['title_fstyle'] == "italic" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['title_fcolor']; ?>;}#smooth_sldr_body h2{line-height:<?php echo ($smooth_slider['ptitle_fsize'] + 3); ?>px;font-family:<?php echo $smooth_slider['ptitle_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['ptitle_fsize']; ?>px;font-weight:<?php if ($smooth_slider['ptitle_fstyle'] == "bold" or $smooth_slider['ptitle_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['ptitle_fstyle'] == "italic" or $smooth_slider['ptitle_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px 0 5px 0;}#smooth_sldr_body h2 a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}#smooth_sldr_body span{font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-weight:<?php if ($smooth_slider['content_fstyle'] == "bold" or $smooth_slider['content_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['content_fstyle']=="italic" or $smooth_slider['content_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['content_fcolor']; ?>;}.smooth_slider_thumbnail{float:<?php echo $smooth_slider['img_align']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px <?php if($smooth_slider['img_align'] == "left") {echo "5";} else {echo "0";} ?>px 0 <?php if($smooth_slider['img_align'] == "right") {echo "5";} else {echo "0";} ?>px;<?php if ($smooth_slider['img_size'] == 1 and $smooth_slider['crop'] != '1') { ?>width:<?php echo $smooth_slider['img_width']; ?>px;height:<?php echo $smooth_slider['img_height']; ?>px;<?php } ?>border:<?php echo $smooth_slider['img_border']; ?>px solid <?php echo $smooth_slider['img_brcolor']; ?>;}#smooth_sldr_body p.more a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;}#smooth_sliderc_nav li{border:1px solid <?php echo $smooth_slider['content_fcolor']; ?>;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;}#smooth_sliderc_nav li a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}.sldrlink{padding-right:<?php if ($smooth_slider['prev_next'] == 1) {echo "40";} else {echo "25";} ?>px;}.sldrlink a{color:<?php echo $smooth_slider['content_fcolor']; ?>;}</style>
 <?php
    } //for smooth slider option page
  }//only for admin
@@ -1290,7 +1311,8 @@ get_smooth_slider();
 <label for="smooth_slider_options[img_height]">Height</label>
 <input type="text" name="smooth_slider_options[img_height]" class="small-text" value="<?php echo $smooth_slider['img_height']; ?>" />&nbsp;px &nbsp;&nbsp; 
 <label for="smooth_slider_options[img_width]">Width</label>
-<input type="text" name="smooth_slider_options[img_width]" class="small-text" value="<?php echo $smooth_slider['img_width']; ?>" />&nbsp;px &nbsp;&nbsp; 
+<input type="text" name="smooth_slider_options[img_width]" class="small-text" value="<?php echo $smooth_slider['img_width']; ?>" />&nbsp;px &nbsp;&nbsp; <br />
+<input name="smooth_slider_options[crop]" type="checkbox" value="1" <?php checked('1', $smooth_slider['crop']); ?>  /> Crop Images if Custom size is selected <small>(this uses timthumb and requires that the images should be in the same folder as of wordpress installation)</small>&nbsp; 
 </fieldset></td> 
 </tr> 
 

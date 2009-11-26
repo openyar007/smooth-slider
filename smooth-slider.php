@@ -3,7 +3,7 @@
 Plugin Name: Smooth Slider
 Plugin URI: http://www.clickonf5.org/smooth-slider
 Description: Smooth Slider adds a smooth content and image slideshow with customizable background and slide intervals to any location of your blog
-Version: 2.1.1	
+Version: 2.1.2	
 Author: Tejaswini Deshpande, Sanjeev Mishra
 Author URI: http://www.clickonf5.org
 Wordpress version supported: 2.7 and above
@@ -39,7 +39,8 @@ function install_smooth_slider() {
 		$rs = $wpdb->query($sql);
 	}
    // Need to delete the previously created options in old versions and create only one option field for Smooth Slider
-   $defualt_slider = array('speed'=>'7', 
+   $default_slider = array();
+   $default_slider = array('speed'=>'7', 
 	                       'no_posts'=>'5', 
 						   'bg_color'=>'#ffffff', 
 						   'height'=>'200',
@@ -76,20 +77,23 @@ function install_smooth_slider() {
 						   'img_pick'=>'0',
 						   'user_level'=>'5',
 						   'custom_nav'=>'',
-						   'crop'=>'0'
+						   'crop'=>'0',
+						   'transition'=>'5',
+						   'autostep'=>'1'
 			              );
-   if (!get_option('smooth_slider_options')) {
-	   add_option('smooth_slider_options',$default_slider);
-   }
-	else {
+   
 	   $smooth_slider = get_option('smooth_slider_options');
+	   if(!$smooth_slider) {
+	     $smooth_slider = array();
+	   }
 	   foreach($default_slider as $key=>$value) {
-	      if(!$smooth_slider[$key]) {
+	      if(!isset($smooth_slider[$key])) {
 		     $smooth_slider[$key] = $value;
 		  }
 	   }
+
+	   delete_option('smooth_slider_options');	  
 	   update_option('smooth_slider_options',$smooth_slider);
-	}
 	
 	 delete_option('smooth_slider_speed');
 	 delete_option('smooth_slider_no_posts');
@@ -128,7 +132,7 @@ register_activation_hook( __FILE__, 'install_smooth_slider' );
 //defined global variables and constants here
 global $smooth_slider;
 $smooth_slider = get_option('smooth_slider_options');
-define("SMOOTH_SLIDER_VER","2.1.1",false);
+define("SMOOTH_SLIDER_VER","2.1.2",false);
 
 //This adds the post to the slider
 function add_to_slider($post_id) {
@@ -158,6 +162,16 @@ function remove_from_slider($post_id) {
 		$wpdb->query($sql);
 	}
   } 
+  
+  
+function delete_from_slider_table($post_id){
+    global $wpdb, $table_prefix;
+	$table_name = $table_prefix.'slider';
+    if(slider($post_id)) {
+		$sql = "DELETE FROM $table_name where id = $post_id LIMIT 1";
+		$wpdb->query($sql);
+	}
+}
 
 //Checks if the post is already added to slider
 function slider($post_id) {
@@ -205,6 +219,7 @@ add_action('publish_page', 'add_to_slider');
 add_action('edit_post', 'add_to_slider');
 add_action('publish_post', 'remove_from_slider');
 add_action('edit_post', 'remove_from_slider');
+add_action('deleted_post','delete_from_slider_table');
 
 
 function smooth_slider_plugin_url( $path = '' ) {
@@ -248,15 +263,18 @@ function carousel_posts_on_slider($max_posts, $offset=0) {
     global $smooth_slider;
 	global $wpdb, $table_prefix;
 	$table_name = $table_prefix."slider";
+	$post_table = $table_prefix."posts";
 	
-	$posts = $wpdb->get_results("SELECT * FROM $table_name ORDER BY date DESC LIMIT $offset, $max_posts", OBJECT);
+	$posts = $wpdb->get_results("SELECT a.id, a.date FROM 
+	                             $table_name a LEFT OUTER JOIN $post_table b 
+								 ON a.id = b.ID 
+								 WHERE b.post_status = 'publish' 
+	                             ORDER BY a.date DESC LIMIT $offset, $max_posts", OBJECT);
 	
 	$html = '';
 	$smooth_sldr_j = 0;
 	
-	
 	foreach($posts as $post) {
-		$smooth_sldr_j++;
 		$id = $post->id;
 		$posts_table = $table_prefix.'posts'; 
 		$sql_post = "SELECT * FROM $posts_table WHERE ID = $id";
@@ -273,11 +291,11 @@ function carousel_posts_on_slider($max_posts, $offset=0) {
 		
 //2.1 changes start
             $slide_redirect_url = get_post_meta($post_id, 'slide_redirect_url', true);
-			if(!empty($slide_redirect_url) and isset($slide_redirect_url)) {
+			if(!empty($slide_redirect_url) and isset($slide_redirect_url) and $slide_redirect_url != '') {
 			   $permalink = $slide_redirect_url;
 			}
 //2.1 changes end	
-
+	   		$smooth_sldr_j++;
 		$html .= '<div class="smooth_slideri">
 			<!-- smooth_slideri -->';
 			
@@ -354,8 +372,13 @@ function carousel_posts_on_slider_cat($max_posts, $catg_slug, $offset=0) {
     global $smooth_slider;
 	global $wpdb, $table_prefix;
 	$table_name = $table_prefix."slider";
-
-	$myposts = $wpdb->get_results("SELECT id FROM $table_name ORDER BY date DESC", OBJECT);
+    $post_table = $table_prefix."posts";
+	
+	$myposts = $wpdb->get_results("SELECT a.id, a.date FROM 
+	                             $table_name a LEFT OUTER JOIN $post_table b 
+								 ON a.id = b.ID 
+								 WHERE b.post_status = 'publish' 
+	                             ORDER BY a.date DESC LIMIT $offset, $max_posts", OBJECT);
 	
 	$html = '';
 	$smooth_sldr_i = 0;
@@ -380,8 +403,6 @@ function carousel_posts_on_slider_cat($max_posts, $catg_slug, $offset=0) {
 		
     	if (in_array($slider_cat,$post_cats) or is_home() or (is_paged() and !is_category()) or is_tag() or is_author() or (is_archive() and !is_category()))
 		{
-			$smooth_sldr_i++;
-			
 			$post_title = stripslashes($post->post_title);
 			$post_title = str_replace('"', '', $post_title);
 			$slider_content = $post->post_content;
@@ -391,10 +412,12 @@ function carousel_posts_on_slider_cat($max_posts, $catg_slug, $offset=0) {
 			$post_id = $post->ID;
 //2.1 changes start
             $slide_redirect_url = get_post_meta($post_id, 'slide_redirect_url', true);
-			if(!empty($slide_redirect_url) or isset($slide_redirect_url)) {
+			if(!empty($slide_redirect_url) and isset($slide_redirect_url) and $slide_redirect_url != '') {
 			   $permalink = $slide_redirect_url;
 			}
 //2.1 changes end	
+					 
+		    $smooth_sldr_i++;
 			
 			$html .= '<div class="smooth_slideri">
 				<!-- smooth_slideri -->';
@@ -465,7 +488,7 @@ function carousel_posts_on_slider_cat($max_posts, $catg_slug, $offset=0) {
 					<!-- /smooth_slideri -->
 				</div>';
 		    }
-	    }
+	  } 
 		if ($smooth_sldr_i >= $max_posts)
 		   { break; }
 	}
@@ -482,16 +505,25 @@ function smooth_slider_wpmu_carousel_posts($max_posts, $offset=0) {
 	
 	$blogs = $wpdb->get_results( $wpdb->prepare("SELECT blog_id FROM $wpdb->blogs WHERE site_id = %d AND public = '1' AND archived = '0' AND mature = '0' AND spam = '0' AND deleted = '0' ORDER BY registered ASC", $wpdb->siteid), ARRAY_A );
     foreach($blogs as $details) {
-	
-		$table_name = $wpdb->base_prefix.$details['blog_id']."_slider";
+	    
+        switch_to_blog($details['blog_id']); 
+		global $table_prefix;
 		
-		$myposts = $wpdb->get_results("SELECT id FROM $table_name ORDER BY date DESC", OBJECT);
+		$table_name = $table_prefix."slider";
+		$post_table = $table_prefix."posts";
+				
+		if(smooth_slider_table_exists($table_name, DB_NAME)){
+		
+		$myposts = $wpdb->get_results("SELECT a.id, a.date FROM 
+	                             $table_name a LEFT OUTER JOIN $post_table b 
+								 ON a.id = b.ID 
+								 WHERE b.post_status = 'publish' 
+	                             ORDER BY a.date DESC LIMIT $offset, $max_posts", OBJECT);
 		
 		foreach($myposts as $mypost) {
-			$posts_table = $wpdb->base_prefix.$details['blog_id']."_posts";
+			$posts_table = $table_prefix."posts";
 			$id = $mypost->id;
 			$post =  $wpdb->get_row("SELECT * FROM $posts_table WHERE ID = $id", OBJECT);
-			$smooth_sldr_k++;
 			
 			$post_title = stripslashes($post->post_title);
 			$post_title = str_replace('"', '', $post_title);
@@ -503,10 +535,12 @@ function smooth_slider_wpmu_carousel_posts($max_posts, $offset=0) {
 
 //2.1 changes start
             $slide_redirect_url = get_post_meta($post_id, 'slide_redirect_url', true);
-			if(!empty($slide_redirect_url) or isset($slide_redirect_url)) {
+			if(!empty($slide_redirect_url) and isset($slide_redirect_url) and $slide_redirect_url != '') {
 			   $permalink = $slide_redirect_url;
 			}
 //2.1 changes end
+
+		 	$smooth_sldr_k++;
 			$html .= '<div class="smooth_slideri">
 				<!-- smooth_slideri -->';
 				
@@ -577,11 +611,13 @@ function smooth_slider_wpmu_carousel_posts($max_posts, $offset=0) {
 			}
 		if ($smooth_sldr_k >= $max_posts)
 		   { break; }
-	    }
+	  }
 		
-	if ($smooth_sldr_k >= $max_posts)
+	  if ($smooth_sldr_k >= $max_posts)
 		   { break; }
+      }//smooth slider table exists
     }
+	restore_current_blog();
 	echo $html;
 	return $smooth_sldr_k;
 }
@@ -613,8 +649,8 @@ stepcarousel.setup({
 	galleryid: 'smooth_sliderc', //id of carousel DIV
 	beltclass: 'smooth_sliderb', //class of inner "belt" DIV containing all the panel DIVs
 	panelclass: 'smooth_slideri', //class of panel DIVs each holding content
-	autostep: {enable: true, moveby:1, pause:<?php echo $smooth_slider['speed']*1000; ?>},
-	panelbehavior: {speed:500, wraparound:false, persist:false},
+	autostep: {<?php if ($smooth_slider['autostep'] == '1'){ echo "enable: true";} else {echo "enable: false";}?>, moveby:1, pause:<?php echo $smooth_slider['speed']*1000; ?>},
+	panelbehavior: {speed:<?php echo $smooth_slider['transition']*100; ?>, wraparound: false, persist:false},
 	defaultbuttons: {enable: <?php if ($smooth_slider['prev_next'] == 1) {echo "true";} else {echo "false";} ?>, moveby: 1, leftnav: ['<?php echo smooth_slider_plugin_url( 'images/button_prev.png' ); ?>', -25, <?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $smooth_slider['content_fsize'] + 5 + 18; } else { $extra_height = $smooth_slider['content_fsize'] + 5 + 5 + 18;  } echo (($smooth_slider['height'] - $extra_height)/2); ?>], rightnav: ['<?php echo smooth_slider_plugin_url( 'images/button_next.png' ); ?>', 0, <?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $smooth_slider['content_fsize'] + 5 + 18; } else { $extra_height = $smooth_slider['content_fsize'] + 5 + 5 + 18;  } echo (($smooth_slider['height'] - $extra_height)/2); ?>]},
 	statusvars: ['imageA', 'imageB', 'imageC'], //register 3 variables that contain current panel (start), current panel (last), and total panels
 	contenttype: ['inline'], //content setting ['inline'] or ['external', 'path_to_external_file']
@@ -693,8 +729,8 @@ stepcarousel.setup({
 	galleryid: 'smooth_sliderc', //id of carousel DIV
 	beltclass: 'smooth_sliderb', //class of inner "belt" DIV containing all the panel DIVs
 	panelclass: 'smooth_slideri', //class of panel DIVs each holding content
-	autostep: {enable: true, moveby:1, pause:<?php echo $smooth_slider['speed']*1000; ?>},
-	panelbehavior: {speed:500, wraparound:false, persist:false},
+	autostep: {<?php if ($smooth_slider['autostep'] == '1'){ echo "enable: true";} else {echo "enable: false";}?>, moveby:1, pause:<?php echo $smooth_slider['speed']*1000; ?>},
+	panelbehavior: {speed:<?php echo $smooth_slider['transition']*100; ?>, wraparound: false, persist:false},
 	defaultbuttons: {enable: <?php if ($smooth_slider['prev_next'] == 1) {echo "true";} else {echo "false";} ?>, moveby: 1, leftnav: ['<?php echo smooth_slider_plugin_url( 'images/button_prev.png' ); ?>', -25, <?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $smooth_slider['content_fsize'] + 5 + 18; } else { $extra_height = $smooth_slider['content_fsize'] + 5 + 5 + 18;  } echo (($smooth_slider['height'] - $extra_height)/2); ?>], rightnav: ['<?php echo smooth_slider_plugin_url( 'images/button_next.png' ); ?>', 0, <?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $smooth_slider['content_fsize'] + 5 + 18; } else { $extra_height = $smooth_slider['content_fsize'] + 5 + 5 + 18;  } echo (($smooth_slider['height'] - $extra_height)/2); ?>]},
 	statusvars: ['imageA', 'imageB', 'imageC'], //register 3 variables that contain current panel (start), current panel (last), and total panels
 	contenttype: ['inline'], //content setting ['inline'] or ['external', 'path_to_external_file']
@@ -773,8 +809,8 @@ stepcarousel.setup({
 	galleryid: 'smooth_sliderc', //id of carousel DIV
 	beltclass: 'smooth_sliderb', //class of inner "belt" DIV containing all the panel DIVs
 	panelclass: 'smooth_slideri', //class of panel DIVs each holding content
-	autostep: {enable: true, moveby:1, pause:<?php echo $smooth_slider['speed']*1000; ?>},
-	panelbehavior: {speed:500, wraparound:false, persist:false},
+	autostep: {<?php if ($smooth_slider['autostep'] == '1'){ echo "enable: true";} else {echo "enable: false";}?>, moveby:1, pause:<?php echo $smooth_slider['speed']*1000; ?>},
+	panelbehavior: {speed:<?php echo $smooth_slider['transition']*100; ?>, wraparound: false, persist:false},
 	defaultbuttons: {enable: <?php if ($smooth_slider['prev_next'] == 1) {echo "true";} else {echo "false";} ?>, moveby: 1, leftnav: ['<?php echo smooth_slider_plugin_url( 'images/button_prev.png' ); ?>', -25, <?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $smooth_slider['content_fsize'] + 5 + 18; } else { $extra_height = $smooth_slider['content_fsize'] + 5 + 5 + 18;  } echo (($smooth_slider['height'] - $extra_height)/2); ?>], rightnav: ['<?php echo smooth_slider_plugin_url( 'images/button_next.png' ); ?>', 0, <?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $smooth_slider['content_fsize'] + 5 + 18; } else { $extra_height = $smooth_slider['content_fsize'] + 5 + 5 + 18;  } echo (($smooth_slider['height'] - $extra_height)/2); ?>]},
 	statusvars: ['imageA', 'imageB', 'imageC'], //register 3 variables that contain current panel (start), current panel (last), and total panels
 	contenttype: ['inline'], //content setting ['inline'] or ['external', 'path_to_external_file']
@@ -1040,21 +1076,8 @@ global $smooth_slider;
 ?>
 
 <div class="wrap">
-<?php
-if (SMOOTH_SLIDER_VER != $plug_api->version) {
-     echo '<div id="sldr_message">A new version Smooth Slider (version '.$plug_api->version.') is available. Please upgrade to enjoy all available features.<img id="sldr_close" src="'.smooth_slider_plugin_url( 'images/close.jpg' ).'" /></div>';
-}
-?>
-<h2 style="float:left;">Smooth Slider Options </h2>
-<form  style="float:left;" action="https://www.paypal.com/cgi-bin/webscr" method="post">
-<input type="hidden" name="cmd" value="_s-xclick">
-<input type="hidden" name="hosted_button_id" value="8046056">
-<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
-</form>
 
-<form  style="clear:both;" method="post" action="options.php">
-<div id="poststuff" class="metabox-holder has-right-sidebar" > 
+<div id="poststuff" class="metabox-holder has-right-sidebar" style="float:right;width:30%;"> 
    <div id="side-info-column" class="inner-sidebar"> 
 			<div class="postbox"> 
 			  <h3 class="hndle"><span>About this Plugin:</span></h3> 
@@ -1117,7 +1140,18 @@ if (SMOOTH_SLIDER_VER != $plug_api->version) {
                     <script language="JavaScript" type="text/javascript" src="http://feedity.com/js/widget.js"></script>
               </div> 
 			</div> 
-     </div>   
+     </div>  
+ </div> <!--end of poststuff --> 
+
+<h2 style="float:left;">Smooth Slider Options </h2>
+<form  style="float:left;" action="https://www.paypal.com/cgi-bin/webscr" method="post">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="hosted_button_id" value="8046056">
+<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+</form>
+
+<form method="post" action="options.php">
 
 <h2>Preview</h2> 
 <?php settings_fields('smooth-slider-group'); ?>
@@ -1129,12 +1163,24 @@ get_smooth_slider();
 <h2>Slider Box</h2> 
 <p>Customize the looks of the Slider box wrapping the complete slideshow from here</p> 
 
-<div style="float:left;">
+<div style="float:left;width:70%;">
 <table class="form-table">
 
 <tr valign="top">
 <th scope="row">Slide Pause Interval</th>
 <td><input type="text" name="smooth_slider_options[speed]" id="smooth_slider_speed" class="small-text" value="<?php echo $smooth_slider['speed']; ?>" />&nbsp;(in secs)</td>
+</tr>
+
+<tr valign="top">
+<th scope="row">Slide Transition Speed</th>
+<td><input type="text" name="smooth_slider_options[transition]" id="smooth_slider_transition" class="small-text" value="<?php echo $smooth_slider['transition']; ?>" />*100(in millisecs)-duration of the slide animation Lower value indicates faster</td>
+</tr>
+
+<tr valign="top">
+<th scope="row"></th>
+<td><label for="smooth_slider_autostep"> 
+<input name="smooth_slider_options[autostep]" type="checkbox" id="smooth_slider_autostep" value="1" <?php checked("1", $smooth_slider['autostep']); ?> /> 
+ Enable autostepping of slides</label></td>
 </tr>
 
 <tr valign="top">
@@ -1419,7 +1465,6 @@ get_smooth_slider();
 <input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
 </p>
 </div> <!--end of float left -->
-</div> <!--end of poststuff -->
 </form>
 <?php 
 if ($_POST['remove_posts_slider']) {
@@ -1459,7 +1504,9 @@ if ($_POST['remove_posts_slider']) {
 	  $post = get_post($slider_post->id);	  
 	  if ( in_array($post->ID, $slider_arr) ) {
 		  $count++;
-		  echo '<tr' . ($count % 2 ? ' class="alternate"' : '') . '><td><strong>' . $post->post_title . '</strong></td><td>By ' . get_userdata($post->post_author)->display_name . '</td><td>' . date('l, F j. Y',strtotime($post->post_date)) . '</td><td><input type="checkbox" name="slider_posts[' . $post->ID . ']" value="1" /></td></tr>'; 
+		  $sslider_author = get_userdata($post->post_author);
+          $sslider_author_dname = $sslider_author->display_name;
+		  echo '<tr' . ($count % 2 ? ' class="alternate"' : '') . '><td><strong>' . $post->post_title . '</strong></td><td>By ' . $sslider_author_dname . '</td><td>' . date('l, F j. Y',strtotime($post->post_date)) . '</td><td><input type="checkbox" name="slider_posts[' . $post->ID . ']" value="1" /></td></tr>'; 
 	  }
 	}
 	if ($count == 0) {
@@ -1476,5 +1523,14 @@ if ($_POST['remove_posts_slider']) {
 }
 function register_mysettings() { // whitelist options
   register_setting( 'smooth-slider-group', 'smooth_slider_options' );
+}
+function smooth_slider_table_exists($table, $db) { 
+	$tables = mysql_list_tables ($db); 
+	while (list ($temp) = mysql_fetch_array ($tables)) {
+		if ($temp == $table) {
+			return TRUE;
+		}
+	}
+	return FALSE;
 }
 ?>

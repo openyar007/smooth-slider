@@ -3,8 +3,8 @@ Contributors: Tejaswini Deshpande, Sanjeev Mishra
 Tags: slideshow,featured,posts,jquery,slider,content,css,simple,thumbnail,image,post,sidebar,plugin,page,category,wpmu,site,blogs,style,home,categories,picture,flash,gallery
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 2.7
-Tested up to: 2.8.6
-Stable tag: 2.1.1
+Tested up to: WP 2.8.6, WPMU 2.8.6
+Stable tag: 2.1.2
 
 == Description ==
 
@@ -89,6 +89,14 @@ Forum link: http://www.clickonf5.org/phpbb/smooth-slider-f12/
 Visit the plugin page (http://www.clickonf5.org/smooth-slider) and screenshot-post (http://www.clickonf5.org/wordpress/smooth-slider-featured-posts-slideshow-plugin/4333) to see more about it.
 
 == Changelog ==
+Version 2.1.2 (11/26/2009)
+
+1. New - Added an option to change the transition speed between two slides. Now you can control the speed with which one slide slides off and another slides in.
+2. New - Added an option to enable the autostepping or autosliding or disable it.
+3. Fixed - A blank slide appeared on the slider if the post which is in slider is deleted from wp-admin. Fixed the issue, now if the post which is also in slider is deleted, then it will also be removed from the slider, fixing the blank slide issue
+4. Fixed - The scheduled or draft post placed into the slider will not appear on the actual slider. It will appear only in case when the post is published.
+5. Fixed - WPMU issue with get_smooth_slider_wpmu_all that the post permalinks direct to a wrong url, that represents the current blog only, though the posts are pulled from other blogs. This issue is fixed in this version of Smooth Slider.
+
 Version 2.1.1 (11/19/2009)
 
 1. New - Added an option whether to crop images or not. This was essential after version 2.1 because, some of us use the images from other location than the wordpress installation. In that case timthumb does not operate

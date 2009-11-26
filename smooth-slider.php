@@ -1088,7 +1088,7 @@ global $smooth_slider;
                 <li><a href="http://www.clickonf5.org/phpbb/smooth-slider-f12/" title="Support Forum for Smooth Slider" >Support Forum</a></li>
                 <li><a href="http://www.clickonf5.org/about/tejaswini" title="Smooth Slider Author Page" >About the Author</a></li>
                 <li><a href="http://wordpress.org/extend/plugins/smooth-slider/stats/">Status:Downloaded <strong><?php echo $plug_api->downloaded; ?></strong> times</a></li>
-                <li><a href="http://clickonf5.org/go/paypal/smooth-slider/" title="Donate if you liked the plugin and support in enhancing Smooth Slider and creating new plugins" >Donate with Paypal</a></li>
+                <li><a href="http://www.clickonf5.org/go/smooth-slider/" title="Donate if you liked the plugin and support in enhancing Smooth Slider and creating new plugins" >Donate with Paypal</a></li>
                 </ul> 
               </div> 
 			</div> 

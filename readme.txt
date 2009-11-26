@@ -3,7 +3,7 @@ Contributors: Tejaswini Deshpande, Sanjeev Mishra
 Tags: slideshow,featured,posts,jquery,slider,content,css,simple,thumbnail,image,post,sidebar,plugin,page,category,wpmu,site,blogs,style,home,categories,picture,flash,gallery
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 2.7
-Tested up to: WP 2.8.6, WPMU 2.8.6
+Tested up to: 2.8.6
 Stable tag: 2.1.2
 
 == Description ==

@@ -42,7 +42,7 @@ Highlighted Feature (from version 2.2) : Ability to create 'Multiple' sliders an
 
 [Demo](http://www.clickonf5.org/) |
 [Plugin Information](http://www.clickonf5.org/smooth-slider) | 
-[Release 2.0](http://www.clickonf5.org/wordpress/smooth-slider-upgrade-2-0-released/5151)
+[Release 2.2](http://www.clickonf5.org/wordpress/release-smooth-slider-22-multiple-slider-option/6386)
 
 == Installation ==
 

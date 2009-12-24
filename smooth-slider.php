@@ -1305,7 +1305,7 @@ global $smooth_slider;
                     <li><a href="http://malamedconsulting.com/" target="_blank">Connie Malamed - $25</a></li>
                     <li><a href="http://www.jacobwiechman.com/wordpress/" target="_blank">Jacob Wiechman - $30</a></li>
                     <li><a href="http://www.whatsthebigidea.com/" target="_blank">WhatsTheBigIdea.com,Inc. - $20</a></li>
-                    <li><a href="http://malamedconsulting.com/" target="_blank">Connie Malamed - $25</a></li>
+                    <li><a href="http://uwaterloo.ca/" target="_blank">Trevor Bain - $25</a></li>
                     <li><a href="http://thule-italia.com/wordpress/" target="_blank">Marco Linguardo - $10</a></li>
                     <li><a href="http://eircom.net" target="_blank">Paul Goode - $5</a></li>
                     <li><a href="http://www.windowsobserver.com/" target="_blank">Richard Hay - $10</a></li>

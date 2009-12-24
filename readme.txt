@@ -3,14 +3,16 @@ Contributors: Tejaswini Deshpande, Sanjeev Mishra
 Tags: slideshow,featured,posts,jquery,slider,content,css,simple,thumbnail,image,post,sidebar,plugin,page,category,wpmu,site,blogs,style,home,categories,picture,flash,gallery
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 2.7
-Tested up to: 2.8.6
-Stable tag: 2.1.2
+Tested up to: 2.9
+Stable tag: 2.2
 
 == Description ==
 
-Smooth Slider is a Wordpress and Wordpress MU Plugin for creating a dynamic slideshow for featured posts on a blog. The slideshow created by Smooth Slider are JavaScript and Text based, that is why bloggers will get full benefit of Search Engine Optimization as the texts are readable by Search Engines. You can choose some of your posts as featured posts and show them into a slideshow on your blog home page (i.e. Index) as well as in Sidebar.
+Smooth Slider is a Wordpress and Wordpress MU Plugin for creating a dynamic slideshow/s for featured posts on a blog. The slideshow created by Smooth Slider are JavaScript and Text based, that is why bloggers will get full benefit of Search Engine Optimization as the texts are readable by Search Engines. You can choose some of your posts as featured posts and show them into a slideshow on your blog home page (i.e. Index) as well as in Sidebar.
 
 Features:
+
+Highlighted Feature (from version 2.2) : Ability to create 'Multiple' sliders and an option to decide which post/page should show which slider
 
 1. Search Engine Optimized Slideshow
 2. Fully Customizable CSS
@@ -73,8 +75,8 @@ if(have_posts()) : while(have_posts()) : the_post();
 
 6. Almost all the fields that appear in the Smooth Slider are customizable, you can change the looks of your Slider and make it suitable for your theme. The defaults set are according to the Default Wordpress theme. Also, you can change the number of posts appearing in the slider and the pause or interval between the two consecutive posts on the slider. For making these changes, there would be  a settings page for Smooth Slider in the wp-admin screen of your blog, once you enable the plugin.
 
-Go to the plugin page to see more details (http://www.clickonf5.org/smooth-slider)
-There are lot many features added in Release version 2.0. To see the upgrade details and usage visit http://www.clickonf5.org/wordpress/smooth-slider-upgrade-2-0-released/5151
+Go to the plugin page to see more details on how to use the 'Multiple Slider' feature(http://www.clickonf5.org/smooth-slider)
+There are lot many features added from Release version 2.0 and above. To see the upgrade details and usage visit http://www.clickonf5.org/wordpress/smooth-slider-upgrade-2-0-released/5151
 
 == Frequently Asked Questions ==
 
@@ -89,6 +91,16 @@ Forum link: http://www.clickonf5.org/phpbb/smooth-slider-f12/
 Visit the plugin page (http://www.clickonf5.org/smooth-slider) and screenshot-post (http://www.clickonf5.org/wordpress/smooth-slider-featured-posts-slideshow-plugin/4333) to see more about it.
 
 == Changelog ==
+Version 2.2 (12/22/2009)
+
+1.New - Multiple Sliders can now be created from the settings page. Post/Pages can be selectively put in the slider of your choice. Also, you could decide  which post/page should display which slider (from the Edit Post/Page), though the page/single post template file contains regular Smooth Slider tag only.
+2.New - Added an option to limit the content on the slider by 'words'. Previously it was only with number of characters due to which sometimes for some posts the last word on the slider was shown broken. Now you can use any of the two, either limit content by number of characters or number of words
+3.Fix - Fixed the issue with get_smooth_slider_cat tag. There was a bug when this tag ws used for home page. Now it is working as per the specifications.
+4.Fix - For using the custom images for navigation, there was an issue with 'getimagesize' php function for some servers. Removed this fuction and directly put options to specify the custom images height and width.
+5.Fix - When the navigation numbers are used, there was some clicking issue, like the numbers needed to be douoble clicked in order to go to that slide number. This issue was observed with some installations of Smooth Slider (like on demo page). Hopefully this would get fixed with this release.
+6.Fix - Changed the name of the database table from slider to smooth_slider to avoid any database conflicts and be more specific
+
+
 Version 2.1.2 (11/26/2009)
 
 1. New - Added an option to change the transition speed between two slides. Now you can control the speed with which one slide slides off and another slides in.

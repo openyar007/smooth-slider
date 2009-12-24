@@ -3,7 +3,7 @@
 Plugin Name: Smooth Slider
 Plugin URI: http://www.clickonf5.org/smooth-slider
 Description: Smooth Slider adds a smooth content and image slideshow with customizable background and slide intervals to any location of your blog
-Version: 2.1.2	
+Version: 2.2	
 Author: Tejaswini Deshpande, Sanjeev Mishra
 Author URI: http://www.clickonf5.org
 Wordpress version supported: 2.7 and above
@@ -27,16 +27,63 @@ Wordpress version supported: 2.7 and above
 */
 //Please visit Plugin page http://www.clickonf5.org/smooth-slider for Changelog
 //on activation
+
+define('SLIDER_TABLE','smooth_slider'); //Slider TABLE NAME
+define('PREV_SLIDER_TABLE','slider'); //Slider TABLE NAME
+define('SLIDER_META','smooth_slider_meta'); //Meta TABLE NAME
+define('SLIDER_POST_META','smooth_slider_postmeta'); //Meta TABLE NAME
+define("SMOOTH_SLIDER_VER","2.2",false);//Current Version of Smooth Slider
+
 function install_smooth_slider() {
 	global $wpdb, $table_prefix;
-	$table_name = $table_prefix.'slider';
+	$table_name = $table_prefix.SLIDER_TABLE;
 	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
 		$sql = "CREATE TABLE $table_name (
-					id mediumint(9) NOT NULL AUTO_INCREMENT,
+					id int(5) NOT NULL AUTO_INCREMENT,
+					post_id int(11) NOT NULL,
 					date datetime NOT NULL,
+					slider_id int(5) NOT NULL DEFAULT '1',
 					UNIQUE KEY id(id)
 				);";
 		$rs = $wpdb->query($sql);
+		
+		$prev_table_name = $table_prefix.PREV_SLIDER_TABLE;
+		
+		if($wpdb->get_var("show tables like '$prev_table_name'") == $prev_table_name) {
+			$prev_slider_data = ss_get_prev_slider();
+			foreach ($prev_slider_data as $prev_slider_row){
+				$prev_post_id = $prev_slider_row['id'];
+				$prev_date_time = $prev_slider_row['date'];
+				if ($prev_post_id) {
+					$sql = "INSERT INTO $table_name (post_id,date) VALUES('$prev_post_id','$prev_date_time');";
+					$result = $wpdb->query($sql);
+				}
+			}
+		}
+		
+	}
+
+   	$meta_table_name = $table_prefix.SLIDER_META;
+	if($wpdb->get_var("show tables like '$meta_table_name'") != $meta_table_name) {
+		$sql = "CREATE TABLE $meta_table_name (
+					slider_id int(5) NOT NULL AUTO_INCREMENT,
+					slider_name varchar(100) NOT NULL default '',
+					UNIQUE KEY slider_id(slider_id)
+				);";
+		$rs2 = $wpdb->query($sql);
+		
+		$sql = "INSERT INTO $meta_table_name (slider_id,slider_name) VALUES('1','Smooth Slider');";
+		$rs3 = $wpdb->query($sql);
+	}
+	
+	$slider_postmeta = $table_prefix.SLIDER_POST_META;
+	if($wpdb->get_var("show tables like '$slider_postmeta'") != $slider_postmeta) {
+		$sql = "CREATE TABLE $slider_postmeta (
+					post_id int(11) NOT NULL,
+					slider_id int(5) NOT NULL default '1',
+					UNIQUE KEY post_id(post_id)
+				);";
+		$rs4 = $wpdb->query($sql);
 	}
    // Need to delete the previously created options in old versions and create only one option field for Smooth Slider
    $default_slider = array();
@@ -79,7 +126,11 @@ function install_smooth_slider() {
 						   'custom_nav'=>'',
 						   'crop'=>'0',
 						   'transition'=>'5',
-						   'autostep'=>'1'
+						   'autostep'=>'1',
+						   'multiple_sliders'=>'0',
+						   'navimg_w'=>'32',
+						   'navimg_ht'=>'32',
+						   'content_limit'=>'50'
 			              );
    
 	   $smooth_slider = get_option('smooth_slider_options');
@@ -132,23 +183,62 @@ register_activation_hook( __FILE__, 'install_smooth_slider' );
 //defined global variables and constants here
 global $smooth_slider;
 $smooth_slider = get_option('smooth_slider_options');
-define("SMOOTH_SLIDER_VER","2.1.2",false);
+include("smooth-slider-functions.php");
 
 //This adds the post to the slider
 function add_to_slider($post_id) {
 	global $wpdb, $table_prefix;
-	if(isset($_POST['slider']) and $_POST['slider'] == "slider" and !slider($post_id)) {
-		$table_name = $table_prefix.'slider';
+	$table_name = $table_prefix.SLIDER_TABLE;
+	
+	if(isset($_POST['slider']) and !isset($_POST['slider_name'])) {
+	  $slider_id = '1';
+	  if(is_post_on_any_slider($post_id)){
+	     $sql = "DELETE FROM $table_name where post_id = '$post_id'";
+		 $wpdb->query($sql);
+	  }
+	  
+	  if(isset($_POST['slider']) and $_POST['slider'] == "slider" and !slider($post_id,$slider_id)) {
 		$dt = date('Y-m-d H:i:s');
-		$sql = "INSERT INTO $table_name (id, date) VALUES ($post_id, '$dt')";
+		$sql = "INSERT INTO $table_name (post_id, date, slider_id) VALUES ('$post_id', '$dt', '$slider_id')";
 		$wpdb->query($sql);
+	  }
 	}
+	if(isset($_POST['slider']) and $_POST['slider'] == "slider" and isset($_POST['slider_name'])){
+	  $slider_id_arr = $_POST['slider_name'];
+	    if(is_post_on_any_slider($post_id)){
+	     $sql = "DELETE FROM $table_name where post_id = '$post_id'";
+		 $wpdb->query($sql);
+	    }
+	    foreach($slider_id_arr as $slider_id) {
+			if(!slider($post_id,$slider_id)) {
+				$dt = date('Y-m-d H:i:s');
+				$sql = "INSERT INTO $table_name (post_id, date, slider_id) VALUES ('$post_id', '$dt', '$slider_id')";
+				$wpdb->query($sql);
+			}
+		}
+	}
+	
+	$table_name = $table_prefix.SLIDER_POST_META;
+	if(isset($_POST['display_slider']) and !isset($_POST['display_slider_name'])) {
+	  $slider_id = '1';
+	}
+	if(isset($_POST['display_slider']) and isset($_POST['display_slider_name'])){
+	  $slider_id = $_POST['display_slider_name'];
+	}
+  	if(isset($_POST['display_slider'])){	
+		  if(!ss_post_on_slider($post_id,$slider_id)) {
+		    $sql = "DELETE FROM $table_name where post_id = '$post_id'";
+		    $wpdb->query($sql);
+			$sql = "INSERT INTO $table_name (post_id, slider_id) VALUES ('$post_id', '$slider_id')";
+			$wpdb->query($sql);
+		  }
+	}	
 }
 
 //Removes the post from the slider, if you uncheck the checkbox from the edit post screen
 function remove_from_slider($post_id) {
 	global $wpdb, $table_prefix;
-	$table_name = $table_prefix.'slider';
+	$table_name = $table_prefix.SLIDER_TABLE;
 	
 	// authorization
 	if (!current_user_can('edit_post', $post_id))
@@ -157,30 +247,32 @@ function remove_from_slider($post_id) {
 	if (!wp_verify_nonce($_POST['sldr-verify'], 'SmoothSlider'))
 		return $post_id;
 	
-	if(empty($_POST['slider']) and slider($post_id)) {
-		$sql = "DELETE FROM $table_name where id = $post_id LIMIT 1";
+    if(empty($_POST['slider']) and is_post_on_any_slider($post_id)) {
+		$sql = "DELETE FROM $table_name where post_id = '$post_id'";
 		$wpdb->query($sql);
 	}
-  } 
+	
+	$display_slider = $_POST['display_slider'];
+	$table_name = $table_prefix.SLIDER_POST_META;
+	if(empty($display_slider) and ss_slider_on_this_post($post_id)){
+	  $sql = "DELETE FROM $table_name where post_id = '$post_id'";
+		    $wpdb->query($sql);
+	}
+} 
   
   
 function delete_from_slider_table($post_id){
     global $wpdb, $table_prefix;
-	$table_name = $table_prefix.'slider';
-    if(slider($post_id)) {
-		$sql = "DELETE FROM $table_name where id = $post_id LIMIT 1";
+	$table_name = $table_prefix.SLIDER_TABLE;
+    if(is_post_on_any_slider($post_id)) {
+		$sql = "DELETE FROM $table_name where post_id = '$post_id'";
 		$wpdb->query($sql);
 	}
-}
-
-//Checks if the post is already added to slider
-function slider($post_id) {
-	global $wpdb, $table_prefix;
-	$table_name = $table_prefix."slider";
-	$check = "SELECT id FROM $table_name WHERE id = $post_id";
-	$result = $wpdb->query($check);
-	if($result == 1) { return TRUE; }
-	else { return FALSE; }
+	$table_name = $table_prefix.SLIDER_POST_META;
+    if(ss_slider_on_this_post($post_id)) {
+		$sql = "DELETE FROM $table_name where post_id = '$post_id'";
+		$wpdb->query($sql);
+	}
 }
 
 // Slider checkbox on the admin page
@@ -191,22 +283,54 @@ function add_to_slider_checkbox() {
 	if ($current_user->allcaps['level_' . $smooth_slider['user_level']]) {
 		$extra = "";
 		
+		$post_id = $post->ID;
+		
 		if(isset($post->ID)) {
 			$post_id = $post->ID;
-			if(slider($post_id)) { $extra = 'checked="checked"'; }
+			if(is_post_on_any_slider($post_id)) { $extra = 'checked="checked"'; }
+		} 
+		
+		$post_slider_arr = array();
+		
+		$post_sliders = ss_get_post_sliders($post_id);
+		if($post_sliders) {
+			foreach($post_sliders as $post_slider){
+			   $post_slider_arr[] = $post_slider['slider_id'];
+			}
 		}
 		
-		echo '<div id="slider_checkbox">
-				<input type="checkbox" class="sldr_post" name="slider" value="slider" '.$extra.' />
-				<label for="slider">Add this post/page to Smooth Slider</label>
-				<input type="hidden" name="sldr-verify" id="sldr-verify" value="'.wp_create_nonce('SmoothSlider').'" />
-			  </div>';
-    }
+		$sliders = ss_get_sliders();
+?>
+		<div id="slider_checkbox">
+				<input type="checkbox" class="sldr_post" name="slider" value="slider" <?php echo $extra;?> />
+				<label for="slider">Add this post/page to </label>
+				<select name="slider_name[]" multiple="multiple" size="2" style="height:4em;">
+                <?php foreach ($sliders as $slider) { ?>
+                  <option value="<?php echo $slider['slider_id'];?>" <?php if(in_array($slider['slider_id'],$post_slider_arr)){echo 'selected';} ?>><?php echo $slider['slider_name'];?></option>
+                <?php } ?>
+                </select>
+                
+         <?php if($smooth_slider['multiple_sliders'] == '1') {?>
+                <br />
+                <br />
+                
+                <input type="checkbox" class="sldr_post" name="display_slider" value="1" <?php if(ss_slider_on_this_post($post_id)){echo "checked";}?> />
+				<label for="display_slider">Display 
+				<select name="display_slider_name">
+                <?php foreach ($sliders as $slider) { ?>
+                  <option value="<?php echo $slider['slider_id'];?>" <?php if(ss_post_on_slider($post_id,$slider['slider_id'])){echo 'selected';} ?>><?php echo $slider['slider_name'];?></option>
+                <?php } ?>
+                </select> on this Post/Page (you need to add the Smooth Slider template tag manually on your page.php/single.php or whatever page template file)</label>
+          <?php } ?>
+                
+				<input type="hidden" name="sldr-verify" id="sldr-verify" value="<?php echo wp_create_nonce('SmoothSlider');?>" />
+	    </div>
+<?php }
 }
 
 //CSS for the checkbox on the admin page
 function slider_checkbox_css() {
-?><style type="text/css" media="screen">#slider_checkbox{margin: 5px 0 10px 0;padding:3px;font-weight:bold;}</style>
+?><style type="text/css" media="screen">#slider_checkbox{margin: 5px 0 10px 0;padding:3px;font-weight:bold;}#slider_checkbox input,#slider_checkbox select{font-weight:bold;}#slider_checkbox label,#slider_checkbox input,#slider_checkbox select{vertical-align:top;}</style>
 <?php
 }
 
@@ -259,23 +383,24 @@ function smooth_slider_get_first_image($post) {
 	return $first_img;
 }
 
-function carousel_posts_on_slider($max_posts, $offset=0) {
+function carousel_posts_on_slider($max_posts, $offset=0, $slider_id = '1') {
     global $smooth_slider;
 	global $wpdb, $table_prefix;
-	$table_name = $table_prefix."slider";
+	$table_name = $table_prefix.SLIDER_TABLE;
 	$post_table = $table_prefix."posts";
 	
-	$posts = $wpdb->get_results("SELECT a.id, a.date FROM 
+	$posts = $wpdb->get_results("SELECT a.post_id, a.date FROM 
 	                             $table_name a LEFT OUTER JOIN $post_table b 
-								 ON a.id = b.ID 
-								 WHERE b.post_status = 'publish' 
+								 ON a.post_id = b.ID 
+								 WHERE b.post_status = 'publish'  
+								 AND a.slider_id = '$slider_id'
 	                             ORDER BY a.date DESC LIMIT $offset, $max_posts", OBJECT);
 	
 	$html = '';
 	$smooth_sldr_j = 0;
 	
 	foreach($posts as $post) {
-		$id = $post->id;
+		$id = $post->post_id;
 		$posts_table = $table_prefix.'posts'; 
 		$sql_post = "SELECT * FROM $posts_table WHERE ID = $id";
 		$rs_post = $wpdb->get_results("SELECT * FROM $posts_table WHERE ID = $id", OBJECT);
@@ -352,12 +477,17 @@ function carousel_posts_on_slider($max_posts, $offset=0) {
 			}
 		}
 		
+		if(!$smooth_slider['content_limit'] or $smooth_slider['content_limit'] == '' or $smooth_slider['content_limit'] == ' ') 
+		  $slider_excerpt = substr($slider_content,0,$smooth_slider['content_chars']);
+		else 
+		  $slider_excerpt = smooth_slider_word_limiter( $slider_content, $limit = $smooth_slider['content_limit'] );
+		  		
 		if ($smooth_slider['image_only'] == '1') { 
 			$html .= '<!-- /smooth_slideri -->
 			</div>';
 		}
 		else {
-			$html .= '<h2 ><a href="'.$permalink.'">'.$post_title.'</a></h2><span> '.substr($slider_content,0,$smooth_slider['content_chars']).'</span>
+			$html .= '<h2 ><a href="'.$permalink.'">'.$post_title.'</a></h2><span> '.$slider_excerpt.'</span>
 				<p class="more"><a href="'.$permalink.'">'.$smooth_slider['more'].'</a></p>
 			
 				<!-- /smooth_slideri -->
@@ -371,12 +501,12 @@ function carousel_posts_on_slider($max_posts, $offset=0) {
 function carousel_posts_on_slider_cat($max_posts, $catg_slug, $offset=0) {
     global $smooth_slider;
 	global $wpdb, $table_prefix;
-	$table_name = $table_prefix."slider";
+	$table_name = $table_prefix.SLIDER_TABLE;
     $post_table = $table_prefix."posts";
 	
-	$myposts = $wpdb->get_results("SELECT a.id, a.date FROM 
+	$myposts = $wpdb->get_results("SELECT a.post_id, a.date FROM 
 	                             $table_name a LEFT OUTER JOIN $post_table b 
-								 ON a.id = b.ID 
+								 ON a.post_id = b.ID 
 								 WHERE b.post_status = 'publish' 
 	                             ORDER BY a.date DESC LIMIT $offset, $max_posts", OBJECT);
 	
@@ -393,7 +523,7 @@ function carousel_posts_on_slider_cat($max_posts, $catg_slug, $offset=0) {
 	}
 	
 	foreach($myposts as $mypost) {
-		$post = get_post($mypost->id);
+		$post = get_post($mypost->post_id);
 		$post_cats_arr = get_the_category($post->ID);
 		
 		$post_cats = array();
@@ -401,7 +531,7 @@ function carousel_posts_on_slider_cat($max_posts, $catg_slug, $offset=0) {
 		  $post_cats[] = $post_cat_arr->cat_ID;
 		}
 		
-    	if (in_array($slider_cat,$post_cats) or is_home() or (is_paged() and !is_category()) or is_tag() or is_author() or (is_archive() and !is_category()))
+    	if ((isset($slider_cat) and in_array($slider_cat,$post_cats)) or (empty($catg_slug) and (is_home() or (is_paged() and !is_category()) or is_tag() or is_author() or (is_archive() and !is_category()))))
 		{
 			$post_title = stripslashes($post->post_title);
 			$post_title = str_replace('"', '', $post_title);
@@ -476,13 +606,18 @@ function carousel_posts_on_slider_cat($max_posts, $catg_slug, $offset=0) {
 			  endif;
 			}
 		}
+		
+		if(!$smooth_slider['content_limit'] or $smooth_slider['content_limit'] == '' or $smooth_slider['content_limit'] == ' ') 
+		  $slider_excerpt = substr($slider_content,0,$smooth_slider['content_chars']);
+		else 
+		  $slider_excerpt = smooth_slider_word_limiter( $slider_content, $limit = $smooth_slider['content_limit'] );
 			
 			if ($smooth_slider['image_only'] == '1') { 
 				$html .= '<!-- /smooth_slideri -->
 				</div>';
 			}
 			else {
-				$html .= '<h2 ><a href="'.$permalink.'">'.$post_title.'</a></h2><span> '.substr($slider_content,0,$smooth_slider['content_chars']).'</span>
+				$html .= '<h2 ><a href="'.$permalink.'">'.$post_title.'</a></h2><span> '.$slider_excerpt.'</span>
 					<p class="more"><a href="'.$permalink.'">'.$smooth_slider['more'].'</a></p>
 				
 					<!-- /smooth_slideri -->
@@ -509,20 +644,20 @@ function smooth_slider_wpmu_carousel_posts($max_posts, $offset=0) {
         switch_to_blog($details['blog_id']); 
 		global $table_prefix;
 		
-		$table_name = $table_prefix."slider";
+		$table_name = $table_prefix.SLIDER_TABLE;
 		$post_table = $table_prefix."posts";
 				
 		if(smooth_slider_table_exists($table_name, DB_NAME)){
 		
-		$myposts = $wpdb->get_results("SELECT a.id, a.date FROM 
+		$myposts = $wpdb->get_results("SELECT a.post_id, a.date FROM 
 	                             $table_name a LEFT OUTER JOIN $post_table b 
-								 ON a.id = b.ID 
+								 ON a.post_id = b.ID 
 								 WHERE b.post_status = 'publish' 
 	                             ORDER BY a.date DESC LIMIT $offset, $max_posts", OBJECT);
 		
 		foreach($myposts as $mypost) {
 			$posts_table = $table_prefix."posts";
-			$id = $mypost->id;
+			$id = $mypost->post_id;
 			$post =  $wpdb->get_row("SELECT * FROM $posts_table WHERE ID = $id", OBJECT);
 			
 			$post_title = stripslashes($post->post_title);
@@ -597,13 +732,18 @@ function smooth_slider_wpmu_carousel_posts($max_posts, $offset=0) {
 			  endif;
 			}
 		}
+		
+		if(!$smooth_slider['content_limit'] or $smooth_slider['content_limit'] == '' or $smooth_slider['content_limit'] == ' ') 
+		  $slider_excerpt = substr($slider_content,0,$smooth_slider['content_chars']);
+		else 
+		  $slider_excerpt = smooth_slider_word_limiter( $slider_content, $limit = $smooth_slider['content_limit'] );
 			
 			if ($smooth_slider['image_only'] == '1') { 
 				$html .= '<!-- /smooth_slideri -->
 				</div>';
 			}
 			else {
-				$html .= '<h2 ><a href="'.$permalink.'">'.$post_title.'</a></h2><span> '.substr($slider_content,0,$smooth_slider['content_chars']).'</span>
+				$html .= '<h2 ><a href="'.$permalink.'">'.$post_title.'</a></h2><span> '.$slider_excerpt.'</span>
 					<p class="more"><a href="'.$permalink.'">'.$smooth_slider['more'].'</a></p>
 				
 					<!-- /smooth_slideri -->
@@ -625,7 +765,7 @@ function smooth_slider_wpmu_carousel_posts($max_posts, $offset=0) {
 function smooth_slider_css() {
 global $smooth_slider;
 ?>
-<style type="text/css" media="screen">#smooth_sldr{width:<?php echo $smooth_slider['width']; ?>px;height:<?php echo $smooth_slider['height']; ?>px;background-color:<?php if ($smooth_slider['bg'] == '1') { echo "transparent";} else { echo $smooth_slider['bg_color']; } ?>;border:<?php echo $smooth_slider['border']; ?>px solid <?php echo $smooth_slider['brcolor']; ?>;}#smooth_sldr_items{padding:10px <?php if ($smooth_slider['prev_next'] == 1) {echo "18";} else {echo "12";} ?>px 0px <?php if ($smooth_slider['prev_next'] == 1) {echo "26";} else {echo "12";} ?>px;}#smooth_sliderc{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 44);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.smooth_slideri{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 54);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.sldr_title{font-family:<?php echo $smooth_slider['title_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['title_fsize']; ?>px;font-weight:<?php if ($smooth_slider['title_fstyle'] == "bold" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "bold";} else { echo "normal"; } ?>;font-style:<?php if ($smooth_slider['title_fstyle'] == "italic" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['title_fcolor']; ?>;}#smooth_sldr_body h2{line-height:<?php echo ($smooth_slider['ptitle_fsize'] + 3); ?>px;font-family:<?php echo $smooth_slider['ptitle_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['ptitle_fsize']; ?>px;font-weight:<?php if ($smooth_slider['ptitle_fstyle'] == "bold" or $smooth_slider['ptitle_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['ptitle_fstyle'] == "italic" or $smooth_slider['ptitle_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px 0 5px 0;}#smooth_sldr_body h2 a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}#smooth_sldr_body span{font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-weight:<?php if ($smooth_slider['content_fstyle'] == "bold" or $smooth_slider['content_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['content_fstyle']=="italic" or $smooth_slider['content_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['content_fcolor']; ?>;}.smooth_slider_thumbnail{float:<?php echo $smooth_slider['img_align']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px <?php if($smooth_slider['img_align'] == "left") {echo "5";} else {echo "0";} ?>px 0 <?php if($smooth_slider['img_align'] == "right") {echo "5";} else {echo "0";} ?>px;<?php if ($smooth_slider['img_size'] == 1 and $smooth_slider['crop'] != '1') { ?>width:<?php echo $smooth_slider['img_width']; ?>px;height:<?php echo $smooth_slider['img_height']; ?>px;<?php } ?>border:<?php echo $smooth_slider['img_border']; ?>px solid <?php echo $smooth_slider['img_brcolor']; ?>;}#smooth_sldr_body p.more a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;}#smooth_sliderc_nav li{border:1px solid <?php echo $smooth_slider['content_fcolor']; ?>;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;}#smooth_sliderc_nav li a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}.sldrlink{padding-right:<?php if ($smooth_slider['prev_next'] == 1) {echo "40";} else {echo "25";} ?>px;}.sldrlink a{color:<?php echo $smooth_slider['content_fcolor']; ?>;}</style>
+<style type="text/css" media="screen">#smooth_sldr{width:<?php echo $smooth_slider['width']; ?>px;height:<?php echo $smooth_slider['height']; ?>px;background-color:<?php if ($smooth_slider['bg'] == '1') { echo "transparent";} else { echo $smooth_slider['bg_color']; } ?>;border:<?php echo $smooth_slider['border']; ?>px solid <?php echo $smooth_slider['brcolor']; ?>;}#smooth_sldr_items{padding:10px <?php if ($smooth_slider['prev_next'] == 1) {echo "18";} else {echo "12";} ?>px 0px <?php if ($smooth_slider['prev_next'] == 1) {echo "26";} else {echo "12";} ?>px;}#smooth_sliderc{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 44);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){$nav_size = $smooth_slider['navimg_ht'];} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.smooth_slideri{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 54);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){$nav_size = $smooth_slider['navimg_ht'];} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.sldr_title{font-family:<?php echo $smooth_slider['title_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['title_fsize']; ?>px;font-weight:<?php if ($smooth_slider['title_fstyle'] == "bold" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "bold";} else { echo "normal"; } ?>;font-style:<?php if ($smooth_slider['title_fstyle'] == "italic" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['title_fcolor']; ?>;}#smooth_sldr_body h2{line-height:<?php echo ($smooth_slider['ptitle_fsize'] + 3); ?>px;font-family:<?php echo $smooth_slider['ptitle_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['ptitle_fsize']; ?>px;font-weight:<?php if ($smooth_slider['ptitle_fstyle'] == "bold" or $smooth_slider['ptitle_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['ptitle_fstyle'] == "italic" or $smooth_slider['ptitle_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px 0 5px 0;}#smooth_sldr_body h2 a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}#smooth_sldr_body span{font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-weight:<?php if ($smooth_slider['content_fstyle'] == "bold" or $smooth_slider['content_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['content_fstyle']=="italic" or $smooth_slider['content_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['content_fcolor']; ?>;}.smooth_slider_thumbnail{float:<?php echo $smooth_slider['img_align']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px <?php if($smooth_slider['img_align'] == "left") {echo "5";} else {echo "0";} ?>px 0 <?php if($smooth_slider['img_align'] == "right") {echo "5";} else {echo "0";} ?>px;<?php if ($smooth_slider['img_size'] == 1 and $smooth_slider['crop'] != '1') { ?>width:<?php echo $smooth_slider['img_width']; ?>px;height:<?php echo $smooth_slider['img_height']; ?>px;<?php } ?>border:<?php echo $smooth_slider['img_border']; ?>px solid <?php echo $smooth_slider['img_brcolor']; ?>;}#smooth_sldr_body p.more a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;}#smooth_sliderc_nav li{border:1px solid <?php echo $smooth_slider['content_fcolor']; ?>;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;}#smooth_sliderc_nav li a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}.sldrlink{padding-right:<?php if ($smooth_slider['prev_next'] == 1) {echo "40";} else {echo "25";} ?>px;}.sldrlink a{color:<?php echo $smooth_slider['content_fcolor']; ?>;}</style>
 <?php
 }
 
@@ -641,83 +781,91 @@ function smooth_slider_enqueue_scripts() {
 
 add_action( 'init', 'smooth_slider_enqueue_scripts' );
 
-function get_smooth_slider() {
+function get_smooth_slider($slider_id = '1') {
  global $smooth_slider; 
+ 
+ if($smooth_slider['multiple_sliders'] == '1' and is_singular()){
+    global $post;
+	$post_id = $post->ID;
+    $slider_id = get_slider_for_the_post($post_id);
+ }
+ 
+if(!empty($slider_id)){
 ?>
-<script type="text/javascript">
-stepcarousel.setup({
-	galleryid: 'smooth_sliderc', //id of carousel DIV
-	beltclass: 'smooth_sliderb', //class of inner "belt" DIV containing all the panel DIVs
-	panelclass: 'smooth_slideri', //class of panel DIVs each holding content
-	autostep: {<?php if ($smooth_slider['autostep'] == '1'){ echo "enable: true";} else {echo "enable: false";}?>, moveby:1, pause:<?php echo $smooth_slider['speed']*1000; ?>},
-	panelbehavior: {speed:<?php echo $smooth_slider['transition']*100; ?>, wraparound: false, persist:false},
-	defaultbuttons: {enable: <?php if ($smooth_slider['prev_next'] == 1) {echo "true";} else {echo "false";} ?>, moveby: 1, leftnav: ['<?php echo smooth_slider_plugin_url( 'images/button_prev.png' ); ?>', -25, <?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $smooth_slider['content_fsize'] + 5 + 18; } else { $extra_height = $smooth_slider['content_fsize'] + 5 + 5 + 18;  } echo (($smooth_slider['height'] - $extra_height)/2); ?>], rightnav: ['<?php echo smooth_slider_plugin_url( 'images/button_next.png' ); ?>', 0, <?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $smooth_slider['content_fsize'] + 5 + 18; } else { $extra_height = $smooth_slider['content_fsize'] + 5 + 5 + 18;  } echo (($smooth_slider['height'] - $extra_height)/2); ?>]},
-	statusvars: ['imageA', 'imageB', 'imageC'], //register 3 variables that contain current panel (start), current panel (last), and total panels
-	contenttype: ['inline'], //content setting ['inline'] or ['external', 'path_to_external_file']
-	onslide:function(){
-	  jQuery("#smooth_sliderc_nav li a").css("fontWeight", "normal");
-	  jQuery("#smooth_sliderc_nav li a").css("fontSize", "<?php echo $smooth_slider['content_fsize']; ?>px");
-	  var curr_slide = imageA;
-  	  jQuery("#sldr"+curr_slide).css("fontWeight", "bolder");
-	  jQuery("#sldr"+curr_slide).css("fontSize", "<?php echo ($smooth_slider['content_fsize'] + 5); ?>px");
-	  
-	  <?php if ($smooth_slider['goto_slide'] == 2) { 
- 				list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");
-				global $sldr_nav_width;
-				$sldr_nav_width = $width/2;
-	  ?>
-	  var nav_width = <?php global $sldr_nav_width; echo $sldr_nav_width; ?>;
-	  jQuery("#smooth_sliderc_nav a").css("backgroundPosition", "0 0");
-	  jQuery("#sldr"+curr_slide).css("backgroundPosition", "-"+nav_width+"px 0");
-	  <?php } ?>
-	  
-  }
-})
-</script>
-<noscript><strong>This page is having a slideshow that uses Javascript. Your browser either doesn't support Javascript or you have it turned off. To see this page as it is meant to appear please use a Javascript enabled browser.</strong></noscript>
-    	<div id="smooth_sldr">
-		<div id="smooth_sldr_items">
-			<div id="smooth_sldr_body">
-				<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { ?><div class="sldr_title"><?php echo $smooth_slider['title_text']; ?></div> <?php } ?>
-				<div id="smooth_sliderc">
-					<div class="smooth_sliderb">
-					<?php global $smooth_sldr_j; $smooth_sldr_j = carousel_posts_on_slider($smooth_slider['no_posts']); ?>
+	<script type="text/javascript">
+	stepcarousel.setup({
+		galleryid: 'smooth_sliderc', //id of carousel DIV
+		beltclass: 'smooth_sliderb', //class of inner "belt" DIV containing all the panel DIVs
+		panelclass: 'smooth_slideri', //class of panel DIVs each holding content
+		autostep: {<?php if ($smooth_slider['autostep'] == '1'){ echo "enable: true";} else {echo "enable: false";}?>, moveby:1, pause:<?php echo $smooth_slider['speed']*1000; ?>},
+		panelbehavior: {speed:<?php echo $smooth_slider['transition']*100; ?>, wraparound: false, persist:false},
+		defaultbuttons: {enable: <?php if ($smooth_slider['prev_next'] == 1) {echo "true";} else {echo "false";} ?>, moveby: 1, leftnav: ['<?php echo smooth_slider_plugin_url( 'images/button_prev.png' ); ?>', -25, <?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $smooth_slider['content_fsize'] + 5 + 18; } else { $extra_height = $smooth_slider['content_fsize'] + 5 + 5 + 18;  } echo (($smooth_slider['height'] - $extra_height)/2); ?>], rightnav: ['<?php echo smooth_slider_plugin_url( 'images/button_next.png' ); ?>', 0, <?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $smooth_slider['content_fsize'] + 5 + 18; } else { $extra_height = $smooth_slider['content_fsize'] + 5 + 5 + 18;  } echo (($smooth_slider['height'] - $extra_height)/2); ?>]},
+		statusvars: ['imageA', 'imageB', 'imageC'], //register 3 variables that contain current panel (start), current panel (last), and total panels
+		contenttype: ['inline'], //content setting ['inline'] or ['external', 'path_to_external_file']
+		onslide:function(){
+		  jQuery("#smooth_sliderc_nav li a").css("fontWeight", "normal");
+		  jQuery("#smooth_sliderc_nav li a").css("fontSize", "<?php echo $smooth_slider['content_fsize']; ?>px");
+		  var curr_slide = imageA;
+		  jQuery("#sldr"+curr_slide).css("fontWeight", "bolder");
+		  jQuery("#sldr"+curr_slide).css("fontSize", "<?php echo ($smooth_slider['content_fsize'] + 5); ?>px");
+		  
+		  <?php if ($smooth_slider['goto_slide'] == 2) { 
+					
+					global $sldr_nav_width;
+					$sldr_nav_width = $smooth_slider['navimg_w'];
+		  ?>
+		  var nav_width = <?php global $sldr_nav_width; echo $sldr_nav_width; ?>;
+		  jQuery("#smooth_sliderc_nav a").css("backgroundPosition", "0 0");
+		  jQuery("#sldr"+curr_slide).css("backgroundPosition", "-"+nav_width+"px 0");
+		  <?php } ?>
+	  }
+	})
+	</script>
+	<noscript><strong>This page is having a slideshow that uses Javascript. Your browser either doesn't support Javascript or you have it turned off. To see this page as it is meant to appear please use a Javascript enabled browser.</strong></noscript>
+			<div id="smooth_sldr">
+			<div id="smooth_sldr_items">
+				<div id="smooth_sldr_body">
+					<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { ?><div class="sldr_title"><?php echo $smooth_slider['title_text']; ?></div> <?php } ?>
+					<div id="smooth_sliderc">
+						<div class="smooth_sliderb">
+						<?php global $smooth_sldr_j; $smooth_sldr_j = carousel_posts_on_slider($smooth_slider['no_posts'], $offset=0, $slider_id); ?>
+						</div>
 					</div>
 				</div>
+				<?php if ($smooth_slider['goto_slide'] == 1) { ?>
+				<ul id="smooth_sliderc_nav">
+					<?php global $smooth_sldr_j; for($i=1; $i<=$smooth_sldr_j; $i++) { 
+					echo "<li><a id=\"sldr".$i."\" href=\"javascript:stepcarousel.stepTo('smooth_sliderc', ".$i.")\" >".$i."</a></li>\n";
+					 } ?>
+				</ul>
+				<?php } 
+				if ($smooth_slider['goto_slide'] == 2) { ?>
+				<div id="smooth_sliderc_nav">
+					<?php global $smooth_sldr_j; for($i=1; $i<=$smooth_sldr_j; $i++) { 
+					
+					$width = $smooth_slider['navimg_w'];
+					echo "<a class=\"smooth_sliderc_nav\" id=\"sldr".$i."\" style=\"background-image:url(".smooth_slider_plugin_url( 'images/' )."slide".$i.".png);background-position:0 0;width:".$width."px;height:".$smooth_slider['navimg_ht']."px;\" href=\"javascript:stepcarousel.stepTo('smooth_sliderc', ".$i.")\" ></a>\n";
+					 } ?>
+				  </div>
+		  <?php }  
+				 if ($smooth_slider['goto_slide'] == 3) { ?>	 
+				 <div id="smooth_sliderc_nav"><li style="border:none;"><?php echo $smooth_slider['custom_nav']; ?></li></div>
+		  <?php } ?>
+				<br class="sldrbr" />
+				<div class="sldrlink"><a href="http://www.clickonf5.org/smooth-slider" target="_blank">Smooth Slider</a></div>
 			</div>
-            <?php if ($smooth_slider['goto_slide'] == 1) { ?>
-            <ul id="smooth_sliderc_nav">
-                <?php global $smooth_sldr_j; for($i=1; $i<=$smooth_sldr_j; $i++) { 
-				echo "<li><a id=\"sldr".$i."\" href=\"#\" >".$i."</a></li>\n";
-                 } ?>
-			</ul>
-            <?php } 
-			if ($smooth_slider['goto_slide'] == 2) { ?>
-            <div id="smooth_sliderc_nav">
-                <?php global $smooth_sldr_j; for($i=1; $i<=$smooth_sldr_j; $i++) { 
-				list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide".$i.".png");
-				$width = $width/2;
-				echo "<a class=\"smooth_sliderc_nav\" id=\"sldr".$i."\" style=\"background-image:url(".smooth_slider_plugin_url( 'images/' )."slide".$i.".png);background-position:0 0;width:".$width."px;height:".$height."px;\" href=\"javascript:stepcarousel.stepTo('smooth_sliderc', ".$i.")\" ></a>\n";
-                 } ?>
-			  </div>
-	  <?php }  
-			 if ($smooth_slider['goto_slide'] == 3) { ?>	 
-             <div id="smooth_sliderc_nav"><li style="border:none;"><?php echo $smooth_slider['custom_nav']; ?></li></div>
-      <?php } ?>
-            <br class="sldrbr" />
-            <div class="sldrlink"><a href="http://www.clickonf5.org/smooth-slider" target="_blank">Smooth Slider</a></div>
 		</div>
-	</div>
-<script type="text/javascript">
-	jQuery(document).ready(function(){
-	jQuery('#smooth_sliderc_nav a').click(function() {
-		var id = jQuery(this).attr('id');
-        var step_to_slide = id.replace(/sldr/, "");
-        document.getElementById(id).href = "javascript:stepcarousel.stepTo('smooth_sliderc', "+step_to_slide+")";
-    });
-	});
-</script>    
+	<script type="text/javascript">
+/*		jQuery(document).ready(function(){
+		jQuery('#smooth_sliderc_nav a').click(function() {
+			var id = jQuery(this).attr('id');
+			var step_to_slide = id.replace(/sldr/, "");
+			document.getElementById(id).href = "javascript:stepcarousel.stepTo('smooth_sliderc', "+step_to_slide+")";
+		});
+		});*/
+	</script>    
 <?php	
+  } //end of not empty slider_id condition
 }
 
 //Smooth Slider template tag to get the Category specific posts in the slider.
@@ -742,9 +890,9 @@ stepcarousel.setup({
 	  jQuery("#sldr"+curr_slide).css("fontSize", "<?php echo ($smooth_slider['content_fsize'] + 5); ?>px");
 	  
 	  <?php if ($smooth_slider['goto_slide'] == 2) { 
- 				list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");
+ 				
 				global $sldr_nav_width;
-				$sldr_nav_width = $width/2;
+				$sldr_nav_width = $smooth_slider['navimg_w'];
 	  ?>
 	  var nav_width = <?php global $sldr_nav_width; echo $sldr_nav_width; ?>;
 	  jQuery("#smooth_sliderc_nav a").css("backgroundPosition", "0 0");
@@ -768,16 +916,16 @@ stepcarousel.setup({
             <?php if ($smooth_slider['goto_slide'] == 1) { ?>
             <ul id="smooth_sliderc_nav">
                 <?php global $smooth_sldr_i; for($i=1; $i<=$smooth_sldr_i; $i++) { 
-				echo "<li><a id=\"sldr".$i."\" href=\"#\" >".$i."</a></li>\n";
+				echo "<li><a id=\"sldr".$i."\" href=\"javascript:stepcarousel.stepTo('smooth_sliderc', ".$i.")\" >".$i."</a></li>\n";
                  } ?>
 			</ul>
             <?php } 
 			if ($smooth_slider['goto_slide'] == 2) { ?>
             <div id="smooth_sliderc_nav">
                 <?php global $smooth_sldr_i; for($i=1; $i<=$smooth_sldr_i; $i++) { 
-				list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide".$i.".png");
-				$width = $width/2;
-				echo "<a class=\"smooth_sliderc_nav\" id=\"sldr".$i."\" style=\"background-image:url(".smooth_slider_plugin_url( 'images/' )."slide".$i.".png);background-position:0 0;width:".$width."px;height:".$height."px;\" href=\"javascript:stepcarousel.stepTo('smooth_sliderc', ".$i.")\" ></a>\n";
+
+				$width = $smooth_slider['navimg_w'];
+				echo "<a class=\"smooth_sliderc_nav\" id=\"sldr".$i."\" style=\"background-image:url(".smooth_slider_plugin_url( 'images/' )."slide".$i.".png);background-position:0 0;width:".$width."px;height:".$smooth_slider['navimg_ht']."px;\" href=\"javascript:stepcarousel.stepTo('smooth_sliderc', ".$i.")\" ></a>\n";
                  } ?>
 			</div>
        <?php }  
@@ -789,13 +937,13 @@ stepcarousel.setup({
 		</div>
 	</div>
 <script type="text/javascript">
-	jQuery(document).ready(function(){
+	/*jQuery(document).ready(function(){
 	jQuery('#smooth_sliderc_nav a').click(function() {
 		var id = jQuery(this).attr('id');
         var step_to_slide = id.replace(/sldr/, "");
         document.getElementById(id).href = "javascript:stepcarousel.stepTo('smooth_sliderc', "+step_to_slide+")";
     });
-	});
+	});*/
 </script>    
 <?php	
 }
@@ -822,9 +970,8 @@ stepcarousel.setup({
 	  jQuery("#sldr"+curr_slide).css("fontSize", "<?php echo ($smooth_slider['content_fsize'] + 5); ?>px");
 	  
 	  <?php if ($smooth_slider['goto_slide'] == 2) { 
- 				list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");
 				global $sldr_nav_width;
-				$sldr_nav_width = $width/2;
+				$sldr_nav_width = $smooth_slider['navimg_w'];
 	  ?>
 	  var nav_width = <?php global $sldr_nav_width; echo $sldr_nav_width; ?>;
 	  jQuery("#smooth_sliderc_nav a").css("backgroundPosition", "0 0");
@@ -848,16 +995,15 @@ stepcarousel.setup({
             <?php if ($smooth_slider['goto_slide'] == 1) { ?>
             <ul id="smooth_sliderc_nav">
                 <?php global $smooth_sldr_k; for($i=1; $i<=$smooth_sldr_k; $i++) { 
-				echo "<li><a id=\"sldr".$i."\" href=\"#\" >".$i."</a></li>\n";
+				echo "<li><a id=\"sldr".$i."\" href=\"javascript:stepcarousel.stepTo('smooth_sliderc', ".$i.")\" >".$i."</a></li>\n";
                  } ?>
 			</ul>
             <?php } 
 			if ($smooth_slider['goto_slide'] == 2) { ?>
             <div id="smooth_sliderc_nav">
                 <?php global $smooth_sldr_k; for($i=1; $i<=$smooth_sldr_k; $i++) { 
-				list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide".$i.".png");
-				$width = $width/2;
-				echo "<a class=\"smooth_sliderc_nav\" id=\"sldr".$i."\" style=\"background-image:url(".smooth_slider_plugin_url( 'images/' )."slide".$i.".png);background-position:0 0;width:".$width."px;height:".$height."px;\" href=\"javascript:stepcarousel.stepTo('smooth_sliderc', ".$i.")\" ></a>\n";
+				$width = $smooth_slider['navimg_w'];
+				echo "<a class=\"smooth_sliderc_nav\" id=\"sldr".$i."\" style=\"background-image:url(".smooth_slider_plugin_url( 'images/' )."slide".$i.".png);background-position:0 0;width:".$width."px;height:".$smooth_slider['navimg_ht']."px;\" href=\"javascript:stepcarousel.stepTo('smooth_sliderc', ".$i.")\" ></a>\n";
                  } ?>
 			</div>
        <?php }  
@@ -869,14 +1015,14 @@ stepcarousel.setup({
 		</div>
 	</div>
 <script type="text/javascript">
-	jQuery(document).ready(function(){
+/*	jQuery(document).ready(function(){
 	jQuery('#smooth_sliderc_nav a').click(function() {
 		var id = jQuery(this).attr('id');
         var step_to_slide = id.replace(/sldr/, "");
         document.getElementById(id).href = "javascript:stepcarousel.stepTo('smooth_sliderc', "+step_to_slide+")";
     });
 	});
-</script>    
+*/</script>    
 <?php	
 }
 
@@ -891,6 +1037,7 @@ function smooth_slider_admin_scripts() {
   // Settings page only
 	if ( isset($_GET['page']) && 'smooth-slider.php' == $_GET['page'] ) {
 	wp_register_script('jquery', false, false, false, false);
+	wp_enqueue_script( 'jquery-ui-tabs' );
 	wp_enqueue_script( 'stepcarousel', smooth_slider_plugin_url( 'js/stepcarousel.js' ),
 		array('jquery'), SMOOTH_SLIDER_VER, false); 
 	wp_enqueue_style( 'smooth_slider_css', smooth_slider_plugin_url( 'css/smooth-slider.css' ),
@@ -913,6 +1060,9 @@ if ( is_admin() ){ // admin actions
 <script type="text/javascript">
 	// <![CDATA[
 jQuery(document).ready(function() {
+        jQuery(function() {
+			jQuery("#slider_tabs").tabs();
+        });
 		jQuery('#colorbox_1').farbtastic('#color_value_1');
 		jQuery('#color_picker_1').click(function () {
            if (jQuery('#colorbox_1').css('display') == "block") {
@@ -1034,8 +1184,38 @@ function confirmRemoveAll()
 	else
 	return false ;
 }
+function confirmSliderDelete()
+{
+	var agree=confirm("Delete this Slider??");
+	if (agree)
+	return true ;
+	else
+	return false ;
+}
+function slider_checkform ( form )
+{
+  if (form.new_slider_name.value == "") {
+    alert( "Please enter the New Slider name." );
+    form.new_slider_name.focus();
+    return false ;
+  }
+  return true ;
+}
 </script>
 <style type="text/css">
+/************************************************
+*	ui-tabs  									*
+************************************************/
+.ui-tabs { padding: .2em; zoom: 1; }
+.ui-tabs .ui-tabs-nav { list-style: none; position: relative; padding: .2em .2em 0; }
+.ui-tabs .ui-tabs-nav li { position: relative; float: left; border-bottom-width: 0 !important; margin: 0 .2em -1px 0; padding: 0;  background-color:#B9B9B9;}
+.ui-tabs .ui-tabs-nav li a { float: left; text-decoration: none; padding: .5em 1em; color:#FFFFFF;}
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected { border-bottom-width: 0; background-color:#ABD37E;}
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .ui-tabs .ui-tabs-nav li.ui-state-disabled a, .ui-tabs .ui-tabs-nav li.ui-state-processing a { cursor: text; color:#FFF;}
+.ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
+.ui-tabs .ui-tabs-panel { padding: 1em 1.4em; display: block; border-width: 0; background: none; }
+.ui-tabs .ui-tabs-hide { display: none !important; }
+/*tabs complete*/
 .color-picker-wrap {
 		position: absolute;
  		display: none; 
@@ -1047,10 +1227,17 @@ function confirmRemoveAll()
 #divFeedityWidget span[style] {
         display:none !important;
 }
+div#smooth_sldr_donations a{
+   color:#366C94 !important;
+   text-decoration:none;
+}
+div#smooth_sldr_donations a:hover{
+   text-decoration:underline;
+}
 #sldr_message {background-color:#FEF7DA;clear:both;width:72%;}
 #sldr_close {float:right;} 
 </style>
-<style type="text/css" media="screen">#smooth_sldr{width:<?php echo $smooth_slider['width']; ?>px;height:<?php echo $smooth_slider['height']; ?>px;background-color:<?php if ($smooth_slider['bg'] == '1') { echo "transparent";} else { echo $smooth_slider['bg_color']; } ?>;border:<?php echo $smooth_slider['border']; ?>px solid <?php echo $smooth_slider['brcolor']; ?>;}#smooth_sldr_items{padding:10px <?php if ($smooth_slider['prev_next'] == 1) {echo "18";} else {echo "12";} ?>px 0px <?php if ($smooth_slider['prev_next'] == 1) {echo "26";} else {echo "12";} ?>px;}#smooth_sliderc{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 44);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.smooth_slideri{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 54);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){list($width, $height, $type, $attr) = getimagesize("".smooth_slider_plugin_url( 'images/' )."slide1.png");$nav_size = $height;} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.sldr_title{font-family:<?php echo $smooth_slider['title_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['title_fsize']; ?>px;font-weight:<?php if ($smooth_slider['title_fstyle'] == "bold" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "bold";} else { echo "normal"; } ?>;font-style:<?php if ($smooth_slider['title_fstyle'] == "italic" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['title_fcolor']; ?>;}#smooth_sldr_body h2{line-height:<?php echo ($smooth_slider['ptitle_fsize'] + 3); ?>px;font-family:<?php echo $smooth_slider['ptitle_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['ptitle_fsize']; ?>px;font-weight:<?php if ($smooth_slider['ptitle_fstyle'] == "bold" or $smooth_slider['ptitle_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['ptitle_fstyle'] == "italic" or $smooth_slider['ptitle_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px 0 5px 0;}#smooth_sldr_body h2 a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}#smooth_sldr_body span{font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-weight:<?php if ($smooth_slider['content_fstyle'] == "bold" or $smooth_slider['content_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['content_fstyle']=="italic" or $smooth_slider['content_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['content_fcolor']; ?>;}.smooth_slider_thumbnail{float:<?php echo $smooth_slider['img_align']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px <?php if($smooth_slider['img_align'] == "left") {echo "5";} else {echo "0";} ?>px 0 <?php if($smooth_slider['img_align'] == "right") {echo "5";} else {echo "0";} ?>px;<?php if ($smooth_slider['img_size'] == 1 and $smooth_slider['crop'] != '1') { ?>width:<?php echo $smooth_slider['img_width']; ?>px;height:<?php echo $smooth_slider['img_height']; ?>px;<?php } ?>border:<?php echo $smooth_slider['img_border']; ?>px solid <?php echo $smooth_slider['img_brcolor']; ?>;}#smooth_sldr_body p.more a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;}#smooth_sliderc_nav li{border:1px solid <?php echo $smooth_slider['content_fcolor']; ?>;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;}#smooth_sliderc_nav li a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}.sldrlink{padding-right:<?php if ($smooth_slider['prev_next'] == 1) {echo "40";} else {echo "25";} ?>px;}.sldrlink a{color:<?php echo $smooth_slider['content_fcolor']; ?>;}</style>
+<style type="text/css" media="screen">#smooth_sldr{width:<?php echo $smooth_slider['width']; ?>px;height:<?php echo $smooth_slider['height']; ?>px;background-color:<?php if ($smooth_slider['bg'] == '1') { echo "transparent";} else { echo $smooth_slider['bg_color']; } ?>;border:<?php echo $smooth_slider['border']; ?>px solid <?php echo $smooth_slider['brcolor']; ?>;}#smooth_sldr_items{padding:10px <?php if ($smooth_slider['prev_next'] == 1) {echo "18";} else {echo "12";} ?>px 0px <?php if ($smooth_slider['prev_next'] == 1) {echo "26";} else {echo "12";} ?>px;}#smooth_sliderc{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 44);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){$nav_size = $smooth_slider['navimg_ht'];} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.smooth_slideri{width:<?php if ($smooth_slider['prev_next'] == 1) {echo ($smooth_slider['width'] - 54);} else {echo ($smooth_slider['width'] - 24);} ?>px;height:<?php if ($smooth_slider['goto_slide'] == "1"){$nav_size = $smooth_slider['content_fsize'];} elseif ($smooth_slider['goto_slide'] == "2"){$nav_size = $smooth_slider['navimg_ht'];} else {$nav_size = 10;} $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { $extra_height = $smooth_slider['title_fsize'] + $nav_size + 5 + 18; } else { $extra_height = $nav_size + 5 + 5 + 18;  } echo ($smooth_slider['height'] - $extra_height); ?>px;}.sldr_title{font-family:<?php echo $smooth_slider['title_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['title_fsize']; ?>px;font-weight:<?php if ($smooth_slider['title_fstyle'] == "bold" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "bold";} else { echo "normal"; } ?>;font-style:<?php if ($smooth_slider['title_fstyle'] == "italic" or $smooth_slider['title_fstyle'] == "bold italic" ){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['title_fcolor']; ?>;}#smooth_sldr_body h2{line-height:<?php echo ($smooth_slider['ptitle_fsize'] + 3); ?>px;font-family:<?php echo $smooth_slider['ptitle_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['ptitle_fsize']; ?>px;font-weight:<?php if ($smooth_slider['ptitle_fstyle'] == "bold" or $smooth_slider['ptitle_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['ptitle_fstyle'] == "italic" or $smooth_slider['ptitle_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px 0 5px 0;}#smooth_sldr_body h2 a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}#smooth_sldr_body span{font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-weight:<?php if ($smooth_slider['content_fstyle'] == "bold" or $smooth_slider['content_fstyle'] == "bold italic" ){echo "bold";} else {echo "normal";} ?>;font-style:<?php if ($smooth_slider['content_fstyle']=="italic" or $smooth_slider['content_fstyle'] == "bold italic"){echo "italic";} else {echo "normal";} ?>;color:<?php echo $smooth_slider['content_fcolor']; ?>;}.smooth_slider_thumbnail{float:<?php echo $smooth_slider['img_align']; ?>;margin:<?php $sldr_title = $smooth_slider['title_text']; if(!empty($sldr_title)) { echo "10"; } else {echo "0";} ?>px <?php if($smooth_slider['img_align'] == "left") {echo "5";} else {echo "0";} ?>px 0 <?php if($smooth_slider['img_align'] == "right") {echo "5";} else {echo "0";} ?>px;<?php if ($smooth_slider['img_size'] == 1 and $smooth_slider['crop'] != '1') { ?>width:<?php echo $smooth_slider['img_width']; ?>px;height:<?php echo $smooth_slider['img_height']; ?>px;<?php } ?>border:<?php echo $smooth_slider['img_border']; ?>px solid <?php echo $smooth_slider['img_brcolor']; ?>;}#smooth_sldr_body p.more a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;}#smooth_sliderc_nav li{border:1px solid <?php echo $smooth_slider['content_fcolor']; ?>;font-size:<?php echo $smooth_slider['content_fsize']; ?>px;font-family:<?php echo $smooth_slider['content_font']; ?>, Arial, Helvetica, sans-serif;}#smooth_sliderc_nav li a{color:<?php echo $smooth_slider['ptitle_fcolor']; ?>;}.sldrlink{padding-right:<?php if ($smooth_slider['prev_next'] == 1) {echo "40";} else {echo "25";} ?>px;}.sldrlink a{color:<?php echo $smooth_slider['content_fcolor']; ?>;}</style>
 <?php
    } //for smooth slider option page
  }//only for admin
@@ -1075,7 +1262,7 @@ global $smooth_slider;
 		}
 ?>
 
-<div class="wrap">
+<div class="wrap" style="clear:both;">
 
 <div id="poststuff" class="metabox-holder has-right-sidebar" style="float:right;width:30%;"> 
    <div id="side-info-column" class="inner-sidebar"> 
@@ -1113,6 +1300,18 @@ global $smooth_slider;
 			<div class="postbox"> 
 			  <h3 class="hndle"><span>Support &amp; Donations</span></h3> 
 			  <div class="inside">
+                <div id="smooth_sldr_donations">
+                 <ul>
+                    <li><a href="http://malamedconsulting.com/" target="_blank">Connie Malamed - $25</a></li>
+                    <li><a href="http://www.jacobwiechman.com/wordpress/" target="_blank">Jacob Wiechman - $30</a></li>
+                    <li><a href="http://www.whatsthebigidea.com/" target="_blank">WhatsTheBigIdea.com,Inc. - $20</a></li>
+                    <li><a href="http://malamedconsulting.com/" target="_blank">Connie Malamed - $25</a></li>
+                    <li><a href="http://thule-italia.com/wordpress/" target="_blank">Marco Linguardo - $10</a></li>
+                    <li><a href="http://eircom.net" target="_blank">Paul Goode - $5</a></li>
+                    <li><a href="http://www.windowsobserver.com/" target="_blank">Richard Hay - $10</a></li>
+                    <li><a href="http://www.maximotimes.com/maximo/" target="_blank">Chonbury Neth - $10</a></li>
+                    <li><a href="http://www.yobeat.com/" target="_blank">Brooke Geery - $10</a></li>
+                 </ul>
 					<script language="JavaScript" type="text/javascript">
                     <!--
                         // Customize the widget by editing the fields below
@@ -1122,7 +1321,7 @@ global $smooth_slider;
                         feedity_widget_feed = "http://feedity.com/rss.aspx/clickonf5-org/UlVTUldR";
                     
                         // Number of items to display in the widget
-                        feedity_widget_numberofitems = "5";
+                        feedity_widget_numberofitems = "10";
                     
                         // Show feed item published date (values: yes or no)
                         feedity_widget_showdate = "no";
@@ -1138,6 +1337,7 @@ global $smooth_slider;
                     //-->
                     </script>
                     <script language="JavaScript" type="text/javascript" src="http://feedity.com/js/widget.js"></script>
+                </div>
               </div> 
 			</div> 
      </div>  
@@ -1152,8 +1352,7 @@ global $smooth_slider;
 </form>
 
 <form method="post" action="options.php">
-
-<h2>Preview</h2> 
+<h2 style="clear:left;">Preview</h2> 
 <?php settings_fields('smooth-slider-group'); ?>
 <div style="width:70%;">
 <?php 
@@ -1224,7 +1423,7 @@ get_smooth_slider();
 <label for="smooth_slider_goto_slide">Show go to slide number links at the bottom as 1, 2, 3 etc. or images</label><br />
 <input name="smooth_slider_options[goto_slide]" type="radio" id="smooth_slider_goto_slide" value="0" <?php checked('0', $smooth_slider['goto_slide']); ?>  /> None <br /> 
 <input name="smooth_slider_options[goto_slide]" type="radio" id="smooth_slider_goto_slide" value="1" <?php checked('1', $smooth_slider['goto_slide']); ?>  /> Numbers <br /> 
-<input name="smooth_slider_options[goto_slide]" type="radio" id="smooth_slider_goto_slide" value="2" <?php checked('2', $smooth_slider['goto_slide']); ?>  /> Custom Images for Navigation <br /> 
+<input name="smooth_slider_options[goto_slide]" type="radio" id="smooth_slider_goto_slide" value="2" <?php checked('2', $smooth_slider['goto_slide']); ?>  /> Custom Images for Navigation &nbsp; &nbsp;Width: <input type="text" name="smooth_slider_options[navimg_w]" id="smooth_slider_navimg_w" class="small-text" value="<?php echo $smooth_slider['navimg_w']; ?>" /> px &nbsp;Height: <input type="text" name="smooth_slider_options[navimg_ht]" id="smooth_slider_navimg_ht" class="small-text" value="<?php echo $smooth_slider['navimg_ht']; ?>" /> px<br /> 
 <input name="smooth_slider_options[goto_slide]" type="radio" id="smooth_slider_goto_slide" value="3" <?php checked('3', $smooth_slider['goto_slide']); ?>  /> Enter Custom Text or HTML &nbsp; &nbsp; 
 <input type="text" name="smooth_slider_options[custom_nav]" class="regular-text code" value="<?php echo htmlentities($smooth_slider['custom_nav'], ENT_QUOTES); ?>" />
 </fieldset></td> 
@@ -1256,6 +1455,7 @@ get_smooth_slider();
 <option value="Monotype Corsiva" <?php if ($smooth_slider['title_font'] == "Monotype Corsiva"){ echo "selected";}?> >Monotype Corsiva</option>
 <option value="Times New Roman" <?php if ($smooth_slider['title_font'] == "Times New Roman"){ echo "selected";}?> >Times New Roman</option>
 <option value="Trebuchet MS" <?php if ($smooth_slider['title_font'] == "Trebuchet MS"){ echo "selected";}?> >Trebuchet MS</option>
+<option value="Verdana" <?php if ($smooth_slider['title_font'] == "Verdana"){ echo "selected";}?> >Verdana</option>
 </select>
 </td>
 </tr>
@@ -1301,6 +1501,7 @@ get_smooth_slider();
 <option value="Monotype Corsiva" <?php if ($smooth_slider['ptitle_font'] == "Monotype Corsiva"){ echo "selected";}?> >Monotype Corsiva</option>
 <option value="Times New Roman" <?php if ($smooth_slider['ptitle_font'] == "Times New Roman"){ echo "selected";}?> >Times New Roman</option>
 <option value="Trebuchet MS" <?php if ($smooth_slider['ptitle_font'] == "Trebuchet MS"){ echo "selected";}?> >Trebuchet MS</option>
+<option value="Verdana" <?php if ($smooth_slider['ptitle_font'] == "Verdana"){ echo "selected";}?> >Verdana</option>
 </select>
 </td>
 </tr>
@@ -1396,6 +1597,7 @@ get_smooth_slider();
 <option value="Monotype Corsiva" <?php if ($smooth_slider['content_font'] == "Monotype Corsiva"){ echo "selected";}?> >Monotype Corsiva</option>
 <option value="Times New Roman" <?php if ($smooth_slider['content_font'] == "Times New Roman"){ echo "selected";}?> >Times New Roman</option>
 <option value="Trebuchet MS" <?php if ($smooth_slider['content_font'] == "Trebuchet MS"){ echo "selected";}?> >Trebuchet MS</option>
+<option value="Verdana" <?php if ($smooth_slider['content_font'] == "Verdana"){ echo "selected";}?> >Verdana</option>
 </select>
 </td>
 </tr>
@@ -1432,8 +1634,12 @@ get_smooth_slider();
 </tr>
 
 <tr valign="top">
-<th scope="row">Maximum content size</th>
+<th scope="row">Maximum content size (in characters)</th>
 <td><input type="text" name="smooth_slider_options[content_chars]" id="smooth_slider_content_chars" class="small-text" value="<?php echo $smooth_slider['content_chars']; ?>" />&nbsp;characters &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</td>
+</tr>
+<tr valign="top">
+<th scope="row">Maximum content size (in words)</th>
+<td><input type="text" name="smooth_slider_options[content_limit]" id="smooth_slider_content_limit" class="small-text" value="<?php echo $smooth_slider['content_limit']; ?>" />&nbsp;words (if specified will override the &quot;Maximum Content Size in Chracters&quot; setting above)</td>
 </tr>
 
 </table>
@@ -1460,6 +1666,14 @@ get_smooth_slider();
 </select>
 </td>
 </tr>
+
+<tr valign="top">
+<th scope="row">Multiple Slider Feature</th>
+<td><label for="smooth_slider_multiple"> 
+<input name="smooth_slider_options[multiple_sliders]" type="checkbox" id="smooth_slider_multiple" value="1" <?php checked("1", $smooth_slider['multiple_sliders']); ?> /> 
+ Enable Multiple Slider Function on Edit Post/Page</label></td>
+</tr>
+
 </table>
 <p class="submit">
 <input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
@@ -1470,38 +1684,87 @@ get_smooth_slider();
 if ($_POST['remove_posts_slider']) {
    if ( $_POST['slider_posts'] ) {
        global $wpdb, $table_prefix;
-       $table_name = $table_prefix.'slider';
+       $table_name = $table_prefix.SLIDER_TABLE;
+	   $current_slider = $_POST['current_slider_id'];
 	   foreach ( $_POST['slider_posts'] as $post_id=>$val ) {
-		   $sql = "DELETE FROM $table_name where id = $post_id LIMIT 1";
+		   $sql = "DELETE FROM $table_name WHERE post_id = '$post_id' AND slider_id = '$current_slider' LIMIT 1";
 		   $wpdb->query($sql);
 	   }
    }
    if ($_POST['remove_all'] == "Remove All at Once") {
        global $wpdb, $table_prefix;
-       $table_name = $table_prefix.'slider';
-	   $sql = "DELETE FROM $table_name";
-	   $wpdb->query($sql);
+       $table_name = $table_prefix.SLIDER_TABLE;
+	   $current_slider = $_POST['current_slider_id'];
+	   if(is_slider_on_slider_table($current_slider)) {
+		   $sql = "DELETE FROM $table_name WHERE slider_id = '$current_slider';";
+		   $wpdb->query($sql);
+	   }
    }
+   if ($_POST['remove_all'] == 'Delete Slider') {
+       $slider_id = $_POST['current_slider_id'];
+       global $wpdb, $table_prefix;
+       $slider_table = $table_prefix.SLIDER_TABLE;
+       $slider_meta = $table_prefix.SLIDER_META;
+	   $slider_postmeta = $table_prefix.SLIDER_POST_META;
+	   if(is_slider_on_slider_table($slider_id)) {
+		   $sql = "DELETE FROM $slider_table WHERE slider_id = '$slider_id';";
+		   $wpdb->query($sql);
+	   }
+	   if(is_slider_on_meta_table($slider_id)) {
+		   $sql = "DELETE FROM $slider_meta WHERE slider_id = '$slider_id';";
+		   $wpdb->query($sql);
+	   }
+	   if(is_slider_on_postmeta_table($slider_id)) {
+		   $sql = "DELETE FROM $slider_postmeta WHERE slider_id = '$slider_id';";
+		   $wpdb->query($sql);
+	   }
+   }
+}
+if ($_POST['create_new_slider']) {
+   $slider_name = $_POST['new_slider_name'];
+   global $wpdb,$table_prefix;
+   $slider_meta = $table_prefix.SLIDER_META;
+   $sql = "INSERT INTO $slider_meta (slider_name) VALUES('$slider_name');";
+   $result = $wpdb->query($sql);
 }
 ?>
 <div style="clear:both"></div>
+<?php 
+$sliders = ss_get_sliders(); ?>
+
+<div id="slider_tabs">
+        <ul class="ui-tabs">
+        <?php foreach($sliders as $slider){?>
+            <li><a href="#tabs-<?php echo $slider['slider_id'];?>"><?php echo $slider['slider_name'];?></a></li>
+        <?php } ?>
+        <?php if($smooth_slider['multiple_sliders'] == '1') {?>
+            <li><a href="#new_slider">Create New Slider</a></li>
+        <?php } ?>
+        </ul>
+
+<?php foreach($sliders as $slider){
+?>
 <form action="" method="post">
 <input type="hidden" name="remove_posts_slider" value="1" />
-<h3>Posts/Pages Added To Smooth Slider</h3>
-<p><em>Check the Post/Page and Press "Remove Selected" to remove them From Smooth Slider. Press "Remove All at Once" to remove all the posts from the slider.</em></p>
+<div id="tabs-<?php echo $slider['slider_id'];?>">
+<h3>Posts/Pages Added To <?php echo $slider['slider_name'];?>(Slider ID = <?php echo $slider['slider_id'];?>)</h3>
+<p><em>Check the Post/Page and Press "Remove Selected" to remove them From <?php echo $slider['slider_name'];?>. Press "Remove All at Once" to remove all the posts from the <?php echo $slider['slider_name'];?>.</em></p>
 
     <table class="widefat">
     <thead><tr><th>Post/Page Title</th><th>Author</th><th>Post Date</th><th>Remove Post</th></tr></thead><tbody>
 
 <?php  
 	global $wpdb, $table_prefix;
-	$table_name = $table_prefix."slider";
-	$slider_posts = $wpdb->get_results("SELECT id FROM $table_name", OBJECT);
+	$table_name = $table_prefix.SLIDER_TABLE;
+	$slider_id = $slider['slider_id'];
+	$slider_posts = $wpdb->get_results("SELECT post_id FROM $table_name WHERE slider_id = '$slider_id'", OBJECT); ?>
 	
-    $count = 0;	
+    <input type="hidden" name="current_slider_id" value="<?php echo $slider_id;?>" />
+    
+<?php    $count = 0;	
 	foreach($slider_posts as $slider_post) {
-	  $slider_arr[] = $slider_post->id;
-	  $post = get_post($slider_post->id);	  
+	  $slider_arr[] = $slider_post->post_id;
+	  $post = get_post($slider_post->post_id);	  
 	  if ( in_array($post->ID, $slider_arr) ) {
 		  $count++;
 		  $sslider_author = get_userdata($post->post_author);
@@ -1513,11 +1776,38 @@ if ($_POST['remove_posts_slider']) {
 		echo '<tr><td colspan="4">No posts/pages have been added to the Slider - You can add respective post/page to slider on the Edit screen for that Post/Page</td></tr>';
 	}
 	echo '</tbody><tfoot><tr><th>Post/Page Title</th><th>Author</th><th>Post Date</th><th>Remove Post</th></tr></tfoot></table>'; 
-    if ($count) echo '<div class="submit"><input type="submit" value="Remove Selected" onclick="return confirmRemove()" /><input type="submit" name="remove_all" value="Remove All at Once" onclick="return confirmRemoveAll()" /></div></form>';
+    
+	echo '<div class="submit">';
+	
+	if ($count) {echo '<input type="submit" value="Remove Selected" onclick="return confirmRemove()" /><input type="submit" name="remove_all" value="Remove All at Once" onclick="return confirmRemoveAll()" />';}
+	
+	if($slider_id != '1') {
+	   echo '<input type="submit" value="Delete Slider" name="remove_all" onclick="return confirmSliderDelete()" />';
+	}
+	
+	echo '</div></form>';
 ?>    
     </tbody></table>
-</form>
-<?php // check_admin_referer('smooth-slider-group-options');?>
+   </div>
+ </form>
+<?php } ?>
+
+<?php if($smooth_slider['multiple_sliders'] == '1') {?>
+    <div id="new_slider">
+    <form action="" method="post" onsubmit="return slider_checkform(this);" >
+    <h3>Enter New Slider Name</h3>
+    <input type="hidden" name="create_new_slider" value="1" />
+    
+    <input name="new_slider_name" class="regular-text code" value="" style="clear:both;" />
+    
+    <div class="submit"><input type="submit" value="Create New" name="create_new" /></div>
+    
+    </form>
+    </div>
+<?php } ?>
+
+</div>
+
 </div> <!--end of float wrap -->
 <?php	
 }

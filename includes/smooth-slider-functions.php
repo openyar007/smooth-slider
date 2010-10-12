@@ -6,7 +6,12 @@ function ss_get_sliders(){
  	$sliders = $wpdb->get_results($sql, ARRAY_A);
 	return $sliders;
 }
-
+function get_slider_posts_in_order($slider_id) {
+    global $wpdb, $table_prefix;
+	$table_name = $table_prefix.SLIDER_TABLE;
+	$slider_posts = $wpdb->get_results("SELECT * FROM $table_name WHERE slider_id = '$slider_id' ORDER BY slide_order ASC, date DESC", OBJECT);
+	return $slider_posts;
+}
 function ss_get_post_sliders($post_id){
     global $wpdb,$table_prefix;
 	$slider_table = $table_prefix.SLIDER_TABLE; 
@@ -92,7 +97,8 @@ function get_slider_for_the_post($post_id) {
 }
 function smooth_slider_word_limiter( $text, $limit = 50 ) {
     $text = str_replace(']]>', ']]&gt;', $text);
-	$text = strip_tags($text);
+	//Not using strip_tags as to accomodate the 'retain html tags' feature
+	//$text = strip_tags($text);
 	
     $explode = explode(' ',$text);
     $string  = '';
@@ -108,5 +114,47 @@ function smooth_slider_word_limiter( $text, $limit = 50 ) {
         $string = substr($string, 0, strlen($string));
     }
     return $string.$dots;
+}
+function sslider_admin_url( $query = array() ) {
+	global $plugin_page;
+
+	if ( ! isset( $query['page'] ) )
+		$query['page'] = $plugin_page;
+
+	$path = 'admin.php';
+
+	if ( $query = build_query( $query ) )
+		$path .= '?' . $query;
+
+	$url = admin_url( $path );
+
+	return esc_url_raw( $url );
+}
+function smooth_slider_table_exists($table, $db) { 
+	$tables = mysql_list_tables ($db); 
+	while (list ($temp) = mysql_fetch_array ($tables)) {
+		if ($temp == $table) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+function add_column_if_not_exist($table_name, $column_name, $create_ddl) {
+     global $wpdb, $debug;
+      foreach ($wpdb->get_col("DESC $table_name", 0) as $column ) {
+          if ($debug) echo("checking $column == $column_name<br />");
+          if ($column == $column_name) {
+              return true;
+          }
+     }
+      //didn't find it try to create it.
+      $q = $wpdb->query($create_ddl);
+      // we cannot directly tell that whether this succeeded!
+     foreach ($wpdb->get_col("DESC $table_name", 0) as $column ) {
+          if ($column == $column_name) {
+             return true;
+          }
+      }
+      return false;
 }
 ?>

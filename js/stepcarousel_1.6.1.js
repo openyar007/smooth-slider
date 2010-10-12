@@ -1,11 +1,19 @@
-//** Step Carousel Viewer- (c) Dynamic Drive DHTML code library: http://www.dynamicdrive.com
-//** Script Download/ http://www.dynamicdrive.com/dynamicindex4/stepcarousel.htm
-//** Usage Terms: http://www.dynamicdrive.com/notice.htm
-//** Current version 1.9 (July 28th, 10'): See http://www.dynamicdrive.com/dynamicindex4/stepcarouselchangelog.txt for details
+//Step Carousel Viewer: By Dynamic Drive, at http://www.dynamicdrive.com
+//** Created: March 19th, 08'
+//** Aug 16th, 08'- Updated to v 1.4:
+	//1) Adds ability to set speed/duration of panel animation (in milliseconds)
+	//2) Adds persistence support, so the last viewed panel is recalled when viewer returns within same browser session
+	//3) Adds ability to specify whether panels should stop at the very last and first panel, or wrap around and start all over again
+	//4) Adds option to specify two navigational image links positioned to the left and right of the Carousel Viewer to move the panels back and forth
 
-//** Modified a little bit to go with the jQuery noconflict on WordPress, for Smooth Slider
+//** Aug 27th, 08'- Nav buttons (if enabled) also repositions themselves now if window is resized
 
-//jQuery.noConflict()
+//** Sept 23rd, 08'- Updated to v 1.6:
+	//1) Carousel now stops at the very last visible panel, instead of the last panel itself. In other words, no more white space at the end.
+	//2) Adds ability for Carousel to auto rotate dictated by the new parameter: autostep: {enable:true, moveby:1, pause:3000}
+	//2i) During Auto Rotate, Carousel pauses onMouseover, resumes onMouseout. Clicking Carousel halts auto rotate.
+
+//** Oct 22nd, 08'- Updated to v 1.6.1, which fixes functions stepBy() and stepTo() not stopping auto stepping of Carousel when called.
 
 var stepcarousel={
 	ajaxloadingmsg: '<div style="margin: 1em; font-weight: bold"><img src="ajaxloadr.gif" style="vertical-align: middle" /> Fetching Content. Please wait...</div>', //customize HTML to show while fetching Ajax content
@@ -50,13 +58,9 @@ var stepcarousel={
 	fadebuttons:function(config, currentpanel){
 		config.$leftnavbutton.fadeTo('fast', currentpanel==0? this.defaultbuttonsfade : 1)
 		config.$rightnavbutton.fadeTo('fast', currentpanel==config.lastvisiblepanel? this.defaultbuttonsfade : 1)
-		if (currentpanel==config.lastvisiblepanel){
-			stepcarousel.stopautostep(config)
-		}
-
 	},
 
-	addnavbuttons:function(jQuery, config, currentpanel){
+	addnavbuttons:function(config, currentpanel){
 		config.$leftnavbutton=jQuery('<img src="'+config.defaultbuttons.leftnav[0]+'">').css({zIndex:50, position:'absolute', left:config.offsets.left+config.defaultbuttons.leftnav[1]+'px', top:config.offsets.top+config.defaultbuttons.leftnav[2]+'px', cursor:'hand', cursor:'pointer'}).attr({title:'Back '+config.defaultbuttons.moveby+' panels'}).appendTo('body')
 		config.$rightnavbutton=jQuery('<img src="'+config.defaultbuttons.rightnav[0]+'">').css({zIndex:50, position:'absolute', left:config.offsets.left+config.$gallery.get(0).offsetWidth+config.defaultbuttons.rightnav[1]+'px', top:config.offsets.top+config.defaultbuttons.rightnav[2]+'px', cursor:'hand', cursor:'pointer'}).attr({title:'Forward '+config.defaultbuttons.moveby+' panels'}).appendTo('body')
 		config.$leftnavbutton.bind('click', function(){ //assign nav button event handlers
@@ -69,6 +73,11 @@ var stepcarousel={
 			this.fadebuttons(config, currentpanel)
 		}
 		return config.$leftnavbutton.add(config.$rightnavbutton)
+	},
+
+	stopautostep:function(config){
+		clearTimeout(config.steptimer)
+		clearTimeout(config.resumeautostep)
 	},
 
 	alignpanels:function(jQuery, config){
@@ -94,12 +103,14 @@ var stepcarousel={
 			}
 		}
 		config.$belt.css({width: paneloffset+'px'}) //Set Belt DIV to total panels' widths
-		config.currentpanel=(config.panelbehavior.persist)? parseInt(this.getCookie(config.galleryid+"persist")) : 0 //determine 1st panel to show by default
+		config.currentpanel=(config.panelbehavior.persist)? parseInt(this.getCookie(window[config.galleryid+"persist"])) : 0 //determine 1st panel to show by default
 		config.currentpanel=(typeof config.currentpanel=="number" && config.currentpanel<config.$panels.length)? config.currentpanel : 0
-		var endpoint=config.paneloffsets[config.currentpanel]+(config.currentpanel==0? 0 : config.beltoffset)
-		config.$belt.css({left: -endpoint+'px'})
+		if (config.currentpanel!=0){
+			var endpoint=config.paneloffsets[config.currentpanel]+(config.currentpanel==0? 0 : config.beltoffset)
+			config.$belt.css({left: -endpoint+'px'})
+		}
 		if (config.defaultbuttons.enable==true){ //if enable default back/forth nav buttons
-			var $navbuttons=this.addnavbuttons(jQuery, config, config.currentpanel)
+			var $navbuttons=this.addnavbuttons(config, config.currentpanel)
 			jQuery(window).bind("load resize", function(){ //refresh position of nav buttons when page loads/resizes, in case offsets weren't available document.oncontentload
 				config.offsets={left:stepcarousel.getoffset(config.$gallery.get(0), "offsetLeft"), top:stepcarousel.getoffset(config.$gallery.get(0), "offsetTop")}
 				config.$leftnavbutton.css({left:config.offsets.left+config.defaultbuttons.leftnav[1]+'px', top:config.offsets.top+config.defaultbuttons.leftnav[2]+'px'})
@@ -109,21 +120,22 @@ var stepcarousel={
 		if (config.autostep && config.autostep.enable){ //enable auto stepping of Carousel?		
 			var $carouselparts=config.$gallery.add(typeof $navbuttons!="undefined"? $navbuttons : null)
 			$carouselparts.bind('click', function(){
-				config.autostep.status="stopped"
 				stepcarousel.stopautostep(config)
+				config.autostep.status="stopped"
 			})
 			$carouselparts.hover(function(){ //onMouseover
 				stepcarousel.stopautostep(config)
 				config.autostep.hoverstate="over"
 			}, function(){ //onMouseout
 				if (config.steptimer && config.autostep.hoverstate=="over" && config.autostep.status!="stopped"){
-					config.steptimer=setInterval(function(){stepcarousel.autorotate(config.galleryid)}, config.autostep.pause)
-					config.autostep.hoverstate="out"
+					config.resumeautostep=setTimeout(function(){
+						stepcarousel.autorotate(config.galleryid)
+						config.autostep.hoverstate="out"
+					}, 500)
 				}
 			})
-			config.steptimer=setInterval(function(){stepcarousel.autorotate(config.galleryid)}, config.autostep.pause) //automatically rotate Carousel Viewer
+			config.steptimer=setTimeout(function(){stepcarousel.autorotate(config.galleryid)}, config.autostep.pause) //automatically rotate Carousel Viewer
 		} //end enable auto stepping check
-		this.createpaginate(jQuery, config)
 		this.statusreport(config.galleryid)
 		config.oninit()
 		config.onslideaction(this)
@@ -132,7 +144,7 @@ var stepcarousel={
 	stepTo:function(galleryid, pindex){ /*User entered pindex starts at 1 for intuitiveness. Internally pindex still starts at 0 */
 		var config=stepcarousel.configholder[galleryid]
 		if (typeof config=="undefined"){
-			//alert("There's an error with your set up of Carousel Viewer \""+galleryid+ "\"!")
+			alert("There's an error with your set up of Carousel Viewer \""+galleryid+ "\"!")
 			return
 		}
 		stepcarousel.stopautostep(config)
@@ -144,16 +156,17 @@ var stepcarousel={
 		config.$belt.animate({left: -endpoint+'px'}, config.panelbehavior.speed, function(){config.onslideaction(this)})
 		config.currentpanel=pindex
 		this.statusreport(galleryid)
+		
+		this.setlinkclass(pindex)
 	},
 
-	stepBy:function(galleryid, steps, isauto){
+	stepBy:function(galleryid, steps){ //isauto if defined indicates stepBy() is being called automatically
 		var config=stepcarousel.configholder[galleryid]
 		if (typeof config=="undefined"){
-			//alert("There's an error with your set up of Carousel Viewer \""+galleryid+ "\"!")
+			alert("There's an error with your set up of Carousel Viewer \""+galleryid+ "\"!")
 			return
 		}
-		if (!isauto) //if stepBy() function isn't called by autorotate() function
-			stepcarousel.stopautostep(config)
+		stepcarousel.stopautostep(config)
 		var direction=(steps>0)? 'forward' : 'back' //If "steps" is negative, that means backwards
 		var pindex=config.currentpanel+steps //index of panel to stop at
 		if (config.panelbehavior.wraparound==false){ //if carousel viewer should stop at first or last panel (instead of wrap back or forth)
@@ -173,7 +186,7 @@ var stepcarousel={
 			}
 		}
 		var endpoint=config.paneloffsets[pindex]+(pindex==0? 0 : config.beltoffset) //left distance for Belt DIV to travel to
-		if (config.panelbehavior.wraparound==true && config.panelbehavior.wrapbehavior=="pushpull" && (pindex==0 && direction=='forward' || config.currentpanel==0 && direction=='back')){ //decide whether to apply "push pull" effect
+		if (pindex==0 && direction=='forward' || config.currentpanel==0 && direction=='back' && config.panelbehavior.wraparound==true){ //decide whether to apply "push pull" effect
 			config.$belt.animate({left: -config.paneloffsets[config.currentpanel]-(direction=='forward'? 100 : -30)+'px'}, 'normal', function(){
 				config.$belt.animate({left: -endpoint+'px'}, config.panelbehavior.speed, function(){config.onslideaction(this)})
 			})
@@ -182,135 +195,40 @@ var stepcarousel={
 			config.$belt.animate({left: -endpoint+'px'}, config.panelbehavior.speed, function(){config.onslideaction(this)})
 		config.currentpanel=pindex
 		this.statusreport(galleryid)
+		
+		this.setlinkclass(pindex)
+	},
+
+	/* CALSS FOR NAVIGATION BAR */
+	setlinkclass:function(pindex){
+		jQuery("#board_carusel_nav a").removeClass("selected");
+		jQuery("#board_carusel_nav #board_carusel_nav_"+(pindex+1)+" a").addClass("selected");
 	},
 
 	autorotate:function(galleryid){
 		var config=stepcarousel.configholder[galleryid]
-		this.stepBy(galleryid, config.autostep.moveby, true)
-	},
-
-	stopautostep:function(config){
-		clearTimeout(config.steptimer)
+		if (config.$gallery.attr('_ismouseover')!="yes"){
+			this.stepBy(galleryid, config.autostep.moveby)
+		}
+		config.steptimer=setTimeout(function(){stepcarousel.autorotate(galleryid)}, config.autostep.pause)
 	},
 
 	statusreport:function(galleryid){
 		var config=stepcarousel.configholder[galleryid]
-		if (config.statusvars.length==3){ //if 3 status vars defined
-			var startpoint=config.currentpanel //index of first visible panel 
-			var visiblewidth=0
-			for (var endpoint=startpoint; endpoint<config.paneloffsets.length; endpoint++){ //index (endpoint) of last visible panel
-				visiblewidth+=config.panelwidths[endpoint]
-				if (visiblewidth>config.gallerywidth){
-					break
-				}
-			}
-			startpoint+=1 //format startpoint for user friendiness
-			endpoint=(endpoint+1==startpoint)? startpoint : endpoint //If only one image visible on the screen and partially hidden, set endpoint to startpoint
-			var valuearray=[startpoint, endpoint, config.panelwidths.length]
-			for (var i=0; i<config.statusvars.length; i++){
-				window[config.statusvars[i]]=valuearray[i] //Define variable (with user specified name) and set to one of the status values
-				config.$statusobjs[i].text(valuearray[i]+" ") //Populate element on page with ID="user specified name" with one of the status values
+		var startpoint=config.currentpanel //index of first visible panel 
+		var visiblewidth=0
+		for (var endpoint=startpoint; endpoint<config.paneloffsets.length; endpoint++){ //index (endpoint) of last visible panel
+			visiblewidth+=config.panelwidths[endpoint]
+			if (visiblewidth>config.gallerywidth){
+				break
 			}
 		}
-		stepcarousel.selectpaginate(jQuery, galleryid)
-	},
-
-	createpaginate:function(jQuery, config){
-		if (config.$paginatediv.length==1){
-			var $templateimg=config.$paginatediv.find('img["data-over"]:eq(0)') //reference first matching image on page
-			var controlpoints=[], controlsrc=[], imgarray=[], moveby=$templateimg.attr("data-moveby") || 1
-			var asize=(moveby==1? 0:1) + Math.floor((config.lastvisiblepanel+1) / moveby) //calculate # of pagination links to create
-			var imghtml=jQuery('<div>').append($templateimg.clone()).html() //get HTML of first matching image
-			srcs=[$templateimg.attr('src'), $templateimg.attr('data-over'), $templateimg.attr('data-select')] //remember control's over and out, and selected image src
-			for (var i=0; i<asize; i++){
-				var moveto=Math.min(i*moveby, config.lastvisiblepanel)
-				imgarray.push(imghtml.replace(/>$/, ' data-index="'+i+'" data-moveto="'+moveto+'" title="Move to Panel '+(moveto+1)+'">') +'\n')
-				controlpoints.push(moveto) //store panel index each control goes to when clicked on
-			}
-			var $controls=jQuery('<span></span>').replaceAll($templateimg).append(imgarray.join('')).find('img') //replace template link with links and return them
-			$controls.css({cursor:'pointer'})
-			config.$paginatediv.bind('click', function(e){
-				var $target=jQuery(e.target)
-				if ($target.is('img') && $target.attr('data-over')){
-					stepcarousel.stepTo(config.galleryid, parseInt($target.attr('data-moveto'))+1)
-				}
-			})
-			config.$paginatediv.bind('mouseover mouseout', function(e){
-				var $target=jQuery(e.target)
-				if ($target.is('img') && $target.attr('data-over')){
-					if (parseInt($target.attr('data-index')) != config.pageinfo.curselected) //if this isn't the selected link
-						$target.attr('src', srcs[(e.type=="mouseover")? 1 : 0])
-				}
-			})
-			config.pageinfo={controlpoints:controlpoints, $controls:$controls,  srcs:srcs, prevselected:null, curselected:null}
-		}
-	},
-
-	
-	selectpaginate:function(jQuery, galleryid){
-		var config=stepcarousel.configholder[galleryid]
-		if (config.$paginatediv.length==1){
-			for (var i=0; i<config.pageinfo.controlpoints.length; i++){
-				if (config.pageinfo.controlpoints[i] <= config.currentpanel) //find largest control point that's less than or equal to current panel shown
-					config.pageinfo.curselected=i
-			}
-			if (typeof config.pageinfo.prevselected!=null) //deselect previously selected link (if found)
-				config.pageinfo.$controls.eq(config.pageinfo.prevselected).attr('src', config.pageinfo.srcs[0])
-			config.pageinfo.$controls.eq(config.pageinfo.curselected).attr('src', config.pageinfo.srcs[2]) //select current paginate link
-			config.pageinfo.prevselected=config.pageinfo.curselected //set current selected link to previous
-		}
-	},
-
-
-	loadcontent:function(galleryid, url){
-		var config=stepcarousel.configholder[galleryid]
-		config.contenttype=['ajax', url]
-		stepcarousel.stopautostep(config)
-		stepcarousel.resetsettings(jQuery, config)
-		stepcarousel.init(jQuery, config)
-
-	},
-
-	init:function(jQuery, config){
-		config.gallerywidth=config.$gallery.width()
-		config.offsets={left:stepcarousel.getoffset(config.$gallery.get(0), "offsetLeft"), top:stepcarousel.getoffset(config.$gallery.get(0), "offsetTop")}
-		config.$belt=config.$gallery.find('.'+config.beltclass) //Find Belt DIV that contains all the panels
-		config.$panels=config.$gallery.find('.'+config.panelclass) //Find Panel DIVs that each contain a slide
-		config.panelbehavior.wrapbehavior=config.panelbehavior.wrapbehavior || "pushpull" //default wrap behavior to "pushpull"
-		config.$paginatediv=jQuery('#'+config.galleryid+'-paginate') //get pagination DIV (if defined)
-		if (config.autostep)
-			config.autostep.pause+=config.panelbehavior.speed
-		config.onpanelclick=(typeof config.onpanelclick=="undefined")? function(target){} : config.onpanelclick //attach custom "onpanelclick" event handler
-		config.onslideaction=(typeof config.onslide=="undefined")? function(){} : function(beltobj){jQuery(beltobj).stop(); config.onslide()} //attach custom "onslide" event handler
-		config.oninit=(typeof config.oninit=="undefined")? function(){} : config.oninit //attach custom "oninit" event handler
-		config.beltoffset=stepcarousel.getCSSValue(config.$belt.css('marginLeft')) //Find length of Belt DIV's left margin
-		config.statusvars=config.statusvars || []  //get variable names that will hold "start", "end", and "total" slides info
-		config.$statusobjs=[jQuery('#'+config.statusvars[0]), jQuery('#'+config.statusvars[1]), jQuery('#'+config.statusvars[2])]
-		config.currentpanel=0
-		stepcarousel.configholder[config.galleryid]=config //store config parameter as a variable
-		if (config.contenttype[0]=="ajax" && typeof config.contenttype[1]!="undefined") //fetch ajax content?
-			stepcarousel.getremotepanels(jQuery, config)
-		else
-			stepcarousel.alignpanels(jQuery, config) //align panels and initialize gallery
-	},
-
-	resetsettings:function(jQuery, config){
-		config.$gallery.unbind()
-		config.$belt.stop()
-		config.$panels.remove()
-		if (config.$leftnavbutton){
-			config.$leftnavbutton.remove()
-			config.$rightnavbutton.remove()
-		}
-		if (config.$paginatediv.length==1){
-			config.$paginatediv.unbind()
-			config.pageinfo.$controls.eq(0).attr('src', config.pageinfo.srcs[0]).removeAttr('data-index').removeAttr('data-moveto').removeAttr('title') //reset first pagination link so it acts as template again
-			.end().slice(1).remove() //then remove all but first pagination link
-		}
-		if (config.autostep)
-			config.autostep.status=null
-		if (config.panelbehavior.persist){
-			stepcarousel.setCookie(window[config.galleryid+"persist"], 0) //set initial panel to 0, overridden w/ current panel if window.unload is invoked
+		startpoint+=1 //format startpoint for user friendiness
+		endpoint=(endpoint+1==startpoint)? startpoint : endpoint //If only one image visible on the screen and partially hidden, set endpoint to startpoint
+		var valuearray=[startpoint, endpoint, config.panelwidths.length]
+		for (var i=0; i<config.statusvars.length; i++){
+			window[config.statusvars[i]]=valuearray[i] //Define variable (with user specified name) and set to one of the status values
+			config.$statusobjs[i].text(valuearray[i]+" ") //Populate element on page with ID="user specified name" with one of the status values
 		}
 	},
 
@@ -319,12 +237,28 @@ var stepcarousel={
 		document.write('<style type="text/css">\n#'+config.galleryid+'{overflow: hidden;}\n</style>')
 		jQuery(document).ready(function(jQuery){
 			config.$gallery=jQuery('#'+config.galleryid)
-			stepcarousel.init(jQuery, config)
+			config.gallerywidth=config.$gallery.width()
+			config.offsets={left:stepcarousel.getoffset(config.$gallery.get(0), "offsetLeft"), top:stepcarousel.getoffset(config.$gallery.get(0), "offsetTop")}
+			config.$belt=config.$gallery.find('.'+config.beltclass) //Find Belt DIV that contains all the panels
+			config.$panels=config.$gallery.find('.'+config.panelclass) //Find Panel DIVs that each contain a slide
+			config.panelbehavior.wraparound=(config.autostep && config.autostep.enable)? true : config.panelbehavior.wraparound //if auto step enabled, set "wraparound" to true
+			config.onpanelclick=(typeof config.onpanelclick=="undefined")? function(target){} : config.onpanelclick //attach custom "onpanelclick" event handler
+			config.onslideaction=(typeof config.onslide=="undefined")? function(){} : function(beltobj){jQuery(beltobj).stop(); config.onslide()} //attach custom "onslide" event handler
+			config.oninit=(typeof config.oninit=="undefined")? function(){} : config.oninit //attach custom "oninit" event handler
+			config.beltoffset=stepcarousel.getCSSValue(config.$belt.css('marginLeft')) //Find length of Belt DIV's left margin
+			config.statusvars=config.statusvars || []  //get variable names that will hold "start", "end", and "total" slides info
+			config.$statusobjs=[jQuery('#'+config.statusvars[0]), jQuery('#'+config.statusvars[1]), jQuery('#'+config.statusvars[2])]
+			config.currentpanel=0
+			stepcarousel.configholder[config.galleryid]=config //store config parameter as a variable
+			if (config.contenttype[0]=="ajax" && typeof config.contenttype[1]!="undefined") //fetch ajax content?
+				stepcarousel.getremotepanels(jQuery, config)
+			else
+				stepcarousel.alignpanels(jQuery, config) //align panels and initialize gallery
 		}) //end document.ready
-		jQuery(window).bind('unload', function(){ //clean up on page unload
-			stepcarousel.resetsettings(jQuery, config)
-			if (config.panelbehavior.persist)
-				stepcarousel.setCookie(config.galleryid+"persist", config.currentpanel)
+		jQuery(window).bind('unload', function(){ //clean up
+			if (config.panelbehavior.persist){
+				stepcarousel.setCookie(window[config.galleryid+"persist"], config.currentpanel)
+			}
 			jQuery.each(config, function(ai, oi){
 				oi=null
 			})
@@ -332,3 +266,4 @@ var stepcarousel={
 		})
 	}
 }
+

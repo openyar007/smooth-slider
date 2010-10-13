@@ -97,7 +97,7 @@ function install_smooth_slider() {
 						   'width'=>'450',
 						   'border'=>'1',
 						   'brcolor'=>'#999999',
-						   'prev_next'=>'1',
+						   'prev_next'=>'0',
 						   'goto_slide'=>'1',
 						   'title_text'=>'Featured Posts',
 						   'title_font'=>'Georgia',
@@ -135,7 +135,7 @@ function install_smooth_slider() {
 						   'navimg_ht'=>'32',
 						   'content_limit'=>'50',
 						   'stylesheet'=>'default.css',
-						   'shortcode'=>'0'
+						   'shortcode'=>'1'
 			              );
    
 	   $smooth_slider = get_option('smooth_slider_options');

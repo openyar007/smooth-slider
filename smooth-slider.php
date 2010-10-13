@@ -31,7 +31,7 @@ define('SLIDER_TABLE','smooth_slider'); //Slider TABLE NAME
 define('PREV_SLIDER_TABLE','slider'); //Slider TABLE NAME
 define('SLIDER_META','smooth_slider_meta'); //Meta TABLE NAME
 define('SLIDER_POST_META','smooth_slider_postmeta'); //Meta TABLE NAME
-define("SMOOTH_SLIDER_VER","2.3",false);//Current Version of Smooth Slider
+define("SMOOTH_SLIDER_VER","2.3.1",false);//Current Version of Smooth Slider
 if ( ! defined( 'SMOOTH_SLIDER_PLUGIN_BASENAME' ) )
 	define( 'SMOOTH_SLIDER_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 if ( ! defined( 'SMOOTH_SLIDER_CSS_DIR' ) )

@@ -1,5 +1,5 @@
 === Smooth Slider ===
-Contributors: internet-techies
+Contributors: internet techies
 Tags: slideshow,featured,posts,jquery,slider,content,widget,shortcode,carousel,css,simple,thumbnail,image,post,sidebar,plugin,page,category,wpmu,site,blogs,style,home,categories,picture,flash,gallery
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 2.9

@@ -3,7 +3,7 @@
 Plugin Name: Smooth Slider
 Plugin URI: http://www.clickonf5.org/smooth-slider
 Description: Smooth Slider adds a smooth content and image slideshow with customizable background and slide intervals to any location of your blog
-Version: 2.3.1	
+Version: 2.3.2	
 Author: Internet Techies
 Author URI: http://www.clickonf5.org/
 Wordpress version supported: 2.9 and above
@@ -31,7 +31,7 @@ define('SLIDER_TABLE','smooth_slider'); //Slider TABLE NAME
 define('PREV_SLIDER_TABLE','slider'); //Slider TABLE NAME
 define('SLIDER_META','smooth_slider_meta'); //Meta TABLE NAME
 define('SLIDER_POST_META','smooth_slider_postmeta'); //Meta TABLE NAME
-define("SMOOTH_SLIDER_VER","2.3.1",false);//Current Version of Smooth Slider
+define("SMOOTH_SLIDER_VER","2.3.2",false);//Current Version of Smooth Slider
 if ( ! defined( 'SMOOTH_SLIDER_PLUGIN_BASENAME' ) )
 	define( 'SMOOTH_SLIDER_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 if ( ! defined( 'SMOOTH_SLIDER_CSS_DIR' ) )
@@ -542,8 +542,7 @@ function carousel_posts_on_slider($max_posts, $offset=0, $slider_id = '1',$out_e
 	$posts = $wpdb->get_results("SELECT a.post_id, a.date FROM 
 	                             $table_name a LEFT OUTER JOIN $post_table b 
 								 ON a.post_id = b.ID 
-								 WHERE ((b.post_type='post' and b.post_status = 'publish') or (b.post_type='attachment' and b.post_status = 'inherit')) 
-								 AND a.slider_id = '$slider_id'
+								 WHERE (b.post_status = 'publish' OR (b.post_type='attachment' AND b.post_status = 'inherit')) AND a.slider_id = '$slider_id' 
 	                             ORDER BY a.slide_order ASC, a.date DESC LIMIT $offset, $max_posts", OBJECT);
 	
 	$html = '';
@@ -706,7 +705,7 @@ function carousel_posts_on_slider_cat($max_posts, $catg_slug, $offset=0) {
 	$myposts = $wpdb->get_results("SELECT a.post_id, a.date FROM 
 	                             $table_name a LEFT OUTER JOIN $post_table b 
 								 ON a.post_id = b.ID 
-								 WHERE ((b.post_type='post' and b.post_status = 'publish') or (b.post_type='attachment' and b.post_status = 'inherit'))  
+								 WHERE b.post_status = 'publish' OR (b.post_type='attachment' AND b.post_status = 'inherit')    
 	                             ORDER BY a.slide_order ASC, a.date DESC LIMIT $offset, $max_posts", OBJECT);
 	
 	$html = '';
@@ -896,7 +895,7 @@ function smooth_slider_wpmu_carousel_posts($max_posts, $offset=0) {
 		$myposts = $wpdb->get_results("SELECT a.post_id, a.date FROM 
 	                             $table_name a LEFT OUTER JOIN $post_table b 
 								 ON a.post_id = b.ID 
-								 WHERE ((b.post_type='post' and b.post_status = 'publish') or (b.post_type='attachment' and b.post_status = 'inherit'))  
+								 WHERE b.post_status = 'publish' OR (b.post_type='attachment' AND b.post_status = 'inherit') 
 	                             ORDER BY a.slide_order ASC, a.date DESC LIMIT $offset, $max_posts", OBJECT);
 		
 		foreach($myposts as $mypost) {

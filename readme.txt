@@ -4,7 +4,7 @@ Tags: slideshow,featured,posts,jquery,slider,content,widget,shortcode,carousel,c
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 2.9
 Tested up to: 3.0.1
-Stable tag: 2.3.1
+Stable tag: 2.3.2
 
 == Description ==
 
@@ -15,6 +15,8 @@ Smooth Slider is a Wordpress and Wordpress MU Plugin for creating a dynamic slid
 Highlighted Feature (from version 2.3) : Smooth Slider Widget and Smooth Slider Shortcode
 
 Highlighted Feature (from version 2.2) : Ability to create 'Multiple' sliders and an option to decide which post/page should show which slider
+
+Along with posts, pages and media images, Smooth Slider now supports Custom Post Types
 
 1. Search Engine Optimized Slideshow
 2. Fully Customizable CSS
@@ -98,42 +100,34 @@ Visit the plugin page (http://www.clickonf5.org/smooth-slider) to see more scree
 
 == Changelog ==
 
+Version 2.3.2 (10/13/2010)
+
+Minor fix to release of version 2.3
+1. Fix: Pages added to Smooth Slider were not displayed. Smooth Slider was turning empty. Fixed this issue
+2. Along with posts, pages and media images, Smooth Slider now supports Custom Post Types
+
 Version 2.3.1 (10/13/2010) 
 
 Minor upgrade to fix small issues with 2.3
 
 1. Plugin compltibility will be now from WordPress 2.9 i.e. you should upgrade to Version 2.3 only if you hav WordPress 2.9 and above.
-
 2. Fixed: For those using Smooth Slider previous versions, some were facing issue with the loading of stylesheets and script specific to slider. Fixed it.
-
 3. Fixed: For some servers content was not pulled from the posts. 
 
 Version 2.3 (10/12/2010)
 
 1. New - Smooth Slider Widget 
-
 2. New - Smooth Slider Shortcode 
-
 3. New - Slides can now be re-ordered thru the 'Slider Admin Panel'
-
 4. New - Images existing and new images added to WordPress Media Gallery can be added to Smooth Slider along with posts and pages.
-
 5. New - Now images in the slider can be extracted in very intelligent manner. Added support for 'Post Thumbnails (WP 2.9+)'.
-
 6. New - Videos can be embedded in the slider. Ad can be added to the slider.
-
 7. New - Some slides can be linked to a webpage and others can be without a link as well. 
-
 8. New - Multiple settings to the sliders on different pages thru CSS files.
-
 9. Fixed - Scheduled Posts issue
-
 10. Fixed - Image Caption Issue
-
 11. Fixed - Retain HTML tags issue
-
 12. Fixed - Permissions issue (Who can add post/page and slides to the slider and who cannot)
-
 
 Version 2.2 (12/24/2009)
 
@@ -193,6 +187,6 @@ Version 1.1 (09/14/2009)
 
 1. New - Active Slide in the slideshow will now be highlighted with bolder and bigger navigation number
 2. Fixed - Added No Script tag brosers not supporting JavaScript for showing the slideshow
-3. Fixed - Issues with Wordpress MU Smooth Slider Options update from setting page
+3. Fixed - Issues with WordPress MU Smooth Slider Options update from setting page
 
 Visit the plugin page (http://www.clickonf5.org/smooth-slider) to see the changelog and release notes.

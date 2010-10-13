@@ -64,7 +64,7 @@ function install_smooth_slider() {
 			}
 		}
 	}
-	add_column_if_not_exist($table_name, 'slide_order', "alter table $table_name add slide_order int(5) DEFAULT '0';");
+	add_column_if_not_exist($table_name, 'slide_order', "ALTER TABLE ".$table_name." ADD slide_order int(5) NOT NULL DEFAULT '0';");
 
    	$meta_table_name = $table_prefix.SLIDER_META;
 	if($wpdb->get_var("show tables like '$meta_table_name'") != $meta_table_name) {

@@ -12,6 +12,13 @@ function get_slider_posts_in_order($slider_id) {
 	$slider_posts = $wpdb->get_results("SELECT * FROM $table_name WHERE slider_id = '$slider_id' ORDER BY slide_order ASC, date DESC", OBJECT);
 	return $slider_posts;
 }
+function get_smooth_slider_name($slider_id) {
+    global $wpdb, $table_prefix;
+	$table_name = $table_prefix.SLIDER_META;
+	$slider_obj = $wpdb->get_results("SELECT * FROM $table_name WHERE slider_id = '$slider_id'", OBJECT);
+	$slider_name = $slider_obj->slider_name;
+	return $slider_name;
+}
 function ss_get_post_sliders($post_id){
     global $wpdb,$table_prefix;
 	$slider_table = $table_prefix.SLIDER_TABLE; 
@@ -139,7 +146,7 @@ function smooth_slider_table_exists($table, $db) {
 	}
 	return FALSE;
 }
-function add_column_if_not_exist($table_name, $column_name, $create_ddl) {
+function add_cf5_column_if_not_exist($table_name, $column_name, $create_ddl) {
      global $wpdb, $debug;
       foreach ($wpdb->get_col("DESC $table_name", 0) as $column ) {
           if ($debug) echo("checking $column == $column_name<br />");
@@ -156,5 +163,26 @@ function add_column_if_not_exist($table_name, $column_name, $create_ddl) {
           }
       }
       return false;
+}
+function cf5_sldr_parse_rss_rand($url,$count=0){
+    $doc = new DOMDocument();
+	$doc->load($url);
+	$arrFeeds = array();
+	foreach ($doc->getElementsByTagName('item') as $node) {
+		$itemRSS = array ( 
+			'title' => $node->getElementsByTagName('title')->item(0)->nodeValue,
+			'desc' => $node->getElementsByTagName('description')->item(0)->nodeValue,
+			'link' => $node->getElementsByTagName('link')->item(0)->nodeValue,
+			);
+		array_push($arrFeeds, $itemRSS);
+	}
+	$outarr=array();
+	if($count==0 or empty($count) or !isset($count)){
+	   $count=count($arrFeeds);
+	}
+	for($i=0;$i<$count;$i++) {
+	 $outarr[$i]=$arrFeeds[$i];
+	}
+	return $outarr;
 }
 ?>

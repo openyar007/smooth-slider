@@ -25,9 +25,9 @@ if (current_user_can( $smooth_slider['user_level'] )) {
 		
 			  
 	  $form_fields['slider'] = array(
-              'label'      => __('Check the box and select the slider'),
+              'label'      => __('Check the box and select the slider','smooth-slider'),
               'input'      => 'html',
-              'html'       => "<input type='checkbox' style='margin-top:6px;' name='attachments[".$post->ID."][slider]' value='slider' ".$extra." /> &nbsp; <strong>Add this Image to </strong>",
+              'html'       => "<input type='checkbox' style='margin-top:6px;' name='attachments[".$post->ID."][slider]' value='slider' ".$extra." /> &nbsp; <strong>".__( 'Add this Image to ', 'smooth-slider' )."</strong>",
               'value'      => 'slider'
            );
 	  
@@ -48,13 +48,13 @@ if (current_user_can( $smooth_slider['user_level'] )) {
 	 $sslider_nolink=get_post_meta($post_id, 'sslider_nolink', true);
 	 if($sslider_nolink=='1'){$checked= "checked";} else {$checked= "";}
 	 $form_fields['sslider_link'] = array(
-              'label'      => __('Slide Link URL'),
+              'label'      => __('Slide Link URL','smooth-slider'),
               'input'      => 'html',
-              'html'       => "<input type='text' style='clear:left;' class='text urlfield' name='attachments[".$post->ID."][sslider_link]' value='" . esc_attr($sslider_link) . "' />",
+              'html'       => "<input type='text' style='clear:left;' class='text urlfield' name='attachments[".$post->ID."][sslider_link]' value='" . esc_attr($sslider_link) . "' /><br /><small>".__( '(If left empty, it will be by default linked to attachment permalink.)', 'smooth-slider' )."</small>",
               'value'      => $sslider_link
            );
      $form_fields['sslider_nolink'] = array(
-              'label'      => __('Do not link this slide to any page(url)'),
+              'label'      => __('Do not link this slide to any page(url)','smooth-slider'),
               'input'      => 'html',
               'html'       => "<input type='checkbox' name='attachments[".$post->ID."][sslider_nolink]' value='1' ".$checked." />",
               'value'      => 'slider'
@@ -114,8 +114,8 @@ if (current_user_can( $smooth_slider['user_level'] )) {
 	
 	$sslider_link = get_post_meta($post_id,'slide_redirect_url',true);
 	$link=$attachment['sslider_link'];
-	if(!isset($link) or empty($link)){$link=get_permalink($post_id);}
-	if($sslider_link != $link) {
+	//if(!isset($link) or empty($link) ){$link=get_attachment_link($post_id);} //from 2.3.3
+	if($sslider_link != $link and isset($link) and !empty($link)) {
 	  update_post_meta($post_id, 'slide_redirect_url', $link);	
 	}
 	

@@ -3,12 +3,12 @@ Contributors: internet techies
 Tags: slideshow,featured,posts,jquery,slider,content,widget,shortcode,carousel,css,simple,thumbnail,image,post,sidebar,plugin,page,category,wpmu,site,blogs,style,home,categories,picture,flash,gallery
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 2.9
-Tested up to: 3.0.1
-Stable tag: 2.3.2
+Tested up to: 3.1.1
+Stable tag: 2.3.3
 
 == Description ==
 
-Smooth Slider is a Wordpress and Wordpress MU Plugin for creating a dynamic slideshow/s for featured posts on a blog. The slideshow created by Smooth Slider are JavaScript and Text based, that is why bloggers will get full benefit of Search Engine Optimization as the texts are readable by Search Engines. You can choose some of your posts as featured posts and show them into a slideshow on your blog home page (i.e. Index) as well as in Sidebar.
+Smooth Slider is a Wordpress Plugin for creating a dynamic slideshow/s for featured posts on a blog. The slideshow created by Smooth Slider are JavaScript and Text based, that is why site owners and bloggers will get full benefit of Search Engine Optimization as the texts are readable by Search Engines. You can choose some of your posts as featured posts and show them into a slideshow on your blog home page (i.e. Index) as well as in sidebar.
 
 =Features=
 
@@ -25,7 +25,7 @@ Along with posts, pages and media images, Smooth Slider now supports Custom Post
 5. Customized Slideshow as per your Wordpress Theme
 6. No Need Of Knowledge of PHP, HTML or CSS. But for those having knowledge of CSS, can have multiple settings for the slider on different pages of the same WP site.
 7. Easy To Install Plugin
-8. Full Support Available
+8. Premium Support Available
 9. Readable by search engine as you can see the screenshot on Lynx browser available on our blog
 10. Option for transparent background, so that rounded corners can be supported
 11. Slider Preview in admin panel
@@ -61,12 +61,17 @@ This plugin is easy to install like other plug-ins of Wordpress as you need to j
 
 4. Now Plugin is Activated, Go to the Usage section to see how to use Smooth Slider.
 
+== Upgrade Notice ==
+You can selectively upgrade to 2.3.3
+
 == Usage ==
 
 1. If you want the slideshow with all the added featured posts on your home page, then open Index.php file from Dashboard by clicking on Tab Appearance / Editor and paste the following piece of code at the suitable place. 
 
 if ( function_exists( 'get_smooth_slider' ) ) {
-     get_smooth_slider(); }If you want to put the slider before the list of articles on your Wordpress blog homepage, put the above piece of code before the Wordpress Loop (the code is a php code, so ensure that it is enclosed within the php tags). Wordpress loop code is shown below:
+     get_smooth_slider(); }
+
+If you want to put the slider before the list of articles on your Wordpress blog homepage, put the above piece of code before the Wordpress Loop (the code is a php code, so ensure that it is enclosed within the php tags). Wordpress loop code is shown below:
 
 if(have_posts()) : while(have_posts()) : the_post();
 
@@ -74,15 +79,11 @@ if(have_posts()) : while(have_posts()) : the_post();
 
 3. You can use the Smooth Slider shortcode [smoothslider] or [smoothslider id='1'] on your edit post/page panel to insert the slider anywhere on the post or page. In case you use multiple sliders feature, just replace the 'id' with your required slider's 'ID' that you would find on Sliders admin panel(settings).
 
-4. You can use the get_smooth_slider_cat('category-name or category slug')or get_smooth_slider_cat()to get the posts from specific category on the slider. Please read the intructions on plugin page to know the details which tag to use in which case.
+4. The content in the slider can be picked up from either the post content or the post excerpt or a new custom field slider_content. You can add the custom field on the Edit Post panel for each of the posts. 
 
-5. Use the template tag get_smooth_slider_wpmu_all to get the site wide posts on your WPMU installation.
+5. It is very easy to select which image you want as the thumbnail for the slides. You can choose to get the image from custom field, or 'Post thumbnail' or from the post content. 
 
-6. The content in the slider can be picked up from either the post content or the post excerpt or a new custom field slider_content. You can add the custom field on the Edit Post panel for each of the posts. 
-
-7. It is very easy to select which image you want as the thumbnail for the slides. You can choose to get the image from custom field, or 'Post thumbnail' or from the post content. 
-
-8. Almost all the fields that appear in the Smooth Slider are customizable, you can change the looks of your Slider and make it suitable for your theme. The defaults set are according to the Default Wordpress theme. Also, you can change the number of posts appearing in the slider and the pause or interval between the two consecutive posts on the slider. For making these changes, there would be  a settings page for Smooth Slider in the wp-admin screen of your blog, once you enable the plugin.
+6. Almost all the fields that appear in the Smooth Slider are customizable, you can change the looks of your Slider and make it suitable for your theme. The defaults set are according to the Default Wordpress theme. Also, you can change the number of posts appearing in the slider and the pause or interval between the two consecutive posts on the slider. For making these changes, there would be  a settings page for Smooth Slider in the wp-admin screen of your blog, once you enable the plugin.
 
 Go to the plugin page to see more details on how to use the 'Multiple Slider' feature(http://www.clickonf5.org/smooth-slider)
 There are lot many features added from Release version 2.0 and above. To see the upgrade details and usage visit http://www.clickonf5.org/wordpress/smooth-slider-upgrade-2-0-released/5151
@@ -99,6 +100,13 @@ FAQ section on: http://www.clickonf5.org/smooth-slider
 Visit the plugin page (http://www.clickonf5.org/smooth-slider) to see more screenshots.
 
 == Changelog ==
+
+Version 2.3.3 (04/16/2011)
+
+1. Randomize the slides in Slider
+2. Translation ready
+3. Multiple sliders can have different titles
+4. No script text option
 
 Version 2.3.2 (10/13/2010)
 
@@ -137,7 +145,6 @@ Version 2.2 (12/24/2009)
 4. Fix - For using the custom images for navigation, there was an issue with 'getimagesize' php function for some servers. Removed this fuction and directly put options to specify the custom images height and width.
 5. Fix - When the navigation numbers are used, there was some clicking issue, like the numbers needed to be douoble clicked in order to go to that slide number. This issue was observed with some installations of Smooth Slider (like on demo page). Hopefully this would get fixed with this release.
 6. Fix - Changed the name of the database table from slider to smooth_slider to avoid any database conflicts and be more specific
-
 
 Version 2.1.2 (11/26/2009)
 

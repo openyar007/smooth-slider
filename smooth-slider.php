@@ -154,7 +154,7 @@ function install_smooth_slider() {
 	   /*if($smooth_slider){
 	      $default_slider['ver']='step';
 	   }*/
-	   
+	   	   
 	   $img_pick = $smooth_slider['img_pick'];
   
        if(is_array($img_pick)) {
@@ -190,8 +190,11 @@ function install_smooth_slider() {
 		  }
 	   }
 	   
+	   if($smooth_slider['ver']!='j'){
+	      $smooth_slider['stylesheet']='default';
+	   }
+	   
 	   $smooth_slider['ver']='j';
-	   $smooth_slider['stylesheet']='default';
      
 	 if($smooth_slider['user_level']<=10 and $smooth_slider['user_level'] >=1) {
 		 if($smooth_slider['user_level']<=10 and $smooth_slider['user_level'] >7) {

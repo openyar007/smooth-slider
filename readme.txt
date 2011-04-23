@@ -4,13 +4,15 @@ Tags: slideshow,featured,posts,jquery,slider,content,widget,shortcode,carousel,c
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 2.9
 Tested up to: 3.1.1
-Stable tag: 2.3.3
+Stable tag: 2.3.4
 
 == Description ==
 
 Smooth Slider is a Wordpress Plugin for creating a dynamic slideshow/s for featured posts on a blog. The slideshow created by Smooth Slider are JavaScript and Text based, that is why site owners and bloggers will get full benefit of Search Engine Optimization as the texts are readable by Search Engines. You can choose some of your posts as featured posts and show them into a slideshow on your blog home page (i.e. Index) as well as in sidebar.
 
 =Features=
+
+!!IMP!! Do not upgrade to 2.3.3 or 2.3.4 if you have highly customized the looks of previous version of Smooth Slider, you may lose some CSS formatting as in the new versions the slider javascript is changed and is different from previous versions.
 
 Highlighted Feature (from version 2.3) : Smooth Slider Widget and Smooth Slider Shortcode
 
@@ -51,6 +53,8 @@ Along with posts, pages and media images, Smooth Slider now supports Custom Post
 
 == Installation ==
 
+!!IMP!! Do not upgrade to 2.3.3 or 2.3.4 if you have highly customized Smooth Slider, you may lose some CSS formatting as in the new versions the slider javascript is changed and is different from previous versions.
+
 This plugin is easy to install like other plug-ins of Wordpress as you need to just follow the below mentioned steps:
 
 1. Copy Folder Smooth Slider from the downloaded and extracted file.
@@ -62,7 +66,8 @@ This plugin is easy to install like other plug-ins of Wordpress as you need to j
 4. Now Plugin is Activated, Go to the Usage section to see how to use Smooth Slider.
 
 == Upgrade Notice ==
-You can selectively upgrade to 2.3.3
+
+!!IMP!! Do not upgrade to 2.3.3 or 2.3.4 if you have highly customized Smooth Slider, you may lose some CSS formatting as in the new versions the slider javascript is changed and is different from previous versions.
 
 == Usage ==
 
@@ -100,6 +105,10 @@ FAQ section on: http://www.clickonf5.org/smooth-slider
 Visit the plugin page (http://www.clickonf5.org/smooth-slider) to see more screenshots.
 
 == Changelog ==
+
+Version 2.3.3 (04/24/2011)
+
+1. Fix: Slider was not working on upgrade from older versions to version 2.3.3
 
 Version 2.3.3 (04/16/2011)
 

@@ -3,7 +3,7 @@
 Plugin Name: Smooth Slider
 Plugin URI: http://www.clickonf5.org/smooth-slider
 Description: Smooth Slider adds a smooth content and image slideshow with customizable background and slide intervals to any location of your blog
-Version: 2.3.3	
+Version: 2.3.4	
 Author: Internet Techies
 Author URI: http://www.clickonf5.org/
 Wordpress version supported: 2.9 and above
@@ -146,14 +146,14 @@ function install_smooth_slider() {
 						   'shortcode'=>'1',
 						   'rand'=>'0',
 						   'ver'=>'j',
-						   'support'=>'0',
+						   'support'=>'1',
 						   'noscript'=>'This page is having a slideshow that uses Javascript. Your browser either doesn\'t support Javascript or you have it turned off. To see this page as it is meant to appear please use a Javascript enabled browser.'
 			              );
    
 	   $smooth_slider = get_option('smooth_slider_options');
-	   if($smooth_slider){
+	   /*if($smooth_slider){
 	      $default_slider['ver']='step';
-	   }
+	   }*/
 	   
 	   $img_pick = $smooth_slider['img_pick'];
   
@@ -189,6 +189,9 @@ function install_smooth_slider() {
 		     $smooth_slider[$key] = $value;
 		  }
 	   }
+	   
+	   $smooth_slider['ver']='j';
+	   $smooth_slider['stylesheet']='default';
      
 	 if($smooth_slider['user_level']<=10 and $smooth_slider['user_level'] >=1) {
 		 if($smooth_slider['user_level']<=10 and $smooth_slider['user_level'] >7) {

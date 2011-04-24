@@ -12,7 +12,7 @@ Smooth Slider is a Wordpress Plugin for creating a dynamic slideshow/s for featu
 
 =Features=
 
-!!IMP!! Do not upgrade to 2.3.3 or 2.3.4 if you have highly customized previous version of Smooth Slider, you may lose some CSS formatting as in the new versions the slider javascript is changed (due to licensing issues) and is different from previous versions.
+!!IMP!! Do not upgrade to 2.3.3 or 2.3.4 if you have highly customized previous version of Smooth Slider, you may lose some CSS formatting as in the new versions the slider javascript is changed (due to licencing issues) and is different from previous versions.
 
 Highlighted Feature (from version 2.3) : Smooth Slider Widget and Smooth Slider Shortcode
 
@@ -67,7 +67,7 @@ This plugin is easy to install like other plug-ins of Wordpress as you need to j
 
 == Upgrade Notice ==
 
-!!IMP!! Do not upgrade to 2.3.3 or 2.3.4 if you have highly customized Smooth Slider, you may lose some CSS formatting as in the new versions the slider javascript is changed (due to licensing issues) and is different from previous versions.
+!!IMP!! Do not upgrade to 2.3.3 or 2.3.4 if you have highly customized Smooth Slider, you may lose some CSS formatting as in the new versions the slider javascript is changed (due to licencing issues) and is different from previous versions.
 
 == Usage ==
 
@@ -95,7 +95,11 @@ There are lot many features added from Release version 2.0 and above. To see the
 
 == Frequently Asked Questions ==
 
-Check the FAQs on Smooth Slider page of Internet Techies. 
+!!IMP!! In case you have upgraded from previous versions (<= 2.3.2) using WordPress automatic upgradation, and the plugin is not working, please deactivate and reactivate the plugin. 
+
+Also, in case you are still getting list of the entries, please go to the Smooth Slider Settings page and just 'Save' the settings. Check if the settings Miscellaneous => Smooth Slider Styles to use on other than Post/Pages is equal to default. Then save the settings.
+ 
+Check the other FAQs on Smooth Slider page of Internet Techies. 
 FAQ section on: http://www.clickonf5.org/smooth-slider
 
 == Screenshots ==
@@ -106,11 +110,7 @@ Visit the plugin page (http://www.clickonf5.org/smooth-slider) to see more scree
 
 == Changelog ==
 
-Version 2.3.4.1 (04/24/2011)
-
-1. Fix: Slider was not working on upgrade from older versions to version 2.3.4
-
-Version 2.3.4 (04/24/2011)
+Version 2.3.3 (04/24/2011)
 
 1. Fix: Slider was not working on upgrade from older versions to version 2.3.3
 

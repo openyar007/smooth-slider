@@ -4,7 +4,7 @@ Tags: slideshow,featured,posts,jquery,slider,content,widget,shortcode,carousel,c
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 2.9
 Tested up to: 3.1.1
-Stable tag: 2.3.4
+Stable tag: 2.3.4.1
 
 == Description ==
 
@@ -12,7 +12,7 @@ Smooth Slider is a Wordpress Plugin for creating a dynamic slideshow/s for featu
 
 =Features=
 
-!!IMP!! Do not upgrade to 2.3.3 or 2.3.4 if you have highly customized the looks of previous version of Smooth Slider, you may lose some CSS formatting as in the new versions the slider javascript is changed and is different from previous versions.
+!!IMP!! Do not upgrade to 2.3.3 or 2.3.4 if you have highly customized previous version of Smooth Slider, you may lose some CSS formatting as in the new versions the slider javascript is changed (due to licensing issues) and is different from previous versions.
 
 Highlighted Feature (from version 2.3) : Smooth Slider Widget and Smooth Slider Shortcode
 
@@ -67,7 +67,7 @@ This plugin is easy to install like other plug-ins of Wordpress as you need to j
 
 == Upgrade Notice ==
 
-!!IMP!! Do not upgrade to 2.3.3 or 2.3.4 if you have highly customized Smooth Slider, you may lose some CSS formatting as in the new versions the slider javascript is changed and is different from previous versions.
+!!IMP!! Do not upgrade to 2.3.3 or 2.3.4 if you have highly customized Smooth Slider, you may lose some CSS formatting as in the new versions the slider javascript is changed (due to licensing issues) and is different from previous versions.
 
 == Usage ==
 
@@ -106,7 +106,11 @@ Visit the plugin page (http://www.clickonf5.org/smooth-slider) to see more scree
 
 == Changelog ==
 
-Version 2.3.3 (04/24/2011)
+Version 2.3.4.1 (04/24/2011)
+
+1. Fix: Slider was not working on upgrade from older versions to version 2.3.4
+
+Version 2.3.4 (04/24/2011)
 
 1. Fix: Slider was not working on upgrade from older versions to version 2.3.3
 

@@ -184,16 +184,17 @@ function install_smooth_slider() {
 	   if(!$smooth_slider) {
 	     $smooth_slider = array();
 	   }
+	   
+	   if($smooth_slider['ver']!='j' or !isset($smooth_slider['ver'])){
+	      $smooth_slider['stylesheet']='default';
+	   }
+	   
 	   foreach($default_slider as $key=>$value) {
 	      if(!isset($smooth_slider[$key])) {
 		     $smooth_slider[$key] = $value;
 		  }
 	   }
-	   
-	   if($smooth_slider['ver']!='j'){
-	      $smooth_slider['stylesheet']='default';
-	   }
-	   
+	   	   
 	   $smooth_slider['ver']='j';
      
 	 if($smooth_slider['user_level']<=10 and $smooth_slider['user_level'] >=1) {

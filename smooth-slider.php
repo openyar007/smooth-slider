@@ -185,9 +185,9 @@ function install_smooth_slider() {
 	     $smooth_slider = array();
 	   }
 	   
-	   if($smooth_slider and !isset($smooth_slider['ver'])){
+	   //if($smooth_slider and !isset($smooth_slider['ver'])){
 	      $smooth_slider['stylesheet']='default';
-	   }
+	   //}
 	   
 	   foreach($default_slider as $key=>$value) {
 	      if(!isset($smooth_slider[$key])) {

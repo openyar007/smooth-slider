@@ -12,6 +12,8 @@ Smooth Slider is a Wordpress Plugin for creating a dynamic slideshow/s for featu
 
 =Features=
 
+**Do Not Upgrade if using Smooth Slider 2.3.2 or older version** - We changed the slider JS because of licensing issue and that may cause issue for existing users with version 2.3.2 or older than that.If you find problem after upgrade, revert back to older version. [Get older versions](http://wordpress.org/extend/plugins/smooth-slider/download/)
+
 !!IMP!! Do not upgrade to 2.3.3 or 2.3.4 if you have highly customized previous version of Smooth Slider, you may lose some CSS formatting as in the new versions the slider javascript is changed (due to licencing issues) and is different from previous versions.
 
 Highlighted Feature (from version 2.3) : Smooth Slider Widget and Smooth Slider Shortcode
@@ -66,6 +68,8 @@ This plugin is easy to install like other plug-ins of Wordpress as you need to j
 4. Now Plugin is Activated, Go to the Usage section to see how to use Smooth Slider.
 
 == Upgrade Notice ==
+
+**Do Not Upgrade if using Smooth Slider 2.3.2 or older version** - We changed the slider JS because of licensing issue and that may cause issue for existing users with version 2.3.2 or older than that.If you find problem after upgrade, revert back to older version. 
 
 !!IMP!! Do not upgrade to 2.3.3 or 2.3.4 if you have highly customized Smooth Slider, you may lose some CSS formatting as in the new versions the slider javascript is changed (due to licencing issues) and is different from previous versions.
 

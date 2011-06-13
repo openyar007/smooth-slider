@@ -246,18 +246,16 @@ if ($_POST['reorder_posts_slider']) {
 			  <h3 class="hndle"><span><?php _e('Top Supporters','smooth-slider'); ?></span></h3> 
 			  <div class="inside">
                 <div id="smooth_sldr_donations">
-					 <?php $donations = cf5_sldr_parse_rss_rand('http://support.clickonf5.com/donations.xml','10'); 
-                    if($donations) {?>
-                    <ul>
-                    <?php foreach($donations as $donation) { ?>
-                    <li><a href="<?php echo $donation['link'];?>" title="<?php _e('Visit','smooth-slider'); ?> <?php echo $donation['title'];?>" ><?php echo $donation['title'];?></a></li>
-                    <?php } ?>
-                    </ul> 
-                    <?php } ?>
+					 <ul>
+                        <li><a href="http://www.jacobwiechman.com/wordpress//" title="Visit Jacob Wiechman - $50" >Jacob Wiechman - $50</a></li>
+                        <li><a href="http://malamedconsulting.com/" title="Visit Connie Malamed - $25" >Connie Malamed - $25</a></li>
+                        <li><a href="http://uwaterloo.ca/" title="Visit Trevor Bain - $25" >Trevor Bain - $25</a></li>
+                        <li><a href="http://www.whatsthebigidea.com/" title="Visit WhatsTheBigIdea.com,Inc. - $20" >WhatsTheBigIdea.com,Inc. - $20</a></li>
+                     </ul>  
                 </div>
               </div> 
 			</div> 
-     </div>  
+          </div>  
           <div style="clear:left;"></div>
 
      <div id="side-info-column" style="float:left;width:325px;"> 

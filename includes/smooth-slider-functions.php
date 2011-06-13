@@ -164,25 +164,4 @@ function add_cf5_column_if_not_exist($table_name, $column_name, $create_ddl) {
       }
       return false;
 }
-function cf5_sldr_parse_rss_rand($url,$count=0){
-    $doc = new DOMDocument();
-	$doc->load($url);
-	$arrFeeds = array();
-	foreach ($doc->getElementsByTagName('item') as $node) {
-		$itemRSS = array ( 
-			'title' => $node->getElementsByTagName('title')->item(0)->nodeValue,
-			'desc' => $node->getElementsByTagName('description')->item(0)->nodeValue,
-			'link' => $node->getElementsByTagName('link')->item(0)->nodeValue,
-			);
-		array_push($arrFeeds, $itemRSS);
-	}
-	$outarr=array();
-	if($count==0 or empty($count) or !isset($count)){
-	   $count=count($arrFeeds);
-	}
-	for($i=0;$i<$count;$i++) {
-	 $outarr[$i]=$arrFeeds[$i];
-	}
-	return $outarr;
-}
 ?>

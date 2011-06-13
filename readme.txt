@@ -55,11 +55,8 @@ Along with posts, pages and media images, Smooth Slider now supports Custom Post
 [Plugin Information](http://www.clickonf5.org/smooth-slider) | 
 [Get Support](http://clickonf5.com/) 
 
-**Find More Slider Styles at [SliderVilla](http://www.slidervilla.com/)**
 
 == Installation ==
-
-**Find advanced WordPress Slider Plugins at [SliderVilla](http://www.slidervilla.com/)**
 
 !!IMP!! Do not upgrade to 2.3.3 or 2.3.4 if you have highly customized Smooth Slider, you may lose some CSS formatting as in the new versions the slider javascript is changed and is different from previous versions.
 
@@ -74,8 +71,6 @@ This plugin is easy to install like other plug-ins of Wordpress as you need to j
 4. Now Plugin is Activated, Go to the Usage section to see how to use Smooth Slider.
 
 ### Usage ###
-
-**Find advanced WordPress Slider Plugins at [SliderVilla](http://www.slidervilla.com/)**
 
 1. If you want the slideshow with all the added featured posts on your home page, open Index.php file from Dashboard by clicking on Tab Appearance / Editor and paste the following piece of code at the suitable place. 
 
@@ -125,14 +120,10 @@ FAQ section on: http://www.clickonf5.org/smooth-slider
 
 == Screenshots ==
 
-**Find advanced WordPress Slider Plugins at [SliderVilla](http://www.slidervilla.com/)**
-
 1. Demo of this plugin is available on Internet Techies home page
 2. Add post/Page to Smooth slider along with other edit panel options
 
 Visit the plugin page (http://www.clickonf5.org/smooth-slider) to see more screenshots.
-
-**Find advanced WordPress Slider Plugins at [SliderVilla](http://www.slidervilla.com/)**
 
 == Changelog ==
 

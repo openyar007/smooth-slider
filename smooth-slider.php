@@ -3,13 +3,13 @@
 Plugin Name: Smooth Slider
 Plugin URI: http://www.clickonf5.org/smooth-slider
 Description: Smooth Slider adds a smooth content and image slideshow with customizable background and slide intervals to any location of your blog
-Version: 2.3.4.1	
+Version: 2.3.5	
 Author: Internet Techies
 Author URI: http://www.clickonf5.org/
 Wordpress version supported: 2.9 and above
 */
 
-/*  Copyright 2009-2010  Internet Techies  (email : tedeshpa@gmail.com)
+/*  Copyright 2009-2011  Internet Techies  (email : tedeshpa@gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ define('SLIDER_TABLE','smooth_slider'); //Slider TABLE NAME
 define('PREV_SLIDER_TABLE','slider'); //Slider TABLE NAME
 define('SLIDER_META','smooth_slider_meta'); //Meta TABLE NAME
 define('SLIDER_POST_META','smooth_slider_postmeta'); //Meta TABLE NAME
-define("SMOOTH_SLIDER_VER","2.3.3",false);//Current Version of Smooth Slider
+define("SMOOTH_SLIDER_VER","2.3.5",false);//Current Version of Smooth Slider
 if ( ! defined( 'SMOOTH_SLIDER_PLUGIN_BASENAME' ) )
 	define( 'SMOOTH_SLIDER_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 if ( ! defined( 'SMOOTH_SLIDER_CSS_DIR' ) ){
@@ -147,6 +147,7 @@ function install_smooth_slider() {
 						   'rand'=>'0',
 						   'ver'=>'j',
 						   'support'=>'1',
+						   'fouc'=>'0',
 						   'noscript'=>'This page is having a slideshow that uses Javascript. Your browser either doesn\'t support Javascript or you have it turned off. To see this page as it is meant to appear please use a Javascript enabled browser.'
 			              );
    
@@ -447,7 +448,7 @@ function add_to_slider_checkbox() {
             if ($handle = opendir($directory)) {
                 while (false !== ($file = readdir($handle))) { 
                  if($file != '.' and $file != '..') { ?>
-                  <option value="<?php echo $file;?>" <?php if ($slider_style == $file){ echo "selected";}?> ><?php echo $file;?></option>
+                  <option value="<?php echo $file;?>" <?php if (($slider_style == $file) or (empty($slider_style) and $smooth_slider['stylesheet'] == $file)){ echo "selected";}?> ><?php echo $file;?></option>
              <?php  } }
                 closedir($handle);
             }
@@ -589,9 +590,7 @@ class Smooth_Slider_Simple_Widget extends WP_Widget {
 }
 add_action( 'widgets_init', create_function('', 'return register_widget("Smooth_Slider_Simple_Widget");') );
 
-if($smooth_slider['ver']=='step') require_once (dirname (__FILE__) . '/slider_versions/step.php');
-else require_once (dirname (__FILE__) . '/slider_versions/j.php');
-
+require_once (dirname (__FILE__) . '/slider_versions/j.php');
 require_once (dirname (__FILE__) . '/settings/settings.php');
 require_once (dirname (__FILE__) . '/includes/media-images.php');
 ?>

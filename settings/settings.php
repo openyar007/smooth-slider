@@ -20,8 +20,34 @@ global $smooth_slider;
 
 <div class="wrap" style="clear:both;">
 
-<div id="poststuff" class="metabox-holder has-right-sidebar" style="float:right;width:30%;"> 
-   <div id="side-info-column" class="inner-sidebar"> 
+<h2 style="float:left;"><?php _e('Smooth Slider Settings ','smooth-slider'); ?></h2>
+<form  style="float:left;" action="https://www.paypal.com/cgi-bin/webscr" method="post">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="hosted_button_id" value="8046056">
+<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+</form>
+<?php $url = sslider_admin_url( array( 'page' => 'smooth-slider-admin' ) );?>
+<button><a href="<?php echo $url; ?>" title="<?php _e('Go to Sliders page where you can re-order the slide posts, delete the slides from the slider etc.','smooth-slider'); ?>"><?php _e('Go to Sliders Admin','smooth-slider'); ?></a></button>
+
+
+<form method="post" action="options.php">
+<h2 style="clear:left"><?php _e('Preview','smooth-slider'); ?></h2> 
+<?php settings_fields('smooth-slider-group'); ?>
+<div>
+<?php 
+get_smooth_slider();
+?> </div>
+
+<div id="poststuff" class="metabox-holder has-right-sidebar" style="float:right;width:28%;"> 
+            <div class="postbox"> 
+     		  <div class="inside">
+
+            <div style="margin:10px auto;">
+                        <a href="http://slidervilla.com/" title="Premium WordPress Slider Plugins" target="_blank"><img src="<?php echo smooth_slider_plugin_url('images/slidervilla-ad1.jpg');?>" alt="Premium WordPress Slider Plugins" /></a>
+            </div>
+            </div></div>
+                
 			<div class="postbox"> 
 			  <h3 class="hndle"><span><?php _e('About this Plugin:','smooth-slider'); ?></span></h3> 
 			  <div class="inside">
@@ -38,19 +64,37 @@ global $smooth_slider;
                 </ul> 
               </div> 
 			</div> 
-     </div>
      
-   <div id="side-info-column" class="inner-sidebar"> 
 			<div class="postbox"> 
 			  <h3 class="hndle"><span></span><?php _e('Our Facebook Fan Page','smooth-slider'); ?></h3> 
 			  <div class="inside">
                 <script type="text/javascript" src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_GB"></script><script type="text/javascript">FB.init("2aeebe9fb014836a6810ec4426d26f7e");</script><fb:fan profile_id="127760528543" stream="" connections="8" width="270" height="250"></fb:fan>
               </div> 
 			</div> 
-     </div>
 
-     <div id="side-info-column" class="inner-sidebar"> 
-			<div class="postbox"> 
+     		<div class="postbox"> 
+			  <h3 class="hndle"><span></span><?php _e('Recommended WordPress Hosting','smooth-slider'); ?></h3> 
+			  <div class="inside">
+                  <div style="margin:10px 5px">
+            <a href="http://slidervilla.com/go/hostgator/" title="Recommended Web Hosting" target="_blank"><img src="<?php echo smooth_slider_plugin_url('images/hostgator.gif');?>" alt="Recommended Web Hosting" /></a>
+            <p><a href="http://slidervilla.com/go/hostgator/" title="Recommended Web Hosting" target="_blank">HostGator</a> is one of the world's top 10 largest web hosting companies with more than 5,000,000 hosted domains. You can host your own WordPress installation with custom themes, plugins, and your own domain name with HostGator from only $3.96 a month.</p>
+            <p><strong>Features: </strong>UNLIMITED Disk Space and Bandwidth, FREE Site Building Tools and Templates, 24/7/365 Award Winning Technical Support</p>
+            <p>For more info visit <a href="http://slidervilla.com/go/hostgator/" title="Recommended Web Hosting" target="_blank">HostGator.com</a></p>
+                  </div>
+          </div></div>
+     
+     		<div class="postbox"> 
+			  <h3 class="hndle"><span></span><?php _e('Recommended Themes','smooth-slider'); ?></h3> 
+			  <div class="inside">
+                     <div style="margin:10px 5px">
+                        <a href="http://slidervilla.com/go/elegantthemes/" title="Recommended WordPress Themes" target="_blank"><img src="<?php echo smooth_slider_plugin_url('images/elegantthemes.gif');?>" alt="Recommended WordPress Themes" /></a>
+                        <p><a href="http://slidervilla.com/go/elegantthemes/" title="Recommended WordPress Themes" target="_blank">Elegant Themes</a> are attractive, compatible, affordable, SEO optimized WordPress Themes and have best support in community.</p>
+                        <p><strong>Beautiful themes, Great support!</strong></p>
+                        <p><a href="http://slidervilla.com/go/elegantthemes/" title="Recommended WordPress Themes" target="_blank">For more info visit ElegantThemes</a></p>
+                     </div>
+               </div></div>
+            
+            <div class="postbox"> 
 			  <h3 class="hndle"><span><?php _e('Credits:','smooth-slider'); ?></span></h3> 
 			  <div class="inside">
                 <ul>
@@ -60,50 +104,13 @@ global $smooth_slider;
                 </ul> 
               </div> 
 			</div> 
-     </div>
-     
-          <div id="side-info-column" class="inner-sidebar"> 
-			<div class="postbox"> 
-			  <h3 class="hndle"><span><?php _e('Top Supporters','smooth-slider'); ?></span></h3> 
-			  <div class="inside">
-                <div id="smooth_sldr_donations">
-                 <?php $donations = cf5_sldr_parse_rss_rand('http://support.clickonf5.com/donations.xml','10'); 
-		        if($donations) {?>
-                <ul>
-                <?php foreach($donations as $donation) { ?>
-                <li><a href="<?php echo $donation['link'];?>" title="<?php _e('Visit','smooth-slider'); ?> <?php echo $donation['title'];?>" ><?php echo $donation['title'];?></a></li>
-                <?php } ?>
-                </ul> 
-                <?php } ?>
-                 
-                </div>
-              </div> 
-			</div> 
-     </div>  
+
  </div> <!--end of poststuff --> 
 
-<h2 style="float:left;"><?php _e('Smooth Slider Settings ','smooth-slider'); ?></h2>
-<form  style="float:left;" action="https://www.paypal.com/cgi-bin/webscr" method="post">
-<input type="hidden" name="cmd" value="_s-xclick">
-<input type="hidden" name="hosted_button_id" value="8046056">
-<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
-</form>
-<?php $url = sslider_admin_url( array( 'page' => 'smooth-slider-admin' ) );?>
-<a href="<?php echo $url; ?>" title="<?php _e('Go to Sliders page where you can re-order the slide posts, delete the slides from the slider etc.','smooth-slider'); ?>"><?php _e('Go to Sliders Admin','smooth-slider'); ?></a>
 
-<form method="post" action="options.php">
-<h2 style="clear:left;"><?php _e('Preview','smooth-slider'); ?></h2> 
-<?php settings_fields('smooth-slider-group'); ?>
-<div style="width:70%;">
-<?php 
-get_smooth_slider();
-?> </div>
-
+<div style="float:left;width:60%;">
 <h2><?php _e('Slider Box','smooth-slider'); ?></h2> 
 <p><?php _e('Customize the looks of the Slider box wrapping the complete slideshow from here','smooth-slider'); ?></p> 
-
-<div style="float:left;width:70%;">
 <table class="form-table">
 
 <tr valign="top">
@@ -490,6 +497,11 @@ if ($handle = opendir($directory)) {
 </tr>
 
 <tr valign="top">
+<th scope="row"><?php _e('Enable FOUC','smooth-slider'); ?></th>
+<td><input name="smooth_slider_options[fouc]" type="checkbox" value="1" <?php checked('1', $smooth_slider['fouc']); ?>  /><small><?php _e('(check this if you would not want to disable Flash of Unstyled Content in the slider when the page is loaded)','smooth-slider'); ?></small></td>
+</tr>
+
+<!--<tr valign="top">
 <th scope="row"><?php _e('Version to use','smooth-slider'); ?></th>
 <td><select name="smooth_slider_options[ver]" >
 <option value="j" <?php if ($smooth_slider['ver'] == "j"){ echo "selected";}?> ><?php _e('New','smooth-slider'); ?></option>
@@ -497,7 +509,7 @@ if ($handle = opendir($directory)) {
 </select>
 </td>
 </tr>
-
+-->
 </table>
 
 <p class="submit">
@@ -505,6 +517,11 @@ if ($handle = opendir($directory)) {
 </p>
 </div> <!--end of float left -->
 </form>
+
+                     <div style="margin:10px auto;clear:left;">
+                        <a href="http://slidervilla.com/" title="Premium WordPress Slider Plugins" target="_blank"><img src="<?php echo smooth_slider_plugin_url('images/slidervilla-728.jpg');?>" alt="Premium WordPress Slider Plugins" /></a>
+                     </div>
+
 
 </div> <!--end of float wrap -->
 

@@ -4,7 +4,9 @@ global $smooth_slider;
 ?>
 
 <div class="wrap" style="clear:both;">
-
+                     <div style="margin:10px auto;clear:left;">
+                        <a href="http://slidervilla.com/" title="Premium WordPress Slider Plugins" target="_blank"><img src="<?php echo smooth_slider_plugin_url('images/slidervilla-728.jpg');?>" alt="Premium WordPress Slider Plugins" /></a>
+                     </div>
 <h2 style="float:left;"><?php _e('Sliders Created','smooth-slider'); ?></h2>
 <form  style="float:left;" action="https://www.paypal.com/cgi-bin/webscr" method="post">
 <input type="hidden" name="cmd" value="_s-xclick">
@@ -197,6 +199,10 @@ if ($_POST['reorder_posts_slider']) {
 <?php }?> 
 </div>
 
+<div style="margin:10px auto;clear:left;">
+                        <a href="http://slidervilla.com/" title="Premium WordPress Slider Plugins" target="_blank"><img src="<?php echo smooth_slider_plugin_url('images/slidervilla-728.jpg');?>" alt="Premium WordPress Slider Plugins" /></a>
+</div>
+
 <div id="poststuff" class="metabox-holder has-right-sidebar"> 
    <div id="side-info-column" class="inner-sidebar" style="float:left;"> 
 			<div class="postbox"> 
@@ -252,6 +258,33 @@ if ($_POST['reorder_posts_slider']) {
               </div> 
 			</div> 
      </div>  
+          <div style="clear:left;"></div>
+
+     <div id="side-info-column" style="float:left;width:325px;"> 
+        <div class="postbox"> 
+			  <h3 class="hndle"><span></span><?php _e('Recommended WordPress Hosting','smooth-slider'); ?></h3> 
+			  <div class="inside">
+                  <div style="margin:10px 5px">
+            <a href="http://slidervilla.com/go/hostgator/" title="Recommended Web Hosting" target="_blank"><img src="<?php echo smooth_slider_plugin_url('images/hostgator.gif');?>" alt="Recommended Web Hosting" /></a>
+            <p><a href="http://slidervilla.com/go/hostgator/" title="Recommended Web Hosting" target="_blank">HostGator</a> is one of the world's top 10 largest web hosting companies with more than 5,000,000 hosted domains. You can host your own WordPress installation with custom themes, plugins, and your own domain name with HostGator from only $3.96 a month.</p>
+            <p><strong>Features: </strong>UNLIMITED Disk Space and Bandwidth, FREE Site Building Tools and Templates, 24/7/365 Award Winning Technical Support</p>
+            <p>For more info visit <a href="http://slidervilla.com/go/hostgator/" title="Recommended Web Hosting" target="_blank">HostGator.com</a></p>
+                  </div>
+          </div></div></div>
+     
+     		<div id="side-info-column" style="float:left;margin-left:1em;width:325px;"> 
+            <div class="postbox"> 
+			  <h3 class="hndle"><span></span><?php _e('Recommended Themes','smooth-slider'); ?></h3> 
+			  <div class="inside">
+                     <div style="margin:10px 5px">
+                        <a href="http://slidervilla.com/go/elegantthemes/" title="Recommended WordPress Themes" target="_blank"><img src="<?php echo smooth_slider_plugin_url('images/elegantthemes.gif');?>" alt="Recommended WordPress Themes" /></a>
+                        <p><a href="http://slidervilla.com/go/elegantthemes/" title="Recommended WordPress Themes" target="_blank">Elegant Themes</a> are attractive, compatible, affordable, SEO optimized WordPress Themes and have best support in community.</p>
+                        <p><strong>Beautiful themes, Great support!</strong></p>
+                        <p><a href="http://slidervilla.com/go/elegantthemes/" title="Recommended WordPress Themes" target="_blank">For more info visit ElegantThemes</a></p>
+                     </div>
+               </div></div></div>
+     
+     
      <div style="clear:left;"></div>
  </div> <!--end of poststuff --> 
 

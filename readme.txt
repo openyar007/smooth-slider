@@ -3,7 +3,7 @@ Contributors: internet techies
 Tags: slideshow,featured,posts,jquery,slider,content,widget,shortcode,carousel,css,simple,thumbnail,image,post,sidebar,plugin,page,category,wpmu,site,blogs,style,home,categories,picture,flash,gallery
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 2.9
-Tested up to: 3.1.3
+Tested up to: 3.3
 Stable tag: 2.3.5
 
 == Description ==

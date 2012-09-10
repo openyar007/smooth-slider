@@ -7,6 +7,8 @@ Tested up to: 3.4.2
 Stable tag: 2.4
 License: GPLv2 or later
 
+Smooth Slider will help you add a decent and fully customizable slider to your WordPress Site.
+
 == Description ==
 
 Smooth Slider is a Wordpress Plugin for creating a dynamic slideshow/s for featured Posts, Pages, Media Images and Custom Post Types on a WordPress site. 

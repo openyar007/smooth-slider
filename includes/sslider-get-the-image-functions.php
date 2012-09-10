@@ -26,25 +26,19 @@
 /* Adds theme support for post images. */
 add_theme_support( 'post-thumbnails' );
 
-/* Delete the cache when a post or post metadata is updated. */
-add_action( 'save_post', 'sslider_get_the_image_delete_cache' );
-add_action( 'deleted_post_meta', 'sslider_get_the_image_delete_cache' );
-add_action( 'updated_post_meta', 'sslider_get_the_image_delete_cache' );
-add_action( 'added_post_meta', 'sslider_get_the_image_delete_cache' );
-
 /**
  * This is a highly intuitive function that gets images.  It first calls for custom field keys. If no 
  * custom field key is set, check for the_post_thumbnail().  If no post image, check for images 
  * attached to post. Check for image order if looking for attached images.  Scan the post for 
  * images if $image_scan = true.  Check for default image if $default_image = true. If an image 
- * is found, call sslider_display_the_image() to format it.
+ * is found, call smooth_sslider_display_the_image() to format it.
  *
  * @since 0.1
  * @global $post The current post's DB object.
  * @param array $args Parameters for what image to get.
  * @return string|array The HTML for the image. | Image attributes in an array.
  */
-function sslider_get_the_image( $args = array() ) {
+function smooth_sslider_get_the_image( $args = array() ) {
 	global $post;
 	$post_id = $post->ID;
 	$permalink = get_permalink( $post_id );
@@ -66,11 +60,13 @@ function sslider_get_the_image( $args = array() ) {
 		'height' => false,
 		'format' => 'img',
 		'echo' => true,
-		'permalink' => $permalink
+		'permalink' => $permalink,
+		'style'=>'',
+		'a_attr'=> ''
 	);
 
 	/* Allow plugins/themes to filter the arguments. */
-	$args = apply_filters( 'sslider_get_the_image_args', $args );
+	$args = apply_filters( 'smooth_sslider_get_the_image_args', $args );
 
 	/* Merge the input arguments and the defaults. */
 	$args = wp_parse_args( $args, $defaults );
@@ -87,48 +83,32 @@ function sslider_get_the_image( $args = array() ) {
 	/* Extract the array to allow easy use of variables. */
 	extract( $args );
 
-	/* Check for a cached image. */
-	$cache = wp_cache_get( 'sslider_get_the_image' );
-
-	if ( !is_array( $cache ) )
-		$cache = array();
-
-	/* If there is no cached image, let's see if one exists. */
-	if ( !isset( $cache[$post_id][$size] ) ) {
-
 		/* If a custom field key (array) is defined, check for images by custom field. */
 		if ( $custom_key )
-			$image = sslider_image_by_custom_field( $args );
+			$image = smooth_sslider_image_by_custom_field( $args );
 
 		/* If no image found and $the_post_thumbnail is set to true, check for a post image (WP feature). */
 		if ( !$image && $the_post_thumbnail )
-			$image = sslider_image_by_the_post_thumbnail( $args );
+			$image = smooth_sslider_image_by_the_post_thumbnail( $args );
 
 		/* If no image found and $attachment is set to true, check for an image by attachment. */
 		if ( !$image && $attachment )
-			$image = sslider_image_by_attachment( $args );
+			$image = smooth_sslider_image_by_attachment( $args );
 
 		/* If no image found and $image_scan is set to true, scan the post for images. */
 		if ( !$image && $image_scan )
-			$image = sslider_image_by_scan( $args );
+			$image = smooth_sslider_image_by_scan( $args );
 
 		/* If no image found and a $default_image is set, get the default image. */
 		if ( !$image && $default_image )
-			$image = sslider_image_by_default( $args );
+			$image = smooth_sslider_image_by_default( $args );
 
 		/* If an image is returned, run it through the display function. */
 		if ( $image )
-			$image = sslider_display_the_image( $args, $image );
-
-		$cache[$post_id][$size] = $image;
-		wp_cache_set( 'sslider_get_the_image', $cache );
-	}
-	else {
-		$image = $cache[$post_id][$size];
-	}
+			$image = smooth_sslider_display_the_image( $args, $image );
 
 	/* Allow plugins/theme to override the final output. */
-	$image = apply_filters( 'sslider_get_the_image', $image );
+	$image = apply_filters( 'smooth_sslider_get_the_image', $image );
 	
 	/*print_r($image);*/
 
@@ -159,7 +139,7 @@ function sslider_get_the_image( $args = array() ) {
  * @param array $args
  * @return array|bool
  */
-function sslider_image_by_custom_field( $args = array() ) {
+function smooth_sslider_image_by_custom_field( $args = array() ) {
 
 	/* If $custom_key is a string, we want to split it by spaces into an array. */
 	if ( !is_array( $args['custom_key'] ) )
@@ -184,13 +164,13 @@ function sslider_image_by_custom_field( $args = array() ) {
 /**
  * Checks for images using a custom version of the WordPress 2.9+ get_the_post_thumbnail()
  * function.  If an image is found, return it and the $post_thumbnail_id.  The WordPress function's
- * other filters are later added in the sslider_display_the_image() function.
+ * other filters are later added in the smooth_sslider_display_the_image() function.
  *
  * @since 0.4
  * @param array $args
  * @return array|bool
  */
-function sslider_image_by_the_post_thumbnail( $args = array() ) {
+function smooth_sslider_image_by_the_post_thumbnail( $args = array() ) {
 
 	/* Check for a post image ID (set by WP as a custom field). */
 	$post_thumbnail_id = get_post_thumbnail_id( $args['post_id'] );
@@ -221,7 +201,7 @@ function sslider_image_by_the_post_thumbnail( $args = array() ) {
  * @param array $args
  * @return array|bool
  */
-function sslider_image_by_attachment( $args = array() ) {
+function smooth_sslider_image_by_attachment( $args = array() ) {
 
 	/* Get attachments for the inputted $post_id. */
 	$attachments = get_children( array( 'post_parent' => $args['post_id'], 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => 'ASC', 'orderby' => 'menu_order ID' ) );
@@ -252,7 +232,7 @@ function sslider_image_by_attachment( $args = array() ) {
 }
 
 /**
- * Scans the post for images within the content.  Not called by default with sslider_get_the_image().
+ * Scans the post for images within the content.  Not called by default with smooth_sslider_get_the_image().
  * Shouldn't use if using large images within posts, better to use the other options.
  *
  * @since 0.3
@@ -260,7 +240,7 @@ function sslider_image_by_attachment( $args = array() ) {
  * @param array $args
  * @return array|bool
  */
-function sslider_image_by_scan( $args = array() ) {
+function smooth_sslider_image_by_scan( $args = array() ) {
 
 	/* Search the post's content for the <img /> tag and get its URL. */
 	preg_match_all( '|<img.*?src=[\'"](.*?)[\'"].*?>|i', get_post_field( 'post_content', $args['post_id'] ), $matches );
@@ -274,13 +254,13 @@ function sslider_image_by_scan( $args = array() ) {
 
 /**
  * Used for setting a default image.  The function simply returns the image URL it was
- * given in an array.  Not used with sslider_get_the_image() by default.
+ * given in an array.  Not used with smooth_sslider_get_the_image() by default.
  *
  * @since 0.3
  * @param array $args
  * @return array
  */
-function sslider_image_by_default( $args = array() ) {
+function smooth_sslider_image_by_default( $args = array() ) {
 	return array( 'url' => $args['default_image'] );
 }
 
@@ -293,7 +273,7 @@ function sslider_image_by_default( $args = array() ) {
  * @param array $image Array of image info ($image, $classes, $alt, $caption).
  * @return string $image Formatted image (w/link to post if the option is set).
  */
-function sslider_display_the_image( $args = array(), $image = false ) {
+function smooth_sslider_display_the_image( $args = array(), $image = false ) {
 
 	/* If there is no image URL, return false. */
 	if ( empty( $image['url'] ) )
@@ -308,6 +288,8 @@ function sslider_display_the_image( $args = array(), $image = false ) {
 	/* If there is a width or height, set them as HMTL-ready attributes. */
 	$width = ( ( $width ) ? ' width="' . esc_attr( $width ) . '"' : '' );
 	$height = ( ( $height ) ? ' height="' . esc_attr( $height ) . '"' : '' );
+	$style = ( ( $style ) ?   ' '.$style   : '' );
+	$a_attr = ( ( $a_attr ) ?   ' '.$a_attr   : '' );
 
 	/* Loop through the custom field keys and add them as classes. */
 	if ( is_array( $custom_key ) ) {
@@ -327,14 +309,14 @@ function sslider_display_the_image( $args = array(), $image = false ) {
 		do_action( 'begin_fetch_post_thumbnail_html', $post_id, $image['post_thumbnail_id'], $size );
 
 	/* Add the image attributes to the <img /> element. */
-	$html = '<img src="' . $image['url'] . '" alt="' . esc_attr( strip_tags( $image_alt ) ) . '" class="' . esc_attr( $class ) . '"' . $width . $height . ' />';
+	$html = '<img src="' . $image['url'] . '" alt="' . esc_attr( strip_tags( $image_alt ) ) . '" class="' . esc_attr( $class ) . '"' . $width . $height . $style .' />';
 
 	/* If $link_to_post is set to true, link the image to its post. */
 	if ( $link_to_post ) {
-		$html = '<a href="' . get_permalink( $post_id ) . '" title="' . esc_attr( apply_filters( 'the_title', get_post_field( 'post_title', $post_id ) ) ) . '">' . $html . '</a>';}
+		$html = '<a href="' . get_permalink( $post_id ) . '" title="' . esc_attr( apply_filters( 'the_title', get_post_field( 'post_title', $post_id ) ) ) . '" '.$a_attr.'>' . $html . '</a>';}
 	else {
 	    if($permalink!='') {
-	      $html = '<a href="' . $permalink . '" title="' . esc_attr( apply_filters( 'the_title', get_post_field( 'post_title', $post_id ) ) ) . '">' . $html . '</a>';
+	      $html = '<a href="' . $permalink . '" title="' . esc_attr( apply_filters( 'the_title', get_post_field( 'post_title', $post_id ) ) ) . '" '.$a_attr.'>' . $html . '</a>';
 		}
 	}
 
@@ -350,22 +332,13 @@ function sslider_display_the_image( $args = array(), $image = false ) {
 }
 
 /**
- * Deletes the image cache for users that are using a persistent-caching plugin.
- *
- * @since 0.5
- */
-function sslider_get_the_image_delete_cache() {
-	wp_cache_delete( 'sslider_get_the_image' );
-}
-
-/**
- * Get the image with a link to the post.  Use sslider_get_the_image() instead.
+ * Get the image with a link to the post.  Use smooth_sslider_get_the_image() instead.
  *
  * @since 0.1
  * @deprecated 0.3
  */
-function sslider_get_the_image_link( $deprecated = '', $deprecated_2 = '', $deprecated_3 = '' ) {
-	sslider_get_the_image();
+function smooth_sslider_get_the_image_link( $deprecated = '', $deprecated_2 = '', $deprecated_3 = '' ) {
+	smooth_sslider_get_the_image();
 }
 
 ?>

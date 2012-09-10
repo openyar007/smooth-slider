@@ -204,84 +204,43 @@ if ($_POST['reorder_posts_slider']) {
 </div>
 
 <div id="poststuff" class="metabox-holder has-right-sidebar"> 
-   <div id="side-info-column" class="inner-sidebar" style="float:left;"> 
+		<div id="side-info-column" class="inner-sidebar" style="float:left;"> 
 			<div class="postbox"> 
 			  <h3 class="hndle"><span><?php _e('About this Plugin:','smooth-slider'); ?></span></h3> 
 			  <div class="inside">
                 <ul>
-                <li><a href="http://www.clickonf5.org/smooth-slider" title="Smooth Slider Homepage" ><?php _e('Plugin Homepage','smooth-slider'); ?></a></li>
-                <li><a href="http://www.clickonf5.org" title="Visit Internet Techies" ><?php _e('Plugin Parent Site','smooth-slider'); ?></a></li>
-                <li><a href="http://www.clickonf5.org/phpbb/smooth-slider-f12/" title="Support Forum for Smooth Slider" ><?php _e('Support Forum','smooth-slider'); ?></a></li>
-                <li><a href="http://www.clickonf5.org/about/tejaswini" title="Smooth Slider Author Page" ><?php _e('About the Author','smooth-slider'); ?></a></li>
+                <li><a href="http://slidervilla.com/smooth-slider" title="<?php _e('Smooth Slider Homepage','smooth-slider'); ?>" ><?php _e('Plugin Homepage','smooth-slider'); ?></a></li>
+                <li><a href="http://clickonf5.com/" title="<?php _e('Support Forum for Smooth Slider','smooth-slider'); ?>
+" ><?php _e('Support Forum','smooth-slider'); ?></a></li>
+                <li><a href="http://keencodes.com/" title="<?php _e('Smooth Slider Author Page','smooth-slider'); ?>" ><?php _e('About the Author','smooth-slider'); ?></a></li>
+				<li><a href="http://www.clickonf5.org" title="<?php _e('Visit Internet Techies','smooth-slider'); ?>
+" ><?php _e('Plugin Parent Site','smooth-slider'); ?></a></li>
                 <li><a href="http://www.clickonf5.org/go/smooth-slider/" title="<?php _e('Donate if you liked the plugin and support in enhancing Smooth Slider and creating new plugins','smooth-slider'); ?>" ><?php _e('Donate with Paypal','smooth-slider'); ?></a></li>
                 </ul> 
               </div> 
 			</div> 
-     </div>
+		</div>
      
         <div id="side-info-column" class="inner-sidebar" style="float:left;margin-left:1em"> 
 			<div class="postbox"> 
 			  <h3 class="hndle"><span></span><?php _e('Our Facebook Fan Page','smooth-slider'); ?></h3> 
 			  <div class="inside">
-                <script type="text/javascript" src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_GB"></script><script type="text/javascript">FB.init("2aeebe9fb014836a6810ec4426d26f7e");</script><fb:fan profile_id="127760528543" stream="" connections="8" width="270" height="250"></fb:fan>
+               <iframe src="//www.facebook.com/plugins/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2Fslidervilla&amp;width=270&amp;height=170&amp;colorscheme=light&amp;show_faces=true&amp;border_color&amp;stream=false&amp;header=false&amp;appId=140253496056337" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:270px; height:170px;" allowTransparency="true"></iframe>
               </div> 
 			</div> 
-     </div>
-
-     <div id="side-info-column" class="inner-sidebar" style="float:left;margin-left:1em"> 
-			<div class="postbox"> 
-			  <h3 class="hndle"><span><?php _e('Credits:','smooth-slider'); ?></span></h3> 
-			  <div class="inside">
-                <ul>
-                <li><a href="http://sorgalla.com/jcarousel/" title="jCarousel jQuey plugin" >Riding carousels with jQuery</a></li>
-                <li><a href="http://acko.net/dev/farbtastic" title="Farbtastic Color Picker by Steven Wittens" >Farbtastic Color Picker</a></li>
-                <li><a href="http://jquery.com/" title="jQuery JavaScript Library - John Resig" >jQuery JavaScript Library</a></li>
-                </ul> 
-              </div> 
-			</div> 
-     </div>
-     
-          <div id="side-info-column" class="inner-sidebar" style="float:left;margin-left:1em"> 
-			<div class="postbox"> 
-			  <h3 class="hndle"><span><?php _e('Top Supporters','smooth-slider'); ?></span></h3> 
-			  <div class="inside">
-                <div id="smooth_sldr_donations">
-					 <ul>
-                        <li><a href="http://www.jacobwiechman.com/wordpress//" title="Visit Jacob Wiechman - $50" >Jacob Wiechman - $50</a></li>
-                        <li><a href="http://malamedconsulting.com/" title="Visit Connie Malamed - $25" >Connie Malamed - $25</a></li>
-                        <li><a href="http://uwaterloo.ca/" title="Visit Trevor Bain - $25" >Trevor Bain - $25</a></li>
-                        <li><a href="http://www.whatsthebigidea.com/" title="Visit WhatsTheBigIdea.com,Inc. - $20" >WhatsTheBigIdea.com,Inc. - $20</a></li>
-                     </ul>  
-                </div>
-              </div> 
-			</div> 
-          </div>  
-          <div style="clear:left;"></div>
-
-     <div id="side-info-column" style="float:left;width:325px;"> 
-        <div class="postbox"> 
-			  <h3 class="hndle"><span></span><?php _e('Recommended WordPress Hosting','smooth-slider'); ?></h3> 
-			  <div class="inside">
-                  <div style="margin:10px 5px">
-            <a href="http://slidervilla.com/go/hostgator/" title="Recommended Web Hosting" target="_blank"><img src="<?php echo smooth_slider_plugin_url('images/hostgator.gif');?>" alt="Recommended Web Hosting" /></a>
-            <p><a href="http://slidervilla.com/go/hostgator/" title="Recommended Web Hosting" target="_blank">HostGator</a> is one of the world's top 10 largest web hosting companies with more than 5,000,000 hosted domains. You can host your own WordPress installation with custom themes, plugins, and your own domain name with HostGator from only $3.96 a month.</p>
-            <p><strong>Features: </strong>UNLIMITED Disk Space and Bandwidth, FREE Site Building Tools and Templates, 24/7/365 Award Winning Technical Support</p>
-            <p>For more info visit <a href="http://slidervilla.com/go/hostgator/" title="Recommended Web Hosting" target="_blank">HostGator.com</a></p>
-                  </div>
-          </div></div></div>
-     
-     		<div id="side-info-column" style="float:left;margin-left:1em;width:325px;"> 
-            <div class="postbox"> 
-			  <h3 class="hndle"><span></span><?php _e('Recommended Themes','smooth-slider'); ?></h3> 
-			  <div class="inside">
-                     <div style="margin:10px 5px">
-                        <a href="http://slidervilla.com/go/elegantthemes/" title="Recommended WordPress Themes" target="_blank"><img src="<?php echo smooth_slider_plugin_url('images/elegantthemes.gif');?>" alt="Recommended WordPress Themes" /></a>
-                        <p><a href="http://slidervilla.com/go/elegantthemes/" title="Recommended WordPress Themes" target="_blank">Elegant Themes</a> are attractive, compatible, affordable, SEO optimized WordPress Themes and have best support in community.</p>
-                        <p><strong>Beautiful themes, Great support!</strong></p>
-                        <p><a href="http://slidervilla.com/go/elegantthemes/" title="Recommended WordPress Themes" target="_blank">For more info visit ElegantThemes</a></p>
-                     </div>
-               </div></div></div>
-     
+		</div>
+          
+		<div id="side-info-column" style="float:left;margin-left:1em;width:325px;"> 
+		<div class="postbox"> 
+		  <h3 class="hndle"><span></span><?php _e('Recommended Themes','smooth-slider'); ?></h3> 
+		  <div class="inside">
+				 <div style="margin:10px 5px">
+					<a href="http://slidervilla.com/go/elegantthemes/" title="Recommended WordPress Themes" target="_blank"><img src="<?php echo smooth_slider_plugin_url('images/elegantthemes.gif');?>" alt="Recommended WordPress Themes" /></a>
+					<p><a href="http://slidervilla.com/go/elegantthemes/" title="Recommended WordPress Themes" target="_blank">Elegant Themes</a> are attractive, compatible, affordable, SEO optimized WordPress Themes and have best support in community.</p>
+					<p><strong>Beautiful themes, Great support!</strong></p>
+					<p><a href="http://slidervilla.com/go/elegantthemes/" title="Recommended WordPress Themes" target="_blank">For more info visit ElegantThemes</a></p>
+				 </div>
+		   </div></div></div>
      
      <div style="clear:left;"></div>
  </div> <!--end of poststuff --> 

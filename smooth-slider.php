@@ -3,7 +3,7 @@
 Plugin Name: Smooth Slider
 Plugin URI: http://www.clickonf5.org/smooth-slider
 Description: Smooth Slider adds a smooth content and image slideshow with customizable background and slide intervals to any location of your blog
-Version: 2.3.5	
+Version: 2.4	
 Author: Internet Techies
 Author URI: http://www.clickonf5.org/
 Wordpress version supported: 2.9 and above
@@ -34,7 +34,7 @@ define('SLIDER_TABLE','smooth_slider'); //Slider TABLE NAME
 define('PREV_SLIDER_TABLE','slider'); //Slider TABLE NAME
 define('SLIDER_META','smooth_slider_meta'); //Meta TABLE NAME
 define('SLIDER_POST_META','smooth_slider_postmeta'); //Meta TABLE NAME
-define("SMOOTH_SLIDER_VER","2.3.5",false);//Current Version of Smooth Slider
+define("SMOOTH_SLIDER_VER","2.4",false);//Current Version of Smooth Slider
 if ( ! defined( 'SMOOTH_SLIDER_PLUGIN_BASENAME' ) )
 	define( 'SMOOTH_SLIDER_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 if ( ! defined( 'SMOOTH_SLIDER_CSS_DIR' ) ){
@@ -100,7 +100,7 @@ function install_smooth_slider() {
    $default_slider = array('speed'=>'7', 
 	                       'no_posts'=>'5', 
 						   'bg_color'=>'#ffffff', 
-						   'height'=>'200',
+						   'height'=>'250',
 						   'width'=>'450',
 						   'border'=>'1',
 						   'brcolor'=>'#999999',
@@ -141,13 +141,16 @@ function install_smooth_slider() {
 						   'multiple_sliders'=>'0',
 						   'navimg_w'=>'32',
 						   'navimg_ht'=>'32',
-						   'content_limit'=>'50',
+						   'content_limit'=>'20',
 						   'stylesheet'=>'default',
 						   'shortcode'=>'1',
 						   'rand'=>'0',
 						   'ver'=>'j',
 						   'support'=>'1',
 						   'fouc'=>'0',
+						   'fx'=>'scrollHorz',
+						   'responsive'=>'0',
+						   'css'=>'',
 						   'noscript'=>'This page is having a slideshow that uses Javascript. Your browser either doesn\'t support Javascript or you have it turned off. To see this page as it is meant to appear please use a Javascript enabled browser.'
 			              );
    
@@ -278,10 +281,10 @@ global $smooth_slider;
 			$wpdb->query($sql);
 		  }
 	}
-	$slider_style = get_post_meta($post_id,'slider_style',true);
-	$post_slider_style=$_POST['slider_style'];
+	$slider_style = get_post_meta($post_id,'_smooth_slider_style',true);
+	$post_slider_style=$_POST['_smooth_slider_style'];
 	if($slider_style != $post_slider_style and isset($post_slider_style) and !empty($post_slider_style)) {
-	  update_post_meta($post_id, 'slider_style', $_POST['slider_style']);	
+	  update_post_meta($post_id, '_smooth_slider_style', $_POST['_smooth_slider_style']);	
 	}
 	
 	$thumbnail_key = $smooth_slider['img_pick'][1];
@@ -440,9 +443,9 @@ function add_to_slider_checkbox() {
         <br />
         <div>
         <?php
-        $slider_style = get_post_meta($post->ID,'slider_style',true);
+        $slider_style = get_post_meta($post->ID,'_smooth_slider_style',true);
         ?>
-         <select name="slider_style" >
+         <select name="_smooth_slider_style" >
 			<?php 
             $directory = SMOOTH_SLIDER_CSS_DIR;
             if ($handle = opendir($directory)) {
@@ -453,7 +456,7 @@ function add_to_slider_checkbox() {
                 closedir($handle);
             }
             ?>
-        </select> <label for="slider_style"><?php _e('Stylesheet to use if slider is displayed on this Post/Page','smooth-slider'); ?> </label><br /> <br />
+        </select> <label for="_smooth_slider_style"><?php _e('Stylesheet to use if slider is displayed on this Post/Page','smooth-slider'); ?> </label><br /> <br />
         
   <?php         $thumbnail_key = $smooth_slider['img_pick'][1];
                 $sslider_thumbnail= get_post_meta($post_id, $thumbnail_key, true); 
@@ -538,59 +541,8 @@ function sslider_plugin_action_links( $links, $file ) {
 
 	return $links;
 }
-class Smooth_Slider_Simple_Widget extends WP_Widget {
-	function Smooth_Slider_Simple_Widget() {
-		$widget_options = array('classname' => 'sslider_wclass', 'description' => 'Insert Smooth Slider' );
-		$this->WP_Widget('sslider_wid', 'Smooth Slider - Simple', $widget_options);
-	}
 
-	function widget($args, $instance) {
-		extract($args, EXTR_SKIP);
-	    global $smooth_slider;
-		
-		echo $before_widget;
-		if($smooth_slider['multiple_sliders'] == '1') {
-		$slider_id = empty($instance['slider_id']) ? '1' : apply_filters('widget_slider_id', $instance['slider_id']);
-		}
-		else{
-		 $slider_id = '1';
-		}
-
-		echo $before_title . $after_title; 
-		 get_smooth_slider($slider_id);
-		echo $after_widget;
-	}
-
-	function update($new_instance, $old_instance) {
-	    global $smooth_slider;
-		$instance = $old_instance;
-		if($smooth_slider['multiple_sliders'] == '1') {
-		   $instance['slider_id'] = strip_tags($new_instance['slider_id']);
-		}
-
-		return $instance;
-	}
-
-	function form($instance) {
-	    global $smooth_slider;
-		if($smooth_slider['multiple_sliders'] == '1') {
-			$instance = wp_parse_args( (array) $instance, array( 'slider_id' => '' ) );
-			$slider_id = strip_tags($instance['slider_id']);
-			$sliders = ss_get_sliders();
-			$sname_html='<option value="0" selected >Select the Slider</option>';
-	 
-		  foreach ($sliders as $slider) { 
-			 if($slider['slider_id']==$slider_id){$selected = 'selected';} else{$selected='';}
-			 $sname_html =$sname_html.'<option value="'.$slider['slider_id'].'" '.$selected.'>'.$slider['slider_name'].'</option>';
-		  } 
-	?>
-				<p><label for="<?php echo $this->get_field_id('slider_id'); ?>">Select Slider Name: <select class="widefat" id="<?php echo $this->get_field_id('slider_id'); ?>" name="<?php echo $this->get_field_name('slider_id'); ?>"><?php echo $sname_html;?></select></label></p>
-<?php  }
-	}
-}
-add_action( 'widgets_init', create_function('', 'return register_widget("Smooth_Slider_Simple_Widget");') );
-
-require_once (dirname (__FILE__) . '/slider_versions/j.php');
+require_once (dirname (__FILE__) . '/slider_versions/smooth_1.php');
 require_once (dirname (__FILE__) . '/settings/settings.php');
 require_once (dirname (__FILE__) . '/includes/media-images.php');
 ?>

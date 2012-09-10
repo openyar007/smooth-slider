@@ -1,74 +1,64 @@
 === Smooth Slider ===
-Contributors: internet techies
-Tags: slideshow,featured,posts,jquery,slider,content,widget,shortcode,carousel,css,simple,thumbnail,image,post,sidebar,plugin,page,category,wpmu,site,blogs,style,home,categories,picture,flash,gallery
+Contributors: internet techies, slidervilla
+Tags: responsive,slideshow,featured,posts,jquery,slider,content,widget,shortcode,carousel,css,simple,thumbnail,image,post,sidebar,plugin,page,category,wpmu,site,blogs,style,home,categories,picture,flash,gallery
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
-Requires at least: 2.9
-Tested up to: 3.3
-Stable tag: 2.3.5
+Requires at least: 3.0
+Tested up to: 3.4.2
+Stable tag: 2.4
+License: GPLv2 or later
 
 == Description ==
 
-Smooth Slider is a Wordpress Plugin for creating a dynamic slideshow/s for featured posts, pages and media images on a blog. The slideshow created by Smooth Slider are JavaScript and Text based, that is why site owners and bloggers will get full benefit of Search Engine Optimization as the texts are readable by Search Engines. You can choose some of your posts,pages and media images as featured posts and show them into a slideshow on your blog home page (i.e. Index) as well as in sidebar. Also, you can show category posts in reverse chronological order.
+Smooth Slider is a Wordpress Plugin for creating a dynamic slideshow/s for featured Posts, Pages, Media Images and Custom Post Types on a WordPress site. 
 
 **Find advanced WordPress Slider Plugins at [SliderVilla](http://www.slidervilla.com/)**
 
-=Features=
+= Features =
 
-**Do Not Upgrade if using Smooth Slider 2.3.2 or older version** - We changed the slider JS because of licensing issue and that may cause issue for existing users with version 2.3.2 or older than that.If you find problem after upgrade, revert back to older version. [Get older versions](http://wordpress.org/extend/plugins/smooth-slider/download/)
+* Supports Responsive Design
+* Six transition effects ( Fade transition supported )
+* Custom Slider, Category Slider and Recent Posts Slider supported ( Template tags, Shortcode and Widget available )
+* Slider Preview in admin panel 
+* Search Engine Optimized Slideshow
+* Full control over the looks thru the Settings Panel
+* Permission setting option to restrict the users from adding posts to Smooth Slider
+* The posts/pages/media library images/custom post types added to the slider can be re-ordered
+* No Need Of Knowledge of PHP, HTML or CSS. But for those having knowledge of CSS, you can create your own stylesheet.
+* Slides can be removed from the slider in single click thru 'Sliders' admin panel
 
-!!IMP!! Do not upgrade to 2.3.3 or 2.3.4 if you have highly customized previous version of Smooth Slider, you may lose some CSS formatting as in the new versions the slider javascript is changed (due to licencing issues) and is different from previous versions.
+[Plugin Home Page](http://slidervilla.com/smooth-slider/) | 
+[Demo](http://www.clickonf5.org/) | 
+[Plugin Documentation](http://guides.slidervilla.com/smooth-slider/) 
 
-Highlighted Feature (from version 2.3) : Smooth Slider Widget and Smooth Slider Shortcode
+**Smooth Slider is now Add-ons compatible. You can check more info on Plugin Home Page (link above)**
 
-Highlighted Feature (from version 2.2) : Ability to create 'Multiple' sliders and an option to decide which post/page should show which slider
-
-Along with posts, pages and media images, Smooth Slider now supports Custom Post Types
-
-1. Search Engine Optimized Slideshow
-2. Fully Customizable CSS
-3. Choose Posts, Pages and images from Media Library (from ver 2.3) as Featured Posts/Pages/Media on Single Click
-4. Simple but Decent Slideshow
-5. Customized Slideshow as per your Wordpress Theme
-6. No Need Of Knowledge of PHP, HTML or CSS. But for those having knowledge of CSS, can have multiple settings for the slider on different pages of the same WP site.
-7. Easy To Install Plugin
-8. Premium Support Available
-9. Readable by search engine as you can see the screenshot on Lynx browser available on our blog
-10. Option for transparent background, so that rounded corners can be supported
-11. Slider Preview in admin panel
-12. Can be converted to pure image Slider
-13. Facility to put Custom Images in place of navigation numbers
-14. WordPress Internal Image cropping feature used, so no need of any external PHP script to crop the images. You just need to select the width of the thumbnail image. 
-15. Pick image from custom field, from "Featured Post" (Post Thumbnail feature), from post/page attachment, or from content. As well you can set priority in which you wish to search the image for the content.
-16. The posts/pages/media library images added to the slider can be re-ordered
-17. You can explicitly specify the link to which any particular slide should be redirected to once clicked. As well, you can specify if you do not want any particular slide to be linked to any webpage.
-18. A template tag to display Category specific posts in reverse chronological order on Smooth Slider
-19. A template tag for WPMU, to get slider posts from all over the WPMU site
-20. Option to change Read More text and also put it in your language
-21. Permission setting option to restrict the users from adding posts to Smooth Slider
-22. Remove posts and pages from Smooth Slider selectively or remove all the posts from the slider at one go from the settings page itself
-23. You can reorder the entries in slider as well as choose to show the slider entries in RANDOM form.
-23. Option to retain specific html tags in the slider posts
-24. Option to specify custom text or html in place of navigation numbers or buttons
-25. Smooth Slider complete uninstall on plugin Delete
-
-[Demo](http://www.clickonf5.org/) |
-[Plugin Information](http://www.clickonf5.org/smooth-slider) | 
-[Get Support](http://clickonf5.com/) 
+1. Taxonomy Add-on
+2. Gallery Add-on
 
 
 == Installation ==
+There's 3 ways to install this plugin:
 
-!!IMP!! Do not upgrade to 2.3.3 or 2.3.4 if you have highly customized Smooth Slider, you may lose some CSS formatting as in the new versions the slider javascript is changed and is different from previous versions.
+= 1. The super easy way =
+1. In your Admin, go to menu Plugins > Add
+1. Search for Smooth Slider
+1. Click to install
+1. Activate the plugin
+1. A new menu `Smooth Slider` will appear in your Admin
 
-This plugin is easy to install like other plug-ins of Wordpress as you need to just follow the below mentioned steps:
+= 2. The easy way =
+1. Download the plugin (.zip file) on the right column of this page
+1. In your Admin, go to menu Plugins > Add
+1. Select the tab "Upload"
+1. Upload the .zip file you just downloaded
+1. Activate the plugin
+1. A new menu will appear in your Admin
 
-1. Copy Folder Smooth Slider from the downloaded and extracted file.
-
-2. Paste it in wp-Content/plugins folder on your Wordpress Installation 
-
-3. Activate the plugin from Dashboard / Plugins window.
-
-4. Now Plugin is Activated, Go to the Usage section to see how to use Smooth Slider.
+= 3. The old way (FTP) =
+1. Unzip the downloaded .zip file
+1. Upload `smooth-slider` folder to the `/wp-content/plugins/` directory
+1. Activate the plugin through the 'Plugins' menu in WordPress
+1. A new menu will appear in your Admin
 
 ### Usage ###
 
@@ -99,33 +89,48 @@ This plugin is easy to install like other plug-ins of Wordpress as you need to j
     where 'apple' is the slug (url friendly version of the category name) of the category from which you want to extract the posts to be shown in the slider. Replace it with your own category slug and you are done.
 
 
-Go to the plugin page to see more details.
+For more documentation go to [Smooth Slider Documentation](http://guides.slidervilla.com/smooth-slider/)
 
-**Find More Slider Styles at [SliderVilla](http://www.slidervilla.com/)**
+**Find More Advanced Slider Styles at [SliderVilla](http://www.slidervilla.com/)**
 
 == Upgrade Notice ==
 
-**Do Not Upgrade if using Smooth Slider 2.3.2 or older version** - We changed the slider JS because of licensing issue and that may cause issue for existing users with version 2.3.2 or older than that.If you find problem after upgrade, revert back to older version. 
+= Before Upgrading =
 
-!!IMP!! Do not upgrade to 2.3.3 or 2.3.4 if you have highly customized Smooth Slider, you may lose some CSS formatting as in the new versions the slider javascript is changed (due to licencing issues) and is different from previous versions.
+* Note the Title and Content fonts on your old Smooth Slider. 
+* Go to 'Settings' panel and 'Save Changes'.
+* Recheck the Slider Title, Post Title and the Slider Content fonts on the Settings Panel.
+
+[Get older versions](http://wordpress.org/extend/plugins/smooth-slider/download/)
+
+!!IMP!! If you have highly customized Smooth Slider, Before upgrading to 2.4, save your CSS and Settings. You may lose some CSS formatting as in the new versions the slider javascript is changed and is different from previous versions.
 
 == Frequently Asked Questions ==
 
-!!IMP!! In case you have upgraded from previous versions (<= 2.3.2) using WordPress automatic upgradation, and the plugin is not working, please deactivate and reactivate the plugin. 
-
-Also, in case you are still getting list of the entries, please go to the Smooth Slider Settings page and just 'Save' the settings. Check if the settings Miscellaneous => Smooth Slider Styles to use on other than Post/Pages is equal to default. Then save the settings.
+1. In case you have upgraded from previous versions (<= 2.3.2) using WordPress automatic upgradation, and the plugin is not working, please deactivate and reactivate the plugin. 
+2. Also, in case you are still getting list of the entries, please go to the Smooth Slider Settings page and just 'Save' the settings. Check if the settings Miscellaneous => Smooth Slider Styles to use on other than Post/Pages is equal to default. Then save the settings.
  
-Check the other FAQs on Smooth Slider page of Internet Techies. 
-FAQ section on: http://www.clickonf5.org/smooth-slider
+Check the other FAQs on Smooth [Slider Documetation on SliderVilla](http://guides.slidervilla.com/smooth-slider/). 
 
 == Screenshots ==
 
-1. Demo of this plugin is available on Internet Techies home page
-2. Add post/Page to Smooth slider along with other edit panel options
+1. Demo of Smooth Slider
+2. A brief view of Settings panel
+3. Add post/Page to Smooth slider along with other edit panel options
 
-Visit the plugin page (http://www.clickonf5.org/smooth-slider) to see more screenshots.
 
 == Changelog ==
+
+Version 2.4 (09/10/2012)
+
+1. New: Smooth Slider now Supports Responsive Design Layout
+2. New: Shortcode for Category Slider
+3. New: Template tag and Shortcode for Recent Posts Smooth Slider
+4. New: Changes to Support Fade and a couple more transitions
+5. New: Changes to Settings Panel design
+6. New: Compatible with SliderVilla add-ons
+7. Fix: Fixed the bug that Smooth Slider slides got jumbled up and Slider looked empty when the Chrome or Safari browser was zoomed in.
+8. Fix: Now the slider_style Custom Field or Post Meta will not appear for each Post or Page saved. This field was automatically created and displayed under the Custom Fields metabox on Edit Post/Page panel inprevious version of Smooth Slider.
 
 Version 2.3.5 (06/13/2011)
 
@@ -235,4 +240,4 @@ Version 1.1 (09/14/2009)
 2. Fixed - Added No Script tag brosers not supporting JavaScript for showing the slideshow
 3. Fixed - Issues with WordPress MU Smooth Slider Options update from setting page
 
-Visit the plugin page (http://www.clickonf5.org/smooth-slider) to see the changelog and release notes.
+Visit the plugin page to see the changelog and release notes.

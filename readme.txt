@@ -1,19 +1,17 @@
 === Smooth Slider ===
 Contributors: internet techies, slidervilla
-Tags: responsive,slideshow,featured,posts,jquery,slider,content,widget,shortcode,carousel,css,simple,thumbnail,image,post,sidebar,plugin,page,category,wpmu,site,blogs,style,home,categories,picture,flash,gallery
+Tags: best slider,responsive slider,responsive,wordpress slider,slideshow,featured,jquery,slider,content,widget,shortcode,carousel,thumbnail,image,post,sidebar,plugin,category,wpmu,site,blogs,style,categories,picture,flash,gallery
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 3.0
-Tested up to: 3.4.2
+Tested up to: 3.9.1
 Stable tag: 2.4
 License: GPLv2 or later
 
-Smooth Slider will help you add a decent and fully customizable slider to your WordPress Site.
+Best Responsive Slider with 100% Customization Option on Settings Panel
 
 == Description ==
 
-Smooth Slider is a Wordpress Plugin for creating a dynamic slideshow/s for featured Posts, Pages, Media Images and Custom Post Types on a WordPress site. 
-
-**Find advanced WordPress Slider Plugins at [SliderVilla](http://www.slidervilla.com/)**
+In less than 50 seconds, embed a recent posts slider using Smooth Slider. It creates a dynamic slideshow/s for featured Posts, Pages, Media Images and Custom Post Types on a WordPress site. With live preview on admin panel, one can customize the slider before implementation. At <a href="http://slidervilla.com/" rel="friend" title="SliderVilla Premium WordPress Sliders">SliderVilla</a>, we develop only sliders and we know the requirements very well. Smooth Slider is a basic slider WordPress plugin but is capable of adding a nice carousel in no time. With shortcode, widgets and template tag, one can embed Smooth SLider anywhere in the site. 
 
 = Features =
 
@@ -28,11 +26,22 @@ Smooth Slider is a Wordpress Plugin for creating a dynamic slideshow/s for featu
 * No Need Of Knowledge of PHP, HTML or CSS. But for those having knowledge of CSS, you can create your own stylesheet.
 * Slides can be removed from the slider in single click thru 'Sliders' admin panel
 
-[Plugin Home Page](http://slidervilla.com/smooth-slider/) | 
-[Demo](http://www.clickonf5.org/) | 
+= <a href="http://slidervilla.com/sliders-list-view/" rel="friend" title="SliderVilla Premium WordPress Sliders">Premium Versions</a> =
+
+* Create Unlimited Settings Panels
+* Created Unlimited Custom Sliders
+* Multiple Designs to Choose From
+* Export/Import Settings
+* Lightbox Effect
+* Logo Slider with Grayscale Effect (Placid)
+* Multiple Image Size Slider
+* Google Web Fonts option on Settings Panel
+* Very Prompt Support and Lifetime Upgrades
+
+<a href="http://slidervilla.com/smooth-slider/" rel="friend" >Plugin Home Page</a> | 
 [Plugin Documentation](http://guides.slidervilla.com/smooth-slider/) 
 
-**Smooth Slider is now Add-ons compatible. You can check more info on Plugin Home Page (link above)**
+**Smooth Slider is now <a href="http://slidervilla.com/add-ons/" rel="friend">Add-ons</a> compatible. **
 
 1. Taxonomy Add-on
 2. Gallery Add-on

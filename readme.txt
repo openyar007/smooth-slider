@@ -1,6 +1,6 @@
 === Smooth Slider ===
 Contributors: internet techies, slidervilla
-Tags: best slider,responsive slider,responsive,wordpress slider,slideshow,featured,jquery,slider,content,widget,shortcode,carousel,thumbnail,image,post,sidebar,plugin,category,wpmu,site,blogs,style,categories,picture,flash,gallery
+Tags: slider, slideshow, wordpress slider, content slider, posts slider,image slider, responsive slideshow, image Rotator, jquery slider, Photo Slider, nivo slider, slider plugin, javascript slider, coin slider, responsive slider, featured-content-slider, Horizontal slider, carousel slider, wp slider, vertical slider, best slider plugin, content slideshow, javascript slideshow, slideshow manager, slideshow plugin, image slideshow, jquery slideshow, wordpress slideshow, vertical slides, responsive, nivoslider, flex slider, coinslider, carousel, post, posts, plugin, slider widget, widget slider, widget slideshow, widget, widgets, seo, wordpress seo, media, page, slide, slides
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 3.0
 Tested up to: 3.9.1
@@ -11,7 +11,7 @@ Most Popular Responsive WordPress Slider for Featured Content, Videos and Media 
 
 == Description ==
 
-In less than 50 seconds, embed a recent posts slider using Smooth Slider. It creates a dynamic slideshow/s for featured Posts, Pages, Media Images and Custom Post Types on a WordPress site. With live preview on admin panel, one can customize the slider before implementation. At <a href="http://slidervilla.com/" rel="friend" title="SliderVilla Premium WordPress Sliders">SliderVilla</a>, we develop only sliders and we know the requirements very well. Smooth Slider is a basic slider WordPress plugin but is capable of adding a nice carousel in no time. With shortcode, widgets and template tag, one can embed Smooth SLider anywhere in the site. 
+In less than 50 seconds, embed a recent posts slider using Smooth Slider. It creates a dynamic slideshow/s for featured Posts, Pages, Media Images and Custom Post Types on a WordPress site. With live preview on admin panel, one can customize the slider before implementation. At <a href="http://slidervilla.com/" rel="friend" title="SliderVilla Premium WordPress Sliders">SliderVilla</a> , we develop only sliders and we know the requirements very well. Smooth Slider is a basic slider WordPress plugin but is capable of adding a nice carousel in no time. With shortcode, widgets and template tag, one can embed Smooth SLider anywhere in the site. 
 
 = Features =
 

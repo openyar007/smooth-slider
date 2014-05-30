@@ -1,15 +1,15 @@
 <?php
 /*
 Plugin Name: Smooth Slider
-Plugin URI: http://www.clickonf5.org/smooth-slider
-Description: Smooth Slider adds a smooth content and image slideshow with customizable background and slide intervals to any location of your blog
-Version: 2.4	
-Author: Internet Techies
-Author URI: http://www.clickonf5.org/
+Plugin URI: http://slidervilla.com/smooth-slider/
+Description: Smooth slider adds a responsive featured content on image slider using shortcode, widget and template tags. Create and embed featured content slider, recent post slider, category slider in less than 60 seconds.
+Version: 2.5	
+Author: SliderVilla
+Author URI: http://slidervilla.com/
 Wordpress version supported: 2.9 and above
 */
 
-/*  Copyright 2009-2011  Internet Techies  (email : tedeshpa@gmail.com)
+/*  Copyright 2009-2014  SliderVilla  (email : support@slidervilla.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,85 +25,33 @@ Wordpress version supported: 2.9 and above
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-//Please visit Plugin page http://www.clickonf5.org/smooth-slider for Changelog
+//Please visit Plugin page http://slidervilla.com/smooth-slider/ for Changelog
 //on activation
 //defined global variables and constants here
-global $smooth_slider;
+global $smooth_slider,$default_slider,$smooth_db_version;
 $smooth_slider = get_option('smooth_slider_options');
+$smooth_db_version='2.5'; //current version of smooth slider database 
 define('SLIDER_TABLE','smooth_slider'); //Slider TABLE NAME
 define('PREV_SLIDER_TABLE','slider'); //Slider TABLE NAME
 define('SLIDER_META','smooth_slider_meta'); //Meta TABLE NAME
 define('SLIDER_POST_META','smooth_slider_postmeta'); //Meta TABLE NAME
-define("SMOOTH_SLIDER_VER","2.4",false);//Current Version of Smooth Slider
+define("SMOOTH_SLIDER_VER","2.5",false);//Current Version of Smooth Slider
 if ( ! defined( 'SMOOTH_SLIDER_PLUGIN_BASENAME' ) )
 	define( 'SMOOTH_SLIDER_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 if ( ! defined( 'SMOOTH_SLIDER_CSS_DIR' ) ){
-	if($smooth_slider['ver']=='step') define( 'SMOOTH_SLIDER_CSS_DIR', WP_PLUGIN_DIR.'/'.str_replace(basename( __FILE__),"",plugin_basename(__FILE__)).'/css/styles/' );
+	if(isset($smooth_slider['ver']) && $smooth_slider['ver']=='step') define( 'SMOOTH_SLIDER_CSS_DIR', WP_PLUGIN_DIR.'/'.str_replace(basename( __FILE__),"",plugin_basename(__FILE__)).'/css/styles/' );
 	else define( 'SMOOTH_SLIDER_CSS_DIR', WP_PLUGIN_DIR.'/'.str_replace(basename( __FILE__),"",plugin_basename(__FILE__)).'/css/skins/' );
 }
-// Create Text Domain For Translations
-load_plugin_textdomain('smooth-slider', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/');
-
-function install_smooth_slider() {
-	global $wpdb, $table_prefix;
-	$table_name = $table_prefix.SLIDER_TABLE;
-	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
-		$sql = "CREATE TABLE $table_name (
-					id int(5) NOT NULL AUTO_INCREMENT,
-					post_id int(11) NOT NULL,
-					date datetime NOT NULL,
-					slider_id int(5) NOT NULL DEFAULT '1',
-					UNIQUE KEY id(id)
-				);";
-		$rs = $wpdb->query($sql);
-		
-		$prev_table_name = $table_prefix.PREV_SLIDER_TABLE;
-		
-		if($wpdb->get_var("show tables like '$prev_table_name'") == $prev_table_name) {
-			$prev_slider_data = ss_get_prev_slider();
-			foreach ($prev_slider_data as $prev_slider_row){
-				$prev_post_id = $prev_slider_row['id'];
-				$prev_date_time = $prev_slider_row['date'];
-				if ($prev_post_id) {
-					$sql = "INSERT INTO $table_name (post_id,date) VALUES('$prev_post_id','$prev_date_time');";
-					$result = $wpdb->query($sql);
-				}
-			}
-		}
-	}
-	add_cf5_column_if_not_exist($table_name, 'slide_order', "ALTER TABLE ".$table_name." ADD slide_order int(5) NOT NULL DEFAULT '0';");
-
-   	$meta_table_name = $table_prefix.SLIDER_META;
-	if($wpdb->get_var("show tables like '$meta_table_name'") != $meta_table_name) {
-		$sql = "CREATE TABLE $meta_table_name (
-					slider_id int(5) NOT NULL AUTO_INCREMENT,
-					slider_name varchar(100) NOT NULL default '',
-					UNIQUE KEY slider_id(slider_id)
-				);";
-		$rs2 = $wpdb->query($sql);
-		
-		$sql = "INSERT INTO $meta_table_name (slider_id,slider_name) VALUES('1','Smooth Slider');";
-		$rs3 = $wpdb->query($sql);
-	}
-	
-	$slider_postmeta = $table_prefix.SLIDER_POST_META;
-	if($wpdb->get_var("show tables like '$slider_postmeta'") != $slider_postmeta) {
-		$sql = "CREATE TABLE $slider_postmeta (
-					post_id int(11) NOT NULL,
-					slider_id int(5) NOT NULL default '1',
-					UNIQUE KEY post_id(post_id)
-				);";
-		$rs4 = $wpdb->query($sql);
-	}
-   // Need to delete the previously created options in old versions and create only one option field for Smooth Slider
-   $default_slider = array();
-   $default_slider = array('speed'=>'7', 
+ 
+// Need to delete the previously created options in old versions and create only one option field for Smooth Slider
+$default_slider = array();
+$default_slider = array('speed'=>'7', 
 	                       'no_posts'=>'5', 
 						   'bg_color'=>'#ffffff', 
 						   'height'=>'250',
 						   'width'=>'450',
-						   'border'=>'1',
-						   'brcolor'=>'#999999',
+						   'border'=>'0',
+						   'brcolor'=>'#dddddd',
 						   'prev_next'=>'0',
 						   'goto_slide'=>'1',
 						   'title_text'=>'Featured Posts',
@@ -138,88 +86,160 @@ function install_smooth_slider() {
 						   'crop'=>'0',
 						   'transition'=>'5',
 						   'autostep'=>'1',
-						   'multiple_sliders'=>'0',
-						   'navimg_w'=>'32',
-						   'navimg_ht'=>'32',
+						   'multiple_sliders'=>'1',
+						   'navimg_w'=>'8',
+						   'navimg_ht'=>'8',
 						   'content_limit'=>'20',
 						   'stylesheet'=>'default',
 						   'shortcode'=>'1',
 						   'rand'=>'0',
 						   'ver'=>'j',
-						   'support'=>'1',
+						   'support'=>'0',
 						   'fouc'=>'0',
 						   'fx'=>'scrollHorz',
-						   'responsive'=>'0',
 						   'css'=>'',
-						   'noscript'=>'This page is having a slideshow that uses Javascript. Your browser either doesn\'t support Javascript or you have it turned off. To see this page as it is meant to appear please use a Javascript enabled browser.'
+						   'active_tab'=>'0',
+						   'disable_preview'=>'0',
+						   'preview'=>'2',
+						   'slider_id'=>'1',
+						   'catg_slug'=>'',
+						   'popup'=>'1',
+						   'readmorecolor'=>'#0092E4',
+						   'noscript'=>''
 			              );
-   
-	   $smooth_slider = get_option('smooth_slider_options');
-	   /*if($smooth_slider){
-	      $default_slider['ver']='step';
-	   }*/
-	   	   
-	   $img_pick = $smooth_slider['img_pick'];
-  
-       if(is_array($img_pick)) {
-	    $cskey = $smooth_slider['img_pick'][1];
-	   }
-	   else{
-	    $cskey = 'slider_thumbnail';
-	   }
-      
-	   if(!is_array($img_pick)) {
-	   //if(!isset($smooth_slider['img_pick'][0])) {
-		   if($smooth_slider['img_pick'] == '1') {
-			  $smooth_slider['img_pick'] = array('0',$cskey,'0','0','1','1');
-		   }
-		   elseif($smooth_slider['img_pick'] == '0'){
-			  $smooth_slider['img_pick'] = array('1',$cskey,'0','0','1','0');
-		   }
-		   else {
-			  $smooth_slider['img_pick'] = array('1',$cskey,'1','1','1','1');
-		   }
-	   }
-	   
-/*	    if(is_array($img_pick) and (count($img_pick)<6 or count($img_pick)>6)) {
-		  $smooth_slider['img_pick'] = array('1',$cskey,'1','1','1','1');
+// Create Text Domain For Translations
+load_plugin_textdomain('smooth-slider', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/');
+
+function install_smooth_slider() {
+	global $wpdb, $table_prefix,$smooth_db_version;
+	$installed_ver = get_site_option( "smooth_db_version" );
+	if( $installed_ver != $smooth_db_version ) {
+		$table_name = $table_prefix.SLIDER_TABLE;
+		if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
+			$sql = "CREATE TABLE $table_name (
+						id int(5) NOT NULL AUTO_INCREMENT,
+						post_id int(11) NOT NULL,
+						date datetime NOT NULL,
+						slider_id int(5) NOT NULL DEFAULT '1',
+						UNIQUE KEY id(id)
+					);";
+			$rs = $wpdb->query($sql);
+		
+			$prev_table_name = $table_prefix.PREV_SLIDER_TABLE;
+		
+			if($wpdb->get_var("show tables like '$prev_table_name'") == $prev_table_name) {
+				$prev_slider_data = ss_get_prev_slider();
+				foreach ($prev_slider_data as $prev_slider_row){
+					$prev_post_id = $prev_slider_row['id'];
+					$prev_date_time = $prev_slider_row['date'];
+					if ($prev_post_id) {
+						$sql = "INSERT INTO $table_name (post_id,date) VALUES('$prev_post_id','$prev_date_time');";
+						$result = $wpdb->query($sql);
+					}
+				}
+			}
 		}
-*/	   
-	   if(!$smooth_slider) {
-	     $smooth_slider = array();
-	   }
-	   
-	   //if($smooth_slider and !isset($smooth_slider['ver'])){
-	      $smooth_slider['stylesheet']='default';
-	   //}
-	   
-	   foreach($default_slider as $key=>$value) {
-	      if(!isset($smooth_slider[$key])) {
-		     $smooth_slider[$key] = $value;
-		  }
-	   }
-	   	   
-	   $smooth_slider['ver']='j';
-     
-	 if($smooth_slider['user_level']<=10 and $smooth_slider['user_level'] >=1) {
-		 if($smooth_slider['user_level']<=10 and $smooth_slider['user_level'] >7) {
-		  $smooth_slider['user_level']='manage_options';
-		 }
-		 elseif($smooth_slider['user_level']<=7 and $smooth_slider['user_level'] >2){
-		  $smooth_slider['user_level']='edit_others_posts';
-		 } 
-		  elseif($smooth_slider['user_level']==2){
-		  $smooth_slider['user_level']='publish_posts';
-		 } 
-		 else {
-		  $smooth_slider['user_level']='edit_posts';
-		 }
-	 }
+		add_cf5_column_if_not_exist($table_name, 'slide_order', "ALTER TABLE ".$table_name." ADD slide_order int(5) NOT NULL DEFAULT '0';");
+
+	   	$meta_table_name = $table_prefix.SLIDER_META;
+		if($wpdb->get_var("show tables like '$meta_table_name'") != $meta_table_name) {
+			$sql = "CREATE TABLE $meta_table_name (
+						slider_id int(5) NOT NULL AUTO_INCREMENT,
+						slider_name varchar(100) NOT NULL default '',
+						UNIQUE KEY slider_id(slider_id)
+					);";
+			$rs2 = $wpdb->query($sql);
+		
+			$sql = "INSERT INTO $meta_table_name (slider_id,slider_name) VALUES('1','Smooth Slider');";
+			$rs3 = $wpdb->query($sql);
+		}
+	
+		$slider_postmeta = $table_prefix.SLIDER_POST_META;
+		if($wpdb->get_var("show tables like '$slider_postmeta'") != $slider_postmeta) {
+			$sql = "CREATE TABLE $slider_postmeta (
+						post_id int(11) NOT NULL,
+						slider_id int(5) NOT NULL default '1',
+						UNIQUE KEY post_id(post_id)
+					);";
+			$rs4 = $wpdb->query($sql);
+		}
 	  
-	   delete_option('smooth_slider_options');	  
-	   update_option('smooth_slider_options',$smooth_slider);
+		global $default_slider;
+	  
+		   $smooth_slider = get_option('smooth_slider_options');
+		   	   	   
+		   $img_pick = $smooth_slider['img_pick'];
+	  
+	       if(is_array($img_pick)) {
+		    $cskey = $smooth_slider['img_pick'][1];
+		   }
+		   else{
+		    $cskey = 'slider_thumbnail';
+		   }
+	      
+		   if(!is_array($img_pick)) {
+		   //if(!isset($smooth_slider['img_pick'][0])) {
+			   if($smooth_slider['img_pick'] == '1') {
+				  $smooth_slider['img_pick'] = array('0',$cskey,'0','0','1','1');
+			   }
+			   elseif($smooth_slider['img_pick'] == '0'){
+				  $smooth_slider['img_pick'] = array('1',$cskey,'0','0','1','0');
+			   }
+			   else {
+				  $smooth_slider['img_pick'] = array('1',$cskey,'1','1','1','1');
+			   }
+		   }
+		   
+	/*	    if(is_array($img_pick) and (count($img_pick)<6 or count($img_pick)>6)) {
+			  $smooth_slider['img_pick'] = array('1',$cskey,'1','1','1','1');
+			}
+	*/	   
+		   if(!$smooth_slider) {
+		     $smooth_slider = array();
+		   }
+		   
+		   //if($smooth_slider and !isset($smooth_slider['ver'])){
+		      $smooth_slider['stylesheet']='default';
+		   //}
+		   
+		   foreach($default_slider as $key=>$value) {
+		      if(!isset($smooth_slider[$key])) {
+			     $smooth_slider[$key] = $value;
+			  }
+		   }
+		   	   
+		   $smooth_slider['ver']='j';
+	     
+		 if($smooth_slider['user_level']<=10 and $smooth_slider['user_level'] >=1) {
+			 if($smooth_slider['user_level']<=10 and $smooth_slider['user_level'] >7) {
+			  $smooth_slider['user_level']='manage_options';
+			 }
+			 elseif($smooth_slider['user_level']<=7 and $smooth_slider['user_level'] >2){
+			  $smooth_slider['user_level']='edit_others_posts';
+			 } 
+			  elseif($smooth_slider['user_level']==2){
+			  $smooth_slider['user_level']='publish_posts';
+			 } 
+			 else {
+			  $smooth_slider['user_level']='edit_posts';
+			 }
+		 }
+		  
+		   delete_option('smooth_slider_options');	  
+		   update_option('smooth_slider_options',$smooth_slider);
+		   update_site_option( "smooth_db_version", $smooth_db_version );
+	}
 }
 register_activation_hook( __FILE__, 'install_smooth_slider' );
+/* Added for auto update - start */
+function smooth_update_db_check() {
+    global $smooth_db_version;
+    if (get_site_option('smooth_db_version') != $smooth_db_version) {
+        install_smooth_slider();
+    }
+}
+add_action('plugins_loaded', 'smooth_update_db_check');
+/* Added for auto update - end */
 require_once (dirname (__FILE__) . '/includes/smooth-slider-functions.php');
 require_once (dirname (__FILE__) . '/includes/sslider-get-the-image-functions.php');
 
@@ -283,14 +303,14 @@ global $smooth_slider;
 	}
 	$slider_style = get_post_meta($post_id,'_smooth_slider_style',true);
 	$post_slider_style=$_POST['_smooth_slider_style'];
-	if($slider_style != $post_slider_style and isset($post_slider_style) and !empty($post_slider_style)) {
+	if($slider_style != $post_slider_style) {
 	  update_post_meta($post_id, '_smooth_slider_style', $_POST['_smooth_slider_style']);	
 	}
 	
 	$thumbnail_key = $smooth_slider['img_pick'][1];
 	$sslider_thumbnail = get_post_meta($post_id,$thumbnail_key,true);
 	$post_slider_thumbnail=$_POST['sslider_thumbnail'];
-	if($sslider_thumbnail != $post_slider_thumbnail and isset($post_slider_thumbnail) and !empty($post_slider_thumbnail)) {
+	if($sslider_thumbnail != $post_slider_thumbnail) {
 	  update_post_meta($post_id, $thumbnail_key, $_POST['sslider_thumbnail']);	
 	}
 	
@@ -298,15 +318,28 @@ global $smooth_slider;
 	$link=$_POST['sslider_link'];
 	//$sldr_post=get_post($post_id);
 	//if((!isset($link) or empty($link)) and $sldr_post->post_status == 'publish'  ){$link=get_permalink($post_id);}//from 2.3.3
-	if($sslider_link != $link and isset($link) and !empty($link)) {
+	if($sslider_link != $link) {
 	  update_post_meta($post_id, 'slide_redirect_url', $link);	
 	}
 	
 	$sslider_nolink = get_post_meta($post_id,'sslider_nolink',true);
 	$post_sslider_nolink = $_POST['sslider_nolink'];
-	if($sslider_nolink != $_POST['sslider_nolink'] and isset($post_sslider_nolink) and !empty($post_sslider_nolink)) {
+	if($sslider_nolink != $post_sslider_nolink) {
 	  update_post_meta($post_id, 'sslider_nolink', $_POST['sslider_nolink']);	
 	}
+	/* Added for embed shortcode - start */
+	$disable_image = get_post_meta($post_id,'_disable_image',true);
+	$post_disable_image = $_POST['disable_image'];
+	if($disable_image != $post_disable_image ) {
+	  update_post_meta($post_id, '_disable_image', $post_disable_image );	
+	}
+	$smooth_sslider_eshortcode = get_post_meta($post_id,'_smooth_embed_shortcode',true);
+	$post_smooth_sslider_eshortcode = $_POST['smooth_sslider_eshortcode'];
+	if($smooth_sslider_eshortcode != $post_smooth_sslider_eshortcode) {
+	  update_post_meta($post_id, '_smooth_embed_shortcode', $post_smooth_sslider_eshortcode);	
+	}
+	
+	/* Added for embed shortcode -end */
 	
   } //sldr_verify
 }
@@ -416,36 +449,36 @@ function add_to_slider_checkbox() {
 		$sliders = ss_get_sliders();
 ?>
 		<div id="slider_checkbox">
-				<input type="checkbox" class="sldr_post" name="slider" value="slider" <?php echo $extra;?> />
-				<label for="slider"><?php _e('Add this post/page to','smooth-slider'); ?> </label>
-				<select name="slider_name[]" multiple="multiple" size="2" style="height:4em;">
+		<table class="form-table">
+		<tr valign="top">
+		<th scope="row"><input type="checkbox" class="sldr_post" name="slider" value="slider" <?php echo $extra;?> />
+		<label for="slider"><?php _e('Add this post/page to','smooth-slider'); ?> </label></th>
+		<td><select name="slider_name[]" multiple="multiple" size="2" style="height:4em;">
                 <?php foreach ($sliders as $slider) { ?>
                   <option value="<?php echo $slider['slider_id'];?>" <?php if(in_array($slider['slider_id'],$post_slider_arr)){echo 'selected';} ?>><?php echo $slider['slider_name'];?></option>
                 <?php } ?>
-                </select>
+                </select></td></tr>
                 
          <?php if($smooth_slider['multiple_sliders'] == '1') {?>
-                <br />
-                <br />
-                <br />
-                
-                <input type="checkbox" class="sldr_post" name="display_slider" value="1" <?php if(ss_slider_on_this_post($post_id)){echo "checked";}?> />
-				<label for="display_slider"><?php _e('Display ','smooth-slider'); ?>
-				<select name="display_slider_name">
+                <tr valign="top">
+		<th scope="row"><input type="checkbox" class="sldr_post" name="display_slider" value="1" <?php if(ss_slider_on_this_post($post_id)){echo "checked";}?> /><label for="display_slider"><?php _e('Display ','smooth-slider'); ?></th>
+		<td><select name="display_slider_name">
                 <?php foreach ($sliders as $slider) { ?>
                   <option value="<?php echo $slider['slider_id'];?>" <?php if(ss_post_on_slider($post_id,$slider['slider_id'])){echo 'selected';} ?>><?php echo $slider['slider_name'];?></option>
                 <?php } ?>
-                </select> <?php _e('on this Post/Page (you need to add the Smooth Slider template tag manually on your page.php/single.php or whatever page template file)','smooth-slider'); ?></label>
+                </select> <?php _e('on this Post/Page (you need to add the Smooth Slider template tag manually on your page.php/single.php or whatever page template file)','smooth-slider'); ?></label></td></tr>
           <?php } ?>
           
 				<input type="hidden" name="sldr-verify" id="sldr-verify" value="<?php echo wp_create_nonce('SmoothSlider');?>" />
-	    </div>
-        <br />
-        <div>
-        <?php
+	   
+    
+
+		<tr valign="top">
+		 <th scope="row"><label for="_smooth_slider_style"><?php _e('Stylesheet to use if slider is displayed on this Post/Page','smooth-slider'); ?> </label></th>
+    <?php
         $slider_style = get_post_meta($post->ID,'_smooth_slider_style',true);
         ?>
-         <select name="_smooth_slider_style" >
+        <td> <select name="_smooth_slider_style" >
 			<?php 
             $directory = SMOOTH_SLIDER_CSS_DIR;
             if ($handle = opendir($directory)) {
@@ -456,22 +489,39 @@ function add_to_slider_checkbox() {
                 closedir($handle);
             }
             ?>
-        </select> <label for="_smooth_slider_style"><?php _e('Stylesheet to use if slider is displayed on this Post/Page','smooth-slider'); ?> </label><br /> <br />
+        </select> </td></tr>
         
   <?php         $thumbnail_key = $smooth_slider['img_pick'][1];
                 $sslider_thumbnail= get_post_meta($post_id, $thumbnail_key, true); 
-				$sslider_link= get_post_meta($post_id, 'slide_redirect_url', true);  
-				$sslider_nolink=get_post_meta($post_id, 'sslider_nolink', true);
+		$sslider_link= get_post_meta($post_id, 'slide_redirect_url', true);  
+		$sslider_nolink=get_post_meta($post_id, 'sslider_nolink', true);
+		$sslider_disable_image=get_post_meta($post_id, '_disable_image', true);
+		$smooth_embed_shortcode=get_post_meta($post_id, '_smooth_embed_shortcode', true);
   ?>
-                <label for="sslider_thumbnail"><?php _e('Custom Thumbnail Image(url)','smooth-slider'); ?>
-                <input type="text" name="sslider_thumbnail" class="sslider_thumbnail" value="<?php echo $sslider_thumbnail;?>" size="75" />
-                <br /> </label> <br /><br />
-                <fieldset>
-                <label for="sslider_link"><?php _e('Slide Link URL ','smooth-slider'); ?>
-                <input type="text" name="sslider_link" class="sslider_link" value="<?php echo $sslider_link;?>" size="50" /><small><?php _e('If left empty, it will be by default linked to the permalink.','smooth-slider'); ?></small> </label><br />
-                <label for="sslider_nolink"> 
-                <input type="checkbox" name="sslider_nolink" class="sslider_nolink" value="1" <?php if($sslider_nolink=='1'){echo "checked";}?>  /> <?php _e('Do not link this slide to any page(url)','smooth-slider'); ?></label>
-                 </fieldset>
+                <tr valign="top">
+		 <th scope="row"><label for="sslider_thumbnail"><?php _e('Custom Thumbnail Image(url)','smooth-slider'); ?></label></th>
+                <td><input type="text" name="sslider_thumbnail" class="sslider_thumbnail" value="<?php echo $sslider_thumbnail;?>" size="50" />
+                </td></tr>
+              
+                <tr valign="top">
+		 <th scope="row"><label for="sslider_link"><?php _e('Slide Link URL ','smooth-slider'); ?></label></th>
+                <td><input type="text" name="sslider_link" class="sslider_link" value="<?php echo $sslider_link;?>" size="50" /><small><?php _e('If left empty, it will be by default linked to the permalink.','smooth-slider'); ?></small> </td></tr>
+                <tr valign="top">
+		 <th scope="row"><label for="sslider_nolink"> <?php _e('Do not link this slide to any page(url)','smooth-slider'); ?></label></th>
+                <td><input type="checkbox" name="sslider_nolink" class="sslider_nolink" value="1" <?php if($sslider_nolink=='1'){echo "checked";}?>  /> </td></tr>
+                 
+		<tr valign="top">
+		<th scope="row"><label for="disable_image"><?php _e('Disable Thumbnail Image','smooth-slider'); ?> </label></th>
+		<td><input type="checkbox" name="disable_image" value="1" <?php if($sslider_disable_image=='1'){echo "checked";}?>  /> </td>
+		</tr>
+		<!-- Added for video - Start -->
+		<tr valign="top">
+		<th scope="row"><label for="embed_shortcode"><?php _e('Embed Shortcode','smooth-slider'); ?> </label><br><br><div style="font-weight:normal;border:1px dashed #ccc;padding:5px;color:#666;line-height:20px;font-size:13px;">You can embed any type of shortcode e.g video shortcode or button shortcode which you want to be overlaid on the slide.</div></th>
+		<td><textarea rows="4" cols="50" name="smooth_sslider_eshortcode"><?php echo htmlentities( $smooth_embed_shortcode, ENT_QUOTES);?></textarea></td>
+		</tr>
+		</table>
+		<!-- Added for video - End -->
+
                  </div>
         
 <?php }

@@ -4,10 +4,10 @@ Tags: best slider,responsive slider,responsive,wordpress slider,slideshow,featur
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 3.0
 Tested up to: 3.9.1
-Stable tag: 2.4
+Stable tag: 2.5
 License: GPLv2 or later
 
-Best Responsive Slider with 100% Customization Option on Settings Panel
+Most Popular Responsive WordPress Slider for Featured Content, Videos and Media Images
 
 == Description ==
 
@@ -15,7 +15,7 @@ In less than 50 seconds, embed a recent posts slider using Smooth Slider. It cre
 
 = Features =
 
-* Supports Responsive Design
+* Responsive Design
 * Six transition effects ( Fade transition supported )
 * Custom Slider, Category Slider and Recent Posts Slider supported ( Template tags, Shortcode and Widget available )
 * Slider Preview in admin panel 
@@ -125,12 +125,35 @@ Check the other FAQs on Smooth [Slider Documetation on SliderVilla](http://guide
 
 == Screenshots ==
 
-1. Demo of Smooth Slider
-2. A brief view of Settings panel
-3. Add post/Page to Smooth slider along with other edit panel options
+1. One Demo of Smooth Slider
+2. Basic Settings Panel
+3. Advance Setting options under Miscellaneous section
+4. Control Live Preview Panel, Get Shortcode and Template Tag
+5. Export/Import Setting Values, Get Quick Shortcode and Template Tag
+6. Image auto fetch preferences, customize image width/height and other parameters
+7. Drag and Drop reorder or added slides
 
 
 == Changelog ==
+
+Version 2.5 (05/30/2014)
+
+1. New: Create Multiple Sliders from Sliders Panel
+2. New: Embed videos or other items using "Embed Shortcode" new field
+3. New: Show/Hide Image Thumbnail if video inserted in slide
+4. New: Made 100% Responsive Slider with Fluid Design
+5. New: Export/Import Settings Set (useful when implementing customized Smooth SLider from dev to live site)
+6. New: Reset Setting values to Global Derfault
+7. New: Preview tab to select 'Recent Post Slider', Category Slider, Custom Slider to live preview on admin panel
+8. New: Shortcode and Template Tags to embed the preview slider are shown on settings panel sidebar
+9. New: Clean and minimal admin panel with almost no advertisement
+10. New: Easy embed shortcode pop-up on setting changes
+11. New: Change the color of "Continue Reading" text
+12. New: Added validations on setting fields
+13. Fix: Post Meta Box fields not updating
+14. Fix: Disable Suto Play was not working properly
+15. Fix: Admin Panel CSS issue
+16. Fix: Debug notifications
 
 Version 2.4 (09/10/2012)
 

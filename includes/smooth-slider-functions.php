@@ -16,7 +16,7 @@ function get_smooth_slider_name($slider_id) {
     global $wpdb, $table_prefix;
 	$table_name = $table_prefix.SLIDER_META;
 	$slider_obj = $wpdb->get_results("SELECT * FROM $table_name WHERE slider_id = '$slider_id'", OBJECT);
-	$slider_name = $slider_obj->slider_name;
+	if (isset ($slider_obj[0]))$slider_name = $slider_obj[0]->slider_name;
 	return $slider_name;
 }
 function ss_get_post_sliders($post_id){
@@ -115,7 +115,8 @@ function smooth_slider_word_limiter( $text, $limit = 50 ) {
         $dots = '';
     }
     for($i=0;$i<$limit;$i++){
-        $string .= $explode[$i]." ";
+       if (isset ($explode[$i]))
+		$string .= $explode[$i]." ";
     }
     if ($dots) {
         $string = substr($string, 0, strlen($string));
@@ -164,4 +165,5 @@ function add_cf5_column_if_not_exist($table_name, $column_name, $create_ddl) {
       }
       return false;
 }
+
 ?>

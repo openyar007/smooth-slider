@@ -40,13 +40,14 @@ add_theme_support( 'post-thumbnails' );
  */
 function smooth_sslider_get_the_image( $args = array() ) {
 	global $post;
-	$post_id = $post->ID;
+	if(isset($post->ID))$post_id = $post->ID;
+	else $post_id = 0;
 	$permalink = get_permalink( $post_id );
 
 	/* Set the default arguments. */
 	$defaults = array(
 		'custom_key' => array( 'Thumbnail', 'thumbnail' ),
-		'post_id' => $post->ID,
+		'post_id' => $post_id,
 		'attachment' => true,
 		'the_post_thumbnail' => true, // WP 2.9+ image function
 		'default_size' => false, // Deprecated 0.5 in favor of $size
@@ -205,7 +206,7 @@ function smooth_sslider_image_by_attachment( $args = array() ) {
 
 	/* Get attachments for the inputted $post_id. */
 	$attachments = get_children( array( 'post_parent' => $args['post_id'], 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => 'ASC', 'orderby' => 'menu_order ID' ) );
-
+	$i = 0;
 	/* If no attachments are found, check if the post itself is an attachment and grab its image. */
 	if ( empty( $attachments ) && $args['size'] ) {
 		if ( 'attachment' == get_post_type( $args['post_id'] ) ) {
@@ -246,8 +247,9 @@ function smooth_sslider_image_by_scan( $args = array() ) {
 	preg_match_all( '|<img.*?src=[\'"](.*?)[\'"].*?>|i', get_post_field( 'post_content', $args['post_id'] ), $matches );
 
 	/* If there is a match for the image, return its URL. */
-	if ( isset( $matches ) && $matches[1][0] )
-		return array( 'url' => $matches[1][0] );
+	if ( isset( $matches ) )
+		if( isset($matches[1][0]) )
+			return array( 'url' => $matches[1][0] );
 
 	return false;
 }
@@ -305,8 +307,10 @@ function smooth_sslider_display_the_image( $args = array(), $image = false ) {
 	$class = join( ' ', array_unique( $classes ) );
 
 	/* If there is a $post_thumbnail_id, apply the WP filters normally associated with get_the_post_thumbnail(). */
-	if ( $image['post_thumbnail_id'] )
-		do_action( 'begin_fetch_post_thumbnail_html', $post_id, $image['post_thumbnail_id'], $size );
+	if (isset ($image['post_thumbnail_id'])) {
+		if ( $image['post_thumbnail_id'] )
+			do_action( 'begin_fetch_post_thumbnail_html', $post_id, $image['post_thumbnail_id'], $size );
+	}
 
 	/* Add the image attributes to the <img /> element. */
 	$html = '<img src="' . $image['url'] . '" alt="' . esc_attr( strip_tags( $image_alt ) ) . '" class="' . esc_attr( $class ) . '"' . $width . $height . $style .' />';
@@ -321,12 +325,16 @@ function smooth_sslider_display_the_image( $args = array(), $image = false ) {
 	}
 
 	/* If there is a $post_thumbnail_id, apply the WP filters normally associated with get_the_post_thumbnail(). */
-	if ( $image['post_thumbnail_id'] )
-		do_action( 'end_fetch_post_thumbnail_html', $post_id, $image['post_thumbnail_id'], $size );
+	if (isset ($image['post_thumbnail_id'])) {
+		if ( $image['post_thumbnail_id'] )
+			do_action( 'end_fetch_post_thumbnail_html', $post_id, $image['post_thumbnail_id'], $size );
+	}
 
 	/* If there is a $post_thumbnail_id, apply the WP filters normally associated with get_the_post_thumbnail(). */
-	if ( $image['post_thumbnail_id'] )
-		$html = apply_filters( 'post_thumbnail_html', $html, $post_id, $image['post_thumbnail_id'], $size, '' );
+	if (isset ($image['post_thumbnail_id'])) {
+		if ( $image['post_thumbnail_id'] )
+			$html = apply_filters( 'post_thumbnail_html', $html, $post_id, $image['post_thumbnail_id'], $size, '' );
+	}
 
 	return $html;
 }

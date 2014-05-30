@@ -3,21 +3,11 @@ function smooth_slider_create_multiple_sliders() {
 global $smooth_slider;
 ?>
 
-<div class="wrap" style="clear:both;">
-                     <div style="margin:10px auto;clear:left;">
-                        <a href="http://slidervilla.com/" title="Premium WordPress Slider Plugins" target="_blank"><img src="<?php echo smooth_slider_plugin_url('images/slidervilla-728.jpg');?>" alt="Premium WordPress Slider Plugins" /></a>
-                     </div>
+<div class="wrap smooth_sliders_create" id="smooth_sliders_create" style="clear:both;">
 <h2 style="float:left;"><?php _e('Sliders Created','smooth-slider'); ?></h2>
-<form  style="float:left;" action="https://www.paypal.com/cgi-bin/webscr" method="post">
-<input type="hidden" name="cmd" value="_s-xclick">
-<input type="hidden" name="hosted_button_id" value="8046056">
-<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
-</form>
-
 <?php 
-if ($_POST['remove_posts_slider']) {
-   if ( $_POST['slider_posts'] ) {
+if (isset($_POST['remove_posts_slider'])) {
+   if (isset($_POST['slider_posts']) ) {
        global $wpdb, $table_prefix;
        $table_name = $table_prefix.SLIDER_TABLE;
 	   $current_slider = $_POST['current_slider_id'];
@@ -55,14 +45,14 @@ if ($_POST['remove_posts_slider']) {
 	   }
    }
 }
-if ($_POST['create_new_slider']) {
+if (isset($_POST['create_new_slider'])) {
    $slider_name = $_POST['new_slider_name'];
    global $wpdb,$table_prefix;
    $slider_meta = $table_prefix.SLIDER_META;
    $sql = "INSERT INTO $slider_meta (slider_name) VALUES('$slider_name');";
    $result = $wpdb->query($sql);
 }
-if ($_POST['reorder_posts_slider']) {
+if (isset($_POST['reorder_posts_slider'])) {
    $i=1;
    global $wpdb, $table_prefix;
    $table_name = $table_prefix.SLIDER_TABLE;
@@ -74,23 +64,27 @@ if ($_POST['reorder_posts_slider']) {
   }
 }
 ?>
-<div style="clear:both"></div>
+<div style="clear:left"></div>
 <?php $url = sslider_admin_url( array( 'page' => 'smooth-slider-settings' ) );?>
-<a href="<?php echo $url; ?>" title="<?php _e('Settings Page for Smooth Slider where you can change the color, font etc. for the sliders','smooth-slider'); ?>"><?php _e('Go to Smooth Slider Settings page','smooth-slider'); ?></a>
+<a class="svorangebutton" href="<?php echo $url; ?>" title="<?php _e('Settings Page for Smooth Slider where you can change the color, font etc. for the sliders','smooth-slider'); ?>"><?php _e('Go to Smooth Slider Settings page','smooth-slider'); ?></a>
 <?php $sliders = ss_get_sliders(); ?>
-
+<div style="clear:right"></div>
 <div id="slider_tabs">
         <ul class="ui-tabs">
         <?php foreach($sliders as $slider){?>
-            <li><a href="#tabs-<?php echo $slider['slider_id'];?>"><?php echo $slider['slider_name'];?></a></li>
+            <li class="yellow"><a href="#tabs-<?php echo $slider['slider_id'];?>"><?php echo $slider['slider_name'];?></a></li>
         <?php } ?>
-        <?php if($smooth_slider['multiple_sliders'] == '1') {?>
-            <li><a href="#new_slider"><?php _e('Create New Slider','smooth-slider'); ?></a></li>
+        <?php if(isset($smooth_slider['multiple_sliders']) && $smooth_slider['multiple_sliders'] == '1') {?>
+            <li class="green"><a href="#new_slider"><?php _e('Create New Slider','smooth-slider'); ?></a></li>
         <?php } ?>
         </ul>
 
 <?php foreach($sliders as $slider){?>
-<div id="tabs-<?php echo $slider['slider_id'];?>">
+<div id="tabs-<?php echo $slider['slider_id'];?>" style="width:56% !important;">
+<strong>Quick Embed Shortcode:</strong>
+<div class="admin_shortcode">
+<pre style="padding: 10px 0;">[smoothslider id='<?php echo $slider['slider_id'];?>']</pre>
+</div>
 <form action="" method="post">
 <?php settings_fields('smooth-slider-group'); ?>
 
@@ -139,6 +133,7 @@ if ($_POST['reorder_posts_slider']) {
 	echo '</div>';
 ?>    
     </tbody></table>
+	<input type="hidden" name="active_tab" class="smooth_activetab" value="0" />
  </form>
  
  
@@ -178,14 +173,15 @@ if ($_POST['reorder_posts_slider']) {
                 
         echo '</div>';
     ?>    
-       </div>       
+       </div>   
+	<input type="hidden" name="active_tab" class="smooth_activetab" value="0" />    
   </form>
 </div> 
  
 <?php } ?>
 
-<?php if($smooth_slider['multiple_sliders'] == '1') {?>
-    <div id="new_slider">
+<?php if(isset($smooth_slider['multiple_sliders']) && $smooth_slider['multiple_sliders'] == '1') {?>
+    <div id="new_slider" style="width:60%;">
     <form action="" method="post" onsubmit="return slider_checkform(this);" >
     <h3><?php _e('Enter New Slider Name','smooth-slider'); ?></h3>
     <input type="hidden" name="create_new_slider" value="1" />
@@ -197,50 +193,33 @@ if ($_POST['reorder_posts_slider']) {
     </form>
     </div>
 <?php }?> 
+
 </div>
 
-<div style="margin:10px auto;clear:left;">
-                        <a href="http://slidervilla.com/" title="Premium WordPress Slider Plugins" target="_blank"><img src="<?php echo smooth_slider_plugin_url('images/slidervilla-728.jpg');?>" alt="Premium WordPress Slider Plugins" /></a>
-</div>
 
-<div id="poststuff" class="metabox-holder has-right-sidebar"> 
-		<div id="side-info-column" class="inner-sidebar" style="float:left;"> 
-			<div class="postbox"> 
-			  <h3 class="hndle"><span><?php _e('About this Plugin:','smooth-slider'); ?></span></h3> 
-			  <div class="inside">
+<div id="poststuff" class="metabox-holder has-right-sidebar" style="float:left;width:25%;max-width:300px;min-width:inherit;"> 
+		
+		<div class="postbox"> 
+		<h3 class="hndle"><span><?php _e('About this Plugin:','smooth-slider'); ?></span></h3> 
+		<div class="inside">
                 <ul>
                 <li><a href="http://slidervilla.com/smooth-slider" title="<?php _e('Smooth Slider Homepage','smooth-slider'); ?>" ><?php _e('Plugin Homepage','smooth-slider'); ?></a></li>
-                <li><a href="http://clickonf5.com/" title="<?php _e('Support Forum for Smooth Slider','smooth-slider'); ?>
+                <li><a href="http://wordpress.org/support/plugin/smooth-slider" title="<?php _e('Support Forum for Smooth Slider','smooth-slider'); ?>
 " ><?php _e('Support Forum','smooth-slider'); ?></a></li>
-                <li><a href="http://keencodes.com/" title="<?php _e('Smooth Slider Author Page','smooth-slider'); ?>" ><?php _e('About the Author','smooth-slider'); ?></a></li>
-				<li><a href="http://www.clickonf5.org" title="<?php _e('Visit Internet Techies','smooth-slider'); ?>
-" ><?php _e('Plugin Parent Site','smooth-slider'); ?></a></li>
-                <li><a href="http://www.clickonf5.org/go/smooth-slider/" title="<?php _e('Donate if you liked the plugin and support in enhancing Smooth Slider and creating new plugins','smooth-slider'); ?>" ><?php _e('Donate with Paypal','smooth-slider'); ?></a></li>
+                <li><a href="http://slidervilla.com/about-us/" title="<?php _e('Smooth Slider Author Page','smooth-slider'); ?>" ><?php _e('About the Author','smooth-slider'); ?></a></li>
+		<li><a href="http://www.clickonf5.org/go/smooth-slider/" title="<?php _e('Donate if you liked the plugin and support in enhancing Smooth Slider and creating new plugins','smooth-slider'); ?>" ><?php _e('Donate with Paypal','smooth-slider'); ?></a></li>
+		<li><strong>Current Version: <?php echo SMOOTH_SLIDER_VER;?></strong></li>
                 </ul> 
-              </div> 
-			</div> 
+            	</div> 
 		</div>
-     
-        <div id="side-info-column" class="inner-sidebar" style="float:left;margin-left:1em"> 
-			<div class="postbox"> 
-			  <h3 class="hndle"><span></span><?php _e('Our Facebook Fan Page','smooth-slider'); ?></h3> 
-			  <div class="inside">
-               <iframe src="//www.facebook.com/plugins/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2Fslidervilla&amp;width=270&amp;height=170&amp;colorscheme=light&amp;show_faces=true&amp;border_color&amp;stream=false&amp;header=false&amp;appId=140253496056337" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:270px; height:170px;" allowTransparency="true"></iframe>
-              </div> 
-			</div> 
-		</div>
-          
-		<div id="side-info-column" style="float:left;margin-left:1em;width:325px;"> 
-		<div class="postbox"> 
-		  <h3 class="hndle"><span></span><?php _e('Recommended Themes','smooth-slider'); ?></h3> 
-		  <div class="inside">
-				 <div style="margin:10px 5px">
-					<a href="http://slidervilla.com/go/elegantthemes/" title="Recommended WordPress Themes" target="_blank"><img src="<?php echo smooth_slider_plugin_url('images/elegantthemes.gif');?>" alt="Recommended WordPress Themes" /></a>
-					<p><a href="http://slidervilla.com/go/elegantthemes/" title="Recommended WordPress Themes" target="_blank">Elegant Themes</a> are attractive, compatible, affordable, SEO optimized WordPress Themes and have best support in community.</p>
-					<p><strong>Beautiful themes, Great support!</strong></p>
-					<p><a href="http://slidervilla.com/go/elegantthemes/" title="Recommended WordPress Themes" target="_blank">For more info visit ElegantThemes</a></p>
-				 </div>
-		   </div></div></div>
+                      
+		<div class="postbox" style="margin:10px 0;"> 
+				
+     		  <div class="inside">
+				<div style="margin:10px auto;">
+							<a href="http://slidervilla.com" title="Premium WordPress Slider Plugins" target="_blank"><img src="<?php echo smooth_slider_plugin_url('images/banner-premium.png');?>" alt="Premium WordPress Slider Plugins" width="100%" /></a>
+				</div>
+				</div></div>
      
      <div style="clear:left;"></div>
  </div> <!--end of poststuff --> 

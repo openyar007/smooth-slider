@@ -125,8 +125,18 @@ function smooth_global_posts_processor( $posts, $smooth_slider,$out_echo ){
 		//filter hook
 		$smooth_slide_image=apply_filters('smooth_slide_image',$smooth_slide_image,$post_id,$smooth_slider,$smooth_slider_css);
 		
-		$html .=  $smooth_slide_image;
+		$thumbnail_image=get_post_meta($post_id, '_disable_image', true);
+		if($thumbnail_image!='1')
+			$html .=  $smooth_slide_image;
 		
+		/* Added for embeding any shortcode on slide - start */
+		$smooth_eshortcode=get_post_meta($post_id, '_smooth_embed_shortcode', true);
+		if(!empty($smooth_eshortcode)){
+			$shortcode_html=do_shortcode($smooth_eshortcode);
+			$html.='<div class="smooth_slider_thumbnail"><div class="smooth_slider_eshortcode" '.$smooth_slider_css['smooth_slider_eshortcode'].'>'.$shortcode_html.'</div></div>';
+		}	
+		/* Added for embeding any shortcode on slide - end */
+
 		if(!$smooth_slider['content_limit'] or $smooth_slider['content_limit'] == '' or $smooth_slider['content_limit'] == ' ') 
 		  $slider_excerpt = substr($slider_content,0,$smooth_slider['content_chars']);
 		else 
@@ -158,20 +168,16 @@ function smooth_global_posts_processor( $posts, $smooth_slider,$out_echo ){
 }
 
 function get_global_smooth_slider($slider_handle,$r_array,$slider_id='',$echo='1'){
-	global $smooth_slider; 
+	global $smooth_slider,$default_slider; 
+	foreach($default_slider as $key=>$value){
+		if(!isset($smooth_slider[$key])) $smooth_slider[$key]='';
+	}
 	$smooth_sldr_j = $r_array[0];
 	$smooth_slider_css = smooth_get_inline_css();
 	$html='';
 	
-	$slider_width=$smooth_slider['width'];
-	$slider_height=$smooth_slider['height'];
-	$slideri_css='margin:0px '. ( ($smooth_slider['prev_next'] == 1) ? "10": "0" ) .'% 0px '. ( ($smooth_slider['prev_next'] == 1) ? "10": "0" ) .'% !important;width:'. ( ($smooth_slider['prev_next'] == 1) ? "80": "100" ) .'% !important;';
-	$smooth_media_queries='';
-    if( $smooth_slider['responsive'] == '1' ) {
-		$smooth_media_queries='@media only screen and (max-width: 479px) {.smooth_slider{width:100% !important;height:'. ( $slider_height + ($slider_height*0.51) ).'px !important;}.smooth_slider .smooth_slideri{'.$slideri_css.'}.smooth_slider .smooth_slider_thumbnail{max-width:100% !important;}}@media only screen and (min-width: 480px) and (max-width: 767px) {.smooth_slider{width:100% !important;height:'. ( $slider_height + ($slider_height*0.36) ).'px !important;}.smooth_slider .smooth_slideri{'.$slideri_css.'}.smooth_slider .smooth_slider_thumbnail{max-width:100% !important;}}@media only screen and (min-width: 768px) and (max-width: 959px) {.smooth_slider{width:100% !important;height:'. ( $slider_height + ($slider_height*0.12) ).'px !important;}.smooth_slider .smooth_slideri{'.$slideri_css.'}.smooth_slider .smooth_slider_thumbnail{max-width:100% !important;} }';
-		//filter hook
-		$smooth_media_queries=apply_filters('smooth_media_queries',$smooth_media_queries,$smooth_slider);
-	}
+	wp_enqueue_script( 'jquery.cycle', smooth_slider_plugin_url( 'js/jcycle.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
+	wp_enqueue_script( 'smooth-slider', smooth_slider_plugin_url( 'js/smooth.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
 	
 	if(!isset($smooth_slider['fouc']) or $smooth_slider['fouc']=='0' ){
 		$fouc='jQuery("html").addClass("smooth_slider_fouc");jQuery(document).ready(function() {   jQuery(".smooth_slider_fouc #'.$slider_handle.'").css({"display" : "block"}); });';
@@ -185,7 +191,7 @@ function get_global_smooth_slider($slider_handle,$r_array,$slider_id='',$echo='1
 		jQuery("#'.$slider_handle.'").cycle({ 
 			fx: "'.$smooth_slider['fx'].'",
 			speed:"'.$smooth_slider['transition'] * 100 .'",
-			timeout: "'. ( ($smooth_slider['autostep'] == '1') ? ( $smooth_slider['speed'] * 1000 ) :  0 ) .'",';
+			timeout: '. ( ($smooth_slider['autostep'] == '1') ? ( $smooth_slider['speed'] * 1000 ) :  0 ) .',';
 		if ($smooth_slider['prev_next'] == 1){ 
 			$html.='next:   "#'.$slider_handle.'_next", 
 			prev:"#'.$slider_handle.'_prev",';
@@ -220,8 +226,15 @@ function get_global_smooth_slider($slider_handle,$r_array,$slider_id='',$echo='1
 		}	
 		
 		if(!empty($smooth_media_queries)){
-			$html.='jQuery("head").append("<style type=\"text/css\">'. $smooth_media_queries .'</style>");';
+		//	$html.='jQuery("head").append("<style type=\"text/css\">'. $smooth_media_queries .'</style>");';
 		}
+		$html.='jQuery("#'.$slider_handle.'").smoothSliderHeight();';
+		
+		$html.='jQuery(window).resize(function() {
+			smooth_waitForFinalEvent(function(){
+				jQuery("#'.$slider_handle.'").smoothSliderHeight();
+			}, 1000, "'.$slider_handle.'");
+		});';
 		
 	$html.='});';
 	//Action hook
@@ -244,11 +257,11 @@ function get_global_smooth_slider($slider_handle,$r_array,$slider_id='',$echo='1
 		$html.='<div id="'.$slider_handle.'_nav" class="smooth_nav">'.$smooth_slider['custom_nav'].'</div>';
 	}
 	if ($smooth_slider['prev_next'] == 1){
-		$html.='<div id="'.$slider_handle.'_next" class="smooth_next" '.$smooth_slider_css['smooth_next'].'></div>
-			<div id="'.$slider_handle.'_prev" class="smooth_prev" '.$smooth_slider_css['smooth_prev'].'></div>';
+		$html.='<div id="'.$slider_handle.'_next" class="smooth_next"></div>
+			<div id="'.$slider_handle.'_prev" class="smooth_prev"></div>';
 	} 
 	if($smooth_slider['support'] == '1'){
-		$html.='<div class="sldrlink" '.$smooth_slider_css['sldrlink'].'><a href="http://www.clickonf5.org/smooth-slider" target="_blank" '.$smooth_slider_css['sldrlink_a'].'>Smooth Slider</a></div>';
+		$html.='<div class="sldrlink" '.$smooth_slider_css['sldrlink'].'><a href="http://slidervilla.com/smooth-slider/" target="_blank" '.$smooth_slider_css['sldrlink_a'].'>Smooth Slider</a></div>';
 	} 
 	$html.='<div class="sldr_clearlt"></div><div class="sldr_clearrt"></div>
 </div>';
@@ -258,7 +271,10 @@ function get_global_smooth_slider($slider_handle,$r_array,$slider_id='',$echo='1
 
 //Basic Smooth Slider
 function carousel_posts_on_slider($max_posts, $offset=0, $slider_id = '1',$out_echo = '1') {
-    global $smooth_slider;
+    global $smooth_slider,$default_slider;
+	foreach($default_slider as $key=>$value){
+		if(!isset($smooth_slider[$key])) $smooth_slider[$key]='';
+	}
 	global $wpdb, $table_prefix;
 	$table_name = $table_prefix.SLIDER_TABLE;
 	$post_table = $table_prefix."posts";
@@ -300,7 +316,10 @@ function get_smooth_slider($slider_id='',$offset=0) {
 
 //For displaying category specific posts in chronologically reverse order, from Smooth Slider 2.3.3
 function carousel_posts_on_slider_category($max_posts='5', $catg_slug='', $offset=0, $out_echo = '1') {
-    global $smooth_slider;
+    global $smooth_slider,$default_slider;
+	foreach($default_slider as $key=>$value){
+		if(!isset($smooth_slider[$key])) $smooth_slider[$key]='';
+	}
 	global $wpdb, $table_prefix;
 	
 	if (!empty($catg_slug)) {
@@ -362,11 +381,10 @@ require_once (dirname (__FILE__) . '/shortcodes_1.php');
 require_once (dirname (__FILE__) . '/widgets_1.php');
 
 function smooth_slider_enqueue_scripts() {
-	wp_enqueue_script( 'jquery.cycle', smooth_slider_plugin_url( 'js/jcycle.js' ),
-		array('jquery'), SMOOTH_SLIDER_VER, false);
+	//wp_enqueue_script( 'jquery.cycle', smooth_slider_plugin_url( 'js/jcycle.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
 }
 
-add_action( 'init', 'smooth_slider_enqueue_scripts' );
+//add_action( 'init', 'smooth_slider_enqueue_scripts' );
 
 function smooth_slider_enqueue_styles() {	
   global $post, $smooth_slider, $wp_registered_widgets,$wp_widget_factory;
@@ -404,12 +422,12 @@ global $smooth_slider;
 	wp_enqueue_script( 'jquery-ui-tabs' );
 	wp_enqueue_script( 'jquery-ui-core' );
     wp_enqueue_script( 'jquery-ui-sortable' );
-	wp_enqueue_script( 'jquery.cycle', smooth_slider_plugin_url( 'js/jcycle.js' ),
-		array('jquery'), SMOOTH_SLIDER_VER, false);
+	//wp_enqueue_script( 'jquery.cycle', smooth_slider_plugin_url( 'js/jcycle.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
 	wp_enqueue_script( 'smooth_slider_admin_js', smooth_slider_plugin_url( 'js/admin.js' ),
 		array('jquery'), SMOOTH_SLIDER_VER, false); 
 	wp_enqueue_style( 'smooth_slider_admin_head_css', smooth_slider_plugin_url( 'css/skins/'.$smooth_slider['stylesheet'].'/style.css' ),
 		false, SMOOTH_SLIDER_VER, 'all');
+	wp_enqueue_script( 'jquery.bpopup.min', smooth_slider_plugin_url( 'js/jquery.bpopup.min.js' ),'', PINWHEEL_SLIDER_VER, false);
 	wp_enqueue_style( 'smooth_slider_admin_css', smooth_slider_plugin_url( 'css/admin.css' ),
 		false, SMOOTH_SLIDER_VER, 'all');
 	}
@@ -421,21 +439,37 @@ add_action( 'admin_init', 'smooth_slider_admin_scripts' );
 function smooth_slider_admin_head() {
 global $smooth_slider;
 if ( is_admin() ){ // admin actions
-   
+	if ( isset($_GET['page']) && ('smooth-slider-admin' == $_GET['page'] or 'smooth-slider-settings' == $_GET['page'])) {
+	$smooth_slider_curr=get_option('smooth_slider_options');
+	$active_tab=(isset($smooth_slider_curr['active_tab']))?$smooth_slider_curr['active_tab']:0;
+			if ( isset($_GET['page']) && ('smooth-slider-admin' == $_GET['page']) ){ if(isset($_POST['active_tab']) ) $active_tab=$_POST['active_tab'];else $active_tab = 0;}
+			if(empty($active_tab)){$active_tab=0;}
+	
+
+	 ?>
+			<script type="text/javascript">
+		    // <![CDATA[
+		jQuery(document).ready(function() { 
+		           jQuery("#slider_tabs").tabs({fx: { opacity: "toggle", duration: 300}, active: <?php echo $active_tab;?> }).addClass( "ui-tabs-vertical-left ui-helper-clearfix" );
+	jQuery( "#slider_tabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
+					<?php 	if ( isset($_GET['page']) && (( 'smooth-slider-settings' == $_GET['page']) or ('smooth-slider-admin' == $_GET['page']) ) ) { ?>
+						jQuery( "#slider_tabs" ).on( "tabsactivate", function( event, ui ) { 
+							jQuery( "#smooth_activetab, .smooth_activetab" ).val( jQuery( "#slider_tabs" ).tabs( "option", "active" ) ); 
+						});
+		   <?php      }
+			 $sliders = ss_get_sliders(); 
+					foreach($sliders as $slider){ ?>
+		            jQuery("#sslider_sortable_<?php echo $slider['slider_id'];?>").sortable();
+		            jQuery("#sslider_sortable_<?php echo $slider['slider_id'];?>").disableSelection();
+				    <?php } ?>
+
+		});
+			</script> <?php
+	}
   // Sliders page only
-    if ( isset($_GET['page']) && 'smooth-slider-admin' == $_GET['page'] ) {
-	  $sliders = ss_get_sliders(); 
-	?>
-		<script type="text/javascript">
-            // <![CDATA[
-        jQuery(document).ready(function() {
-                    jQuery("#slider_tabs").tabs();
-				<?php foreach($sliders as $slider){?>
-                    jQuery("#sslider_sortable_<?php echo $slider['slider_id'];?>").sortable();
-                    jQuery("#sslider_sortable_<?php echo $slider['slider_id'];?>").disableSelection();
-			    <?php } ?>
-        });
-        function confirmRemove()
+    if ( isset($_GET['page']) && 'smooth-slider-admin' == $_GET['page'] ) {?>
+<script type="text/javascript"> 
+       function confirmRemove()
         {
             var agree=confirm("This will remove selected Posts/Pages from Slider.");
             if (agree)
@@ -473,14 +507,9 @@ if ( is_admin() ){ // admin actions
    } //Sliders page only
    
    // Settings page only
-  if ( isset($_GET['page']) && 'smooth-slider-settings' == $_GET['page']  ) { ?>
-		<script type="text/javascript">
-            // <![CDATA[
-        jQuery(document).ready(function() {
-                    jQuery("#slider_tabs").tabs();
-        });
-		</script>
-		<?php wp_print_scripts( 'farbtastic' );
+  if ( isset($_GET['page']) && 'smooth-slider-settings' == $_GET['page']  ) {
+$smooth_slider_curr=get_option('smooth_slider_options');
+		wp_print_scripts( 'farbtastic' );
 		wp_print_styles( 'farbtastic' );
 ?>
 <script type="text/javascript">
@@ -590,7 +619,35 @@ jQuery(document).ready(function() {
 		jQuery('#sldr_close').click(function () {
 			jQuery('#sldr_message').fadeOut("slow");
 		});
+//for seventh color box
+	jQuery('#colorbox_7').farbtastic('#color_value_7');
+		jQuery('#color_picker_7').click(function () {
+           if (jQuery('#colorbox_7').css('display') == "block") {
+		      jQuery('#colorbox_7').fadeOut("slow"); }
+		   else {
+		      jQuery('#colorbox_7').fadeIn("slow"); }
+        });
+		var colorpick_7 = false;
+		jQuery(document).mousedown(function(){
+		    if (colorpick_7 == true) {
+    			return; }
+				jQuery('#colorbox_7').fadeOut("slow");
+		});
+		jQuery(document).mouseup(function(){
+		    colorpick_7 = false;
+		});
+		jQuery('#sldr_close').click(function () {
+			jQuery('#sldr_message').fadeOut("slow");
+		});
 });
+function confirmSettingsImport()
+        {
+            var agree=confirm("Reset these Settings to Imported Settings Set??");
+            if (agree)
+            return true ;
+            else
+            return false ;
+}
 </script>
 <style type="text/css">
 .color-picker-wrap {
@@ -607,13 +664,18 @@ jQuery(document).ready(function() {
 <?php
    } //for smooth slider option page
  }//only for admin
+?>
+<style type="text/css">#adminmenu #toplevel_page_smooth-slider-admin div.wp-menu-image:before { content: "\f233"; }</style>
+<?php
 }
 add_action('admin_head', 'smooth_slider_admin_head');
 
 //get inline css with style attribute attached
 function smooth_get_inline_css($echo='0'){
-    global $smooth_slider;
-	
+    global $smooth_slider,$default_slider;
+	foreach($default_slider as $key=>$value){
+		if(!isset($smooth_slider[$key])) $smooth_slider[$key]='';
+	}
 	global $post;
 	if(is_singular()) {	
 		$smooth_slider_style = get_post_meta($post->ID,'_smooth_slider_style',true);
@@ -628,7 +690,7 @@ function smooth_get_inline_css($echo='0'){
 		$style_start= ($echo=='0') ? 'style="':'';
 		$style_end= ($echo=='0') ? '"':'';
 	//smooth_slider
-		$smooth_slider_css['smooth_slider']=$style_start.'width:'.$smooth_slider['width'].'px;height:'.$smooth_slider['height'].'px;background-color:'. ( ($smooth_slider['bg'] == '1') ? "transparent" : $smooth_slider['bg_color'] ) .';border:'. $smooth_slider['border'].'px solid '.$smooth_slider['brcolor'].';'.$style_end;
+		$smooth_slider_css['smooth_slider']=$style_start.'max-width:'.$smooth_slider['width'].'px;min-height:'.$smooth_slider['height'].'px;background-color:'. ( ($smooth_slider['bg'] == '1') ? "transparent" : $smooth_slider['bg_color'] ) .';border:'. $smooth_slider['border'].'px solid '.$smooth_slider['brcolor'].';'.$style_end;
 		
 		if ($smooth_slider['title_fstyle'] == "bold" or $smooth_slider['title_fstyle'] == "bold italic" ){$slider_title_font = "bold";} else { $slider_title_font = "normal"; }
 		if ($smooth_slider['title_fstyle'] == "italic" or $smooth_slider['title_fstyle'] == "bold italic" ){$slider_title_style = "italic";} else {$slider_title_style = "normal";}
@@ -637,12 +699,13 @@ function smooth_get_inline_css($echo='0'){
 
 		if ($smooth_slider['bg'] == '1') { $smooth_slideri_bg = "transparent";} else { $smooth_slideri_bg = $smooth_slider['bg_color']; }
 	//smooth_slideri
-		$smooth_slider_css['smooth_slideri']=$style_start.'width:'. ( ($smooth_slider['prev_next'] == 1) ? ( $smooth_slider['width'] - 48 ): $smooth_slider['width'] ) .'px;margin:0px '. ( ($smooth_slider['prev_next'] == 1) ? "24": "0" ) .'px 0px '. ( ($smooth_slider['prev_next'] == 1) ? "24": "0" ) .'px;'.$style_end;
+		$smooth_slider_css['smooth_slideri']=$style_start.'max-width:'. ( ($smooth_slider['prev_next'] == 1) ? ( $smooth_slider['width'] - 48 ): $smooth_slider['width'] ) .'px;margin:0px '. ( ($smooth_slider['prev_next'] == 1) ? "24": "0" ) .'px 0px '. ( ($smooth_slider['prev_next'] == 1) ? "24": "0" ) .'px;'.$style_end;
 		
 		if ($smooth_slider['ptitle_fstyle'] == "bold" or $smooth_slider['ptitle_fstyle'] == "bold italic" ){$ptitle_fweight = "bold";} else {$ptitle_fweight = "normal";}
 		if ($smooth_slider['ptitle_fstyle'] == "italic" or $smooth_slider['ptitle_fstyle'] == "bold italic"){$ptitle_fstyle = "italic";} else {$ptitle_fstyle = "normal";}
+	if ($smooth_slider['img_align'] == "none"){$margin="1em 0 5px 0;";}else{$margin="0 0 5px 0;";}
 	//smooth_slider_h2
-		$smooth_slider_css['smooth_slider_h2']=$style_start.'clear:none;line-height:'. ($smooth_slider['ptitle_fsize'] + 3) .'px;font-family:'. $smooth_slider['ptitle_font'].';font-size:'.$smooth_slider['ptitle_fsize'].'px;font-weight:'.$ptitle_fweight.';font-style:'.$ptitle_fstyle.';color:'.$smooth_slider['ptitle_fcolor'].';margin:0 0 5px 0;'.$style_end;
+		$smooth_slider_css['smooth_slider_h2']=$style_start.'clear:none;line-height:'. ($smooth_slider['ptitle_fsize'] + 3) .'px;font-family:'. $smooth_slider['ptitle_font'].';font-size:'.$smooth_slider['ptitle_fsize'].'px;font-weight:'.$ptitle_fweight.';font-style:'.$ptitle_fstyle.';color:'.$smooth_slider['ptitle_fcolor'].';margin:'.$margin.$style_end;
 		
 	//smooth_slider_h2 a
 		$smooth_slider_css['smooth_slider_h2_a']=$style_start.'color:'.$smooth_slider['ptitle_fcolor'].';font-size:'.$smooth_slider['ptitle_fsize'].'px;font-weight:'.$ptitle_fweight.';font-style:'.$ptitle_fstyle.';'.$style_end;
@@ -658,9 +721,12 @@ function smooth_get_inline_css($echo='0'){
 		if($smooth_slider['img_size'] == '1'){ $thumb_width= 'width:'. $smooth_slider['img_width'].'px;';} else{$thumb_width='';}
 	//smooth_slider_thumbnail
 		$smooth_slider_css['smooth_slider_thumbnail']=$style_start.'float:'.$smooth_slider['img_align'].';margin:0 '.$thumb_margin_right.'px 0 '.$thumb_margin_left.'px;max-height:'.$smooth_slider['img_height'].'px;border:'.$smooth_slider['img_border'].'px solid '.$smooth_slider['img_brcolor'].';'.$thumb_width.$style_end;
+
+//smooth_slider_eshortcode
+		$smooth_slider_css['smooth_slider_eshortcode']=$style_start.'float:'.$smooth_slider['img_align'].';margin:0 '.$thumb_margin_right.'px 0 '.$thumb_margin_left.'px;height:'.$smooth_slider['img_height'].'px;border:'.$smooth_slider['img_border'].'px solid '.$smooth_slider['img_brcolor'].';'.$thumb_width.$style_end;
 	
 	//smooth_slider_p_more
-		$smooth_slider_css['smooth_slider_p_more']=$style_start.'color:'.$smooth_slider['ptitle_fcolor'].';font-family:'.$smooth_slider['content_font'].';font-size:'.$smooth_slider['content_fsize'].'px;'.$style_end;
+		$smooth_slider_css['smooth_slider_p_more']=$style_start.'color:'.$smooth_slider['readmorecolor'].';font-family:'.$smooth_slider['content_font'].';font-size:'.$smooth_slider['content_fsize'].'px;margin-left: 10px;'.$style_end;
 		
 		$smooth_slider_css['sldrlink']=$style_start.'padding-right:'. ( ($smooth_slider['prev_next'] == 1) ? "10" : "0" ) .'px;"';
 		$smooth_slider_css['sldrlink_a']='style="color:'.$smooth_slider['content_fcolor'].' !important;'.$style_end;

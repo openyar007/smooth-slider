@@ -126,12 +126,13 @@ Check the other FAQs on Smooth [Slider Documetation on SliderVilla](http://guide
 == Screenshots ==
 
 1. One Demo of Smooth Slider
-2. Basic Settings Panel
-3. Advance Setting options under Miscellaneous section
-4. Control Live Preview Panel, Get Shortcode and Template Tag
-5. Export/Import Setting Values, Get Quick Shortcode and Template Tag
-6. Image auto fetch preferences, customize image width/height and other parameters
-7. Drag and Drop reorder or added slides
+2. Another demo with image in centre
+3. Basic Settings Panel
+4. Advance Setting options under Miscellaneous section
+5. Control Live Preview Panel, Get Shortcode and Template Tag
+6. Export/Import Setting Values, Get Quick Shortcode and Template Tag
+7. Image auto fetch preferences, customize image width/height and other parameters
+8. Drag and Drop reorder or added slides
 
 
 == Changelog ==

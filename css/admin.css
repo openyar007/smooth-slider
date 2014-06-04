@@ -13,7 +13,7 @@ form#smooth_slider_form input.regular-text{width:60%;}
 form#smooth_slider_form select{width:60%;}
 form#smooth_slider_form select {}
 form#smooth_slider_form option{display:block;color:#666;}
-code {word-break:break-all;}
+code {word-break:break-all;line-height:22px;background:#f3f3f3;}
 form#smooth_slider_form input[type="checkbox"] {}
 form#smooth_slider_form input[type="radio"]    {}
 
@@ -84,7 +84,7 @@ div.sub_settings_m{padding:0 0px 10px 10px;background:#fff;margin:5px 0;}
 #sldr_close {float:right;} 
 
 /*Buttons*/
-.svilla_button{background:#333 !important;color:#fff !important;font-size:13px;width:100%;text-align:left;border:0 !important;padding:10px 5%;font-weight:bold;cursor:pointer;}a.svilla_button{text-decoration:none;display:block;margin-right:10px;width:100%;font-weight:bold;-webkit-box-sizing: border-box; -moz-box-sizing: border-box;box-sizing: border-box;}
+.svilla_button{background:#333 !important;color:#fff !important;font-size:13px;width:100%;text-align:left;border:0 !important;padding:10px 5%;font-weight:bold;cursor:pointer;margin:1px 0;}a.svilla_button{text-decoration:none;display:block;margin-right:10px;width:100%;font-weight:bold;-webkit-box-sizing: border-box; -moz-box-sizing: border-box;box-sizing: border-box;}
 .svilla_gray_button{background:#00c0e4 !important;padding:5px 5%;}a.svilla_gray_button{color:#ffffff !important; }
 a.svorangebutton{background:#f07057;color:#fff !important;margin-right:10px;font-size:13px;width:100%;text-align:left;border:0 !important;font-weight:bold;cursor:pointer;text-decoration:none;display:block;font-weight:bold;-webkit-box-sizing: border-box; -moz-box-sizing: border-box;box-sizing: border-box;float:right;max-width:25%;padding:10px 0px;text-align:center;max-width:25%;}
 
@@ -105,6 +105,7 @@ font-family: "Century Gothic", "Avant Garde", "Trebuchet MS", sans-serif;}
 #poststuff .postbox{min-width:100%;}
 
 .frmdiv{float:left;width:70%;}
+
 /*responsive*/
 @media only screen and (min-width: 1280px) { .ui-tabs-vertical-left .ui-tabs-nav li {width:175px !important;}}
 @media only screen and (min-width: 768px) and (max-width: 1279px) {.ui-tabs-vertical-left .ui-tabs-panel {width: 75%;}}

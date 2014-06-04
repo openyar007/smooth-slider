@@ -3,7 +3,7 @@
 Plugin Name: Smooth Slider
 Plugin URI: http://slidervilla.com/smooth-slider/
 Description: Smooth slider adds a responsive featured content on image slider using shortcode, widget and template tags. Create and embed featured content slider, recent post slider, category slider in less than 60 seconds.
-Version: 2.5	
+Version: 2.5.1	
 Author: SliderVilla
 Author URI: http://slidervilla.com/
 Wordpress version supported: 2.9 and above
@@ -30,12 +30,12 @@ Wordpress version supported: 2.9 and above
 //defined global variables and constants here
 global $smooth_slider,$default_slider,$smooth_db_version;
 $smooth_slider = get_option('smooth_slider_options');
-$smooth_db_version='2.5'; //current version of smooth slider database 
+$smooth_db_version='2.5.1'; //current version of smooth slider database 
 define('SLIDER_TABLE','smooth_slider'); //Slider TABLE NAME
 define('PREV_SLIDER_TABLE','slider'); //Slider TABLE NAME
 define('SLIDER_META','smooth_slider_meta'); //Meta TABLE NAME
 define('SLIDER_POST_META','smooth_slider_postmeta'); //Meta TABLE NAME
-define("SMOOTH_SLIDER_VER","2.5",false);//Current Version of Smooth Slider
+define("SMOOTH_SLIDER_VER","2.5.1",false);//Current Version of Smooth Slider
 if ( ! defined( 'SMOOTH_SLIDER_PLUGIN_BASENAME' ) )
 	define( 'SMOOTH_SLIDER_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 if ( ! defined( 'SMOOTH_SLIDER_CSS_DIR' ) ){
@@ -94,7 +94,6 @@ $default_slider = array('speed'=>'7',
 						   'shortcode'=>'1',
 						   'rand'=>'0',
 						   'ver'=>'j',
-						   'support'=>'0',
 						   'fouc'=>'0',
 						   'fx'=>'scrollHorz',
 						   'css'=>'',
@@ -250,7 +249,7 @@ global $smooth_slider;
 	global $wpdb, $table_prefix, $post;
 	$table_name = $table_prefix.SLIDER_TABLE;
 	
-	if(isset($_POST['slider']) and !isset($_POST['slider_name'])) {
+	if(isset($_POST['slider']) and !isset($_POST['slider_name'])) { 
 	  $slider_id = '1';
 	  if(is_post_on_any_slider($post_id)){
 	     $sql = "DELETE FROM $table_name where post_id = '$post_id'";
@@ -539,6 +538,9 @@ add_action('edit_post', 'add_to_slider');
 add_action('publish_post', 'remove_from_slider');
 add_action('edit_post', 'remove_from_slider');
 add_action('deleted_post','delete_from_slider_table');
+
+add_action('edit_attachment', 'add_to_slider');
+add_action('delete_attachment','delete_from_slider_table');
 
 function smooth_slider_plugin_url( $path = '' ) {
 	global $wp_version;

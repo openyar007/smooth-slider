@@ -53,7 +53,11 @@ function smooth_global_posts_processor( $posts, $smooth_slider,$out_echo ){
 		
 		//filter hook
 		$slider_content=apply_filters('smooth_slide_excerpt',$slider_content,$post_id,$smooth_slider,$smooth_slider_css);
-						
+		if(!isset($smooth_slider['img_pick'][0])) $smooth_slider['img_pick'][0]='';
+		if(!isset($smooth_slider['img_pick'][2])) $smooth_slider['img_pick'][2]='';
+		if(!isset($smooth_slider['img_pick'][3])) $smooth_slider['img_pick'][3]='';
+		if(!isset($smooth_slider['img_pick'][5])) $smooth_slider['img_pick'][5]='';		
+					
 		if($smooth_slider['img_pick'][0] == '1'){
 		 $custom_key = array($smooth_slider['img_pick'][1]);
 		}
@@ -260,9 +264,7 @@ function get_global_smooth_slider($slider_handle,$r_array,$slider_id='',$echo='1
 		$html.='<div id="'.$slider_handle.'_next" class="smooth_next"></div>
 			<div id="'.$slider_handle.'_prev" class="smooth_prev"></div>';
 	} 
-	if($smooth_slider['support'] == '1'){
-		$html.='<div class="sldrlink" '.$smooth_slider_css['sldrlink'].'><a href="http://slidervilla.com/smooth-slider/" target="_blank" '.$smooth_slider_css['sldrlink_a'].'>Smooth Slider</a></div>';
-	} 
+	
 	$html.='<div class="sldr_clearlt"></div><div class="sldr_clearrt"></div>
 </div>';
 	if($echo == '1')  {echo $html; }
@@ -300,13 +302,12 @@ function get_smooth_slider($slider_id='',$offset=0) {
 	global $smooth_slider; 
  
 	if($smooth_slider['multiple_sliders'] == '1' and is_singular() and (empty($slider_id) or !isset($slider_id))){
-	global $post;
-	$post_id = $post->ID;
-	$slider_id = get_slider_for_the_post($post_id);
+		global $post;
+		$post_id = $post->ID;
+		$slider_id = get_slider_for_the_post($post_id);
 	}
-	if((!is_singular() or $smooth_slider['multiple_sliders'] != '1') and (empty($slider_id) or !isset($slider_id))){
-	  $slider_id = '1';
-	}
+
+	if(empty($slider_id) or !isset($slider_id))  $slider_id = '1';
 	if(!empty($slider_id)){
 		$r_array = carousel_posts_on_slider($smooth_slider['no_posts'], $offset, $slider_id, '0'); 
 		$slider_handle='smooth_slider_'.$slider_id;

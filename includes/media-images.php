@@ -1,6 +1,8 @@
 <?php
 //For media files
 function smooth_slider_media_lib_edit($form_fields, $post){
+global $wp_version;
+if ( version_compare( $wp_version, '3.5', '<' ) ) : // Using WordPress less than 3.5
 global $smooth_slider;
 if (current_user_can( $smooth_slider['user_level'] )) {
     if ( substr($post->post_mime_type, 0, 5) == 'image') {
@@ -34,9 +36,9 @@ if (current_user_can( $smooth_slider['user_level'] )) {
 	  $sname_html='';
  
 	  foreach ($sliders as $slider) { 
-	     if(in_array($slider['slider_id'],$post_slider_arr)){$selected = 'selected';} else{$selected='';}
-         $sname_html =$sname_html.'<option value="'.$slider['slider_id'].'" '.$selected.'>'.$slider['slider_name'].'</option>';
-      } 
+	    	 if(in_array($slider['slider_id'],$post_slider_arr)){$selected = 'selected';} else{$selected='';}
+        	$sname_html =$sname_html.'<option value="'.$slider['slider_id'].'" '.$selected.'>'.$slider['slider_name'].'</option>';
+      	   } 
 	  $form_fields['slider_name[]'] = array(
               'label'      => __(''),
               'input'      => 'html',
@@ -66,13 +68,18 @@ if (current_user_can( $smooth_slider['user_level'] )) {
 	 unset( $form_fields['sslider_link'] );
 	 unset( $form_fields['sslider_nolink'] );
   }
-  return $form_fields;
+
+  
 }
+endif; //less than WP 3.5
+return $form_fields;
 }
 
 add_filter('attachment_fields_to_edit', 'smooth_slider_media_lib_edit', 10, 2);
 
 function smooth_slider_media_lib_save($post, $attachment){
+global $wp_version;
+if ( version_compare( $wp_version, '3.5', '<' ) ) : // Using WordPress less than 3.5
 global $smooth_slider;
 if (current_user_can( $smooth_slider['user_level'] )) {
 	global $wpdb, $table_prefix;
@@ -124,7 +131,8 @@ if (current_user_can( $smooth_slider['user_level'] )) {
 	  update_post_meta($post_id, 'sslider_nolink', $attachment['sslider_nolink']);	
 	}
 }	
-	return $post;	
+endif; //less than WP 3.5
+return $post;		
 } 
 
 add_filter('attachment_fields_to_save', 'smooth_slider_media_lib_save', 10, 2);

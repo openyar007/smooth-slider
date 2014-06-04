@@ -181,7 +181,7 @@ if (isset($_POST['reorder_posts_slider'])) {
 <?php } ?>
 
 <?php if(isset($smooth_slider['multiple_sliders']) && $smooth_slider['multiple_sliders'] == '1') {?>
-    <div id="new_slider" style="width:60%;">
+    <div id="new_slider" style="width:56%;">
     <form action="" method="post" onsubmit="return slider_checkform(this);" >
     <h3><?php _e('Enter New Slider Name','smooth-slider'); ?></h3>
     <input type="hidden" name="create_new_slider" value="1" />

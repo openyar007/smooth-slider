@@ -1,9 +1,6 @@
 @charset "utf-8";
-/* CSS Document 
-Author:Tejaswini
-Website:http://www.clickonf5.org
-*/
-/*Smooth Slider specific styles*/
+/*CSS Document 
+Smooth Slider default styles*/
 .smooth_slider_fouc .smooth_slider {display: none;}
 .smooth_slider div,.smooth_slider p,.smooth_slider li,.smooth_slider span,.smooth_slider img,.smooth_slider h2,.smooth_slider ul{list-style:none;vertical-align:baseline;}
 .smooth_slider{padding:0 5px;width:100%;}
@@ -37,12 +34,10 @@ Website:http://www.clickonf5.org
 .smooth_slider .smooth_nav a.smooth_slider_inav{display:block;float:left;}
 .smooth_slider .smooth_nav a.smooth_slider_bnav{background: transparent url(buttons/default/nav.png) no-repeat 0 0;margin:0 3px;}
 /* smooth Video */
-.smooth_slider_eshortcode{position:relative;}
-.smooth_slider video{
-	display: inline-block;
-	width: 100% !important;
-}
-.mejs-overlay-button{margin-top:-50px !important;}
-.smooth_slider_eshortcode div.mejs-mediaelement{height:auto !important;max-width:100% !important;}
-.smooth_slider_eshortcode div.mejs-inner,div.wp-video-shortcode,div.wp-video,.mejs-layers,.mejs-overlay-play{height:100% !important;max-width:100% !important;}
-.wp-core-ui .button-primary{float:left;}
+.smooth_slider .smooth_slider_eshortcode{position:relative;}
+.smooth_slider video{display: inline-block;width: 100% !important;margin: 0 !important;}
+.smooth_slider .mejs-container{margin:0 !important;}
+.smooth_slider .mejs-overlay-button{margin-top:-50px !important;}
+.smooth_slider div.mejs-mediaelement{height:auto !important;max-width:100% !important;}
+.smooth_slider div.mejs-inner,.smooth_slider div.wp-video-shortcode,.smooth_slider div.wp-video,.smooth_slider .mejs-layers,.smooth_slider .mejs-overlay-play{height:100% !important;max-width:100% !important;}
+

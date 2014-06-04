@@ -89,24 +89,25 @@ function smooth_sslider_get_the_image( $args = array() ) {
 			$image = smooth_sslider_image_by_custom_field( $args );
 
 		/* If no image found and $the_post_thumbnail is set to true, check for a post image (WP feature). */
-		if ( !$image && $the_post_thumbnail )
+		if ( empty($image) && $the_post_thumbnail )
 			$image = smooth_sslider_image_by_the_post_thumbnail( $args );
 
 		/* If no image found and $attachment is set to true, check for an image by attachment. */
-		if ( !$image && $attachment )
+		if ( empty($image) && $attachment )
 			$image = smooth_sslider_image_by_attachment( $args );
 
 		/* If no image found and $image_scan is set to true, scan the post for images. */
-		if ( !$image && $image_scan )
+		if ( empty($image) && $image_scan )
 			$image = smooth_sslider_image_by_scan( $args );
 
 		/* If no image found and a $default_image is set, get the default image. */
-		if ( !$image && $default_image )
+		if ( empty($image) && $default_image )
 			$image = smooth_sslider_image_by_default( $args );
 
 		/* If an image is returned, run it through the display function. */
-		if ( $image )
+		if ( isset($image) )
 			$image = smooth_sslider_display_the_image( $args, $image );
+		else $image='';
 
 	/* Allow plugins/theme to override the final output. */
 	$image = apply_filters( 'smooth_sslider_get_the_image', $image );
@@ -285,13 +286,13 @@ function smooth_sslider_display_the_image( $args = array(), $image = false ) {
 	extract( $args );
 
 	/* If there is alt text, set it.  Otherwise, default to the post title. */
-	$image_alt = ( ( $image['alt'] ) ? $image['alt'] : apply_filters( 'the_title', get_post_field( 'post_title', $post_id ) ) );
+	$image_alt = ( isset( $image['alt'] ) ? $image['alt'] : apply_filters( 'the_title', get_post_field( 'post_title', $post_id ) ) );
 
 	/* If there is a width or height, set them as HMTL-ready attributes. */
-	$width = ( ( $width ) ? ' width="' . esc_attr( $width ) . '"' : '' );
-	$height = ( ( $height ) ? ' height="' . esc_attr( $height ) . '"' : '' );
-	$style = ( ( $style ) ?   ' '.$style   : '' );
-	$a_attr = ( ( $a_attr ) ?   ' '.$a_attr   : '' );
+	$width = ( isset( $width ) ? ' width="' . esc_attr( $width ) . '"' : '' );
+	$height = ( isset( $height ) ? ' height="' . esc_attr( $height ) . '"' : '' );
+	$style = ( isset( $style ) ?   ' '.$style   : '' );
+	$a_attr = ( isset( $a_attr ) ?   ' '.$a_attr   : '' );
 
 	/* Loop through the custom field keys and add them as classes. */
 	if ( is_array( $custom_key ) ) {

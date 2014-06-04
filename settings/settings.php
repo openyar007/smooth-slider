@@ -275,16 +275,6 @@ else
 
 <table class="form-table">
 
-<tr valign="top" <?php if($smooth_slider['ver']=='step') echo 'style="display:none;"';?>>
-<th scope="row"><?php _e('Help promoting Smooth Slider','smooth-slider'); ?></th>
-<td><select name="smooth_slider_options[support]" >
-<option value="1" <?php if ($smooth_slider['support'] == "1"){ echo "selected";}?> ><?php _e('Yes','smooth-slider'); ?></option>
-<option value="0" <?php if ($smooth_slider['support'] == "0"){ echo "selected";}?> ><?php _e('No','smooth-slider'); ?></option>
-</select>
-<small><?php _e('Consider donating in case you select "No"','smooth-slider'); ?></small>
-</td>
-</tr>
-
 <tr valign="top">
 <th scope="row"><?php _e('Retain these html tags','smooth-slider'); ?></th>
 <td><input type="text" name="smooth_slider_options[allowable_tags]" class="regular-text code" value="<?php echo $smooth_slider['allowable_tags']; ?>" />

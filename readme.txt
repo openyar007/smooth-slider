@@ -4,14 +4,14 @@ Tags: slider, slideshow, wordpress slider, content slider, posts slider,image sl
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 3.0
 Tested up to: 3.9.1
-Stable tag: 2.5
+Stable tag: 2.5.1
 License: GPLv2 or later
 
 Most Popular Responsive WordPress Slider for Featured Content, Videos and Media Images
 
 == Description ==
 
-In less than 50 seconds, embed a recent posts slider using Smooth Slider. It creates a dynamic slideshow/s for featured Posts, Pages, Media Images and Custom Post Types on a WordPress site. With live preview on admin panel, one can customize the slider before implementation. At <a href="http://slidervilla.com/" rel="friend" title="SliderVilla Premium WordPress Sliders">SliderVilla</a> , we develop only sliders and we know the requirements very well. Smooth Slider is a basic slider WordPress plugin but is capable of adding a nice carousel in no time. With shortcode, widgets and template tag, one can embed Smooth SLider anywhere in the site. 
+In less than 50 seconds, embed a recent posts, category specific or featured posts slider using Smooth Slider. It creates a dynamic slideshow/s for featured Posts, Pages, Media Images and Custom Post Types on a WordPress site. With live preview on admin panel, one can customize the slider before implementation. At <a href="http://slidervilla.com/" rel="friend" title="SliderVilla Premium WordPress Sliders">SliderVilla</a> , we develop only sliders and we know the requirements very well. Smooth Slider is a basic slider WordPress plugin but is capable of adding a nice carousel in no time. With shortcode, widgets and template tag, one can embed Smooth SLider anywhere in the site. 
 
 = Features =
 
@@ -136,6 +136,15 @@ Check the other FAQs on Smooth [Slider Documetation on SliderVilla](http://guide
 
 
 == Changelog ==
+
+Version 2.5.1 (06/04/2014)
+
+1. New: Removed promotional link text 'smooth slider' from the slider
+2. Fix: Edit Media page having double post meta boxes
+3. Fix: Add to Slider not working for media images
+4. Fix: CSS changes for video slides and WordPress Video Shortcode
+5. Fix: On Delete and Reinstall, options are not saved
+6. Fix: Slider appears only if "Display slider" option is checked in Post Meta box 
 
 Version 2.5 (05/30/2014)
 

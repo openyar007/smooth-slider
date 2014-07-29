@@ -180,7 +180,9 @@ function smooth_sslider_image_by_the_post_thumbnail( $args = array() ) {
 	/* If no post image ID is found, return false. */
 	if ( empty( $post_thumbnail_id ) )
 		return false;
-
+	/* Added for category Slider  */
+	if( !wp_attachment_is_image($post_thumbnail_id) ) 
+		return false;
 	/* Apply filters on post_thumbnail_size because this is a default WP filter used with its image feature. */
 	$size = apply_filters( 'post_thumbnail_size', $args['size'] );
 

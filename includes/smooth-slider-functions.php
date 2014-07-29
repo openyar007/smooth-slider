@@ -14,6 +14,7 @@ function get_slider_posts_in_order($slider_id) {
 }
 function get_smooth_slider_name($slider_id) {
     global $wpdb, $table_prefix;
+	
 	$table_name = $table_prefix.SLIDER_META;
 	$slider_obj = $wpdb->get_results("SELECT * FROM $table_name WHERE slider_id = '$slider_id'", OBJECT);
 	if (isset ($slider_obj[0]))$slider_name = $slider_obj[0]->slider_name;

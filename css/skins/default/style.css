@@ -1,13 +1,12 @@
 @charset "utf-8";
 /*CSS Document 
 Smooth Slider default styles*/
-.smooth_slider_fouc .smooth_slider {display: none;}
 .smooth_slider div,.smooth_slider p,.smooth_slider li,.smooth_slider span,.smooth_slider img,.smooth_slider h2,.smooth_slider ul{list-style:none;vertical-align:baseline;}
 .smooth_slider{padding:0 5px;width:100%;}
 .smooth_slider .sldr_title{margin:5px 0 10px 0;}
 .smooth_slider span{display:inline;overflow:hidden;margin: 10px auto;line-height:18px;}
 .smooth_slider .smooth_sliderb{position:relative;}
-.smooth_slider .smooth_slideri{position:absolute;width:100% !important;height:auto !important;}
+.smooth_slider .smooth_slideri{position:absolute;width:100% !important;height:auto !important;word-break:break-all;}
 .smooth_slider .smooth_slider_thumbnail{position:relative;max-width:100%;}
 .smooth_slider a{text-decoration:none !important;}
 .smooth_slider h2{clear:none;display:block;padding:0px;}
@@ -40,4 +39,6 @@ Smooth Slider default styles*/
 .smooth_slider .mejs-overlay-button{margin-top:-50px !important;}
 .smooth_slider div.mejs-mediaelement{height:auto !important;max-width:100% !important;}
 .smooth_slider div.mejs-inner,.smooth_slider div.wp-video-shortcode,.smooth_slider div.wp-video,.smooth_slider .mejs-layers,.smooth_slider .mejs-overlay-play{height:100% !important;max-width:100% !important;}
-
+/*Added for responsiveness*/
+.smooth_slider .smoothNone{float:none !important;}
+.smooth_slider .smoothLeft{float:left !important;}

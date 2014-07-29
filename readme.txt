@@ -4,7 +4,7 @@ Tags: slider, slideshow, wordpress slider, content slider, posts slider,image sl
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 3.0
 Tested up to: 3.9.1
-Stable tag: 2.5.1
+Stable tag: 2.6
 License: GPLv2 or later
 
 Most Popular Responsive WordPress Slider for Featured Content, Videos and Media Images
@@ -136,6 +136,19 @@ Check the other FAQs on Smooth [Slider Documetation on SliderVilla](http://guide
 
 
 == Changelog ==
+
+Version 2.6 (07/29/2014)
+
+1. New: Image uploader for Sliders on 'Sliders' settings panel. No need to add individual media image to Smooth slider.
+2. New: Add any shortcode like video shortcode or button shortcode to slide which will be overlayed on it.
+3. New: Rename Slider field on Smooth Slider => Sliders panel
+4. New: Smooth Slider post meta box now has two tabs named basic and advanced with respective fields for the purpose of easy understanding and saving the space.
+5. New: On settings panel of Smooth slider now it is possible to expand and collapse tabs which greatly reduces scrolling efforts.
+6. New: Preview Slider params simplified on Settings panel.
+7. New: Color picker changed from Farbtastic to "wp-color-picker".
+8. Fix: Worked on responsiveness of slider. 
+9. Fix: Settings panel cleanup and restructuring.
+10. Fix: Solved the debug errors on Sliders panel.
 
 Version 2.5.1 (06/04/2014)
 

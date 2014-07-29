@@ -2,7 +2,6 @@
 function smooth_slider_create_multiple_sliders() {
 global $smooth_slider;
 ?>
-
 <div class="wrap smooth_sliders_create" id="smooth_sliders_create" style="clear:both;">
 <h2 style="float:left;"><?php _e('Sliders Created','smooth-slider'); ?></h2>
 <?php 
@@ -16,6 +15,7 @@ if (isset($_POST['remove_posts_slider'])) {
 		   $wpdb->query($sql);
 	   }
    }
+ if (isset ($_POST['remove_all'])) {
    if ($_POST['remove_all'] == __('Remove All at Once','smooth-slider')) {
        global $wpdb, $table_prefix;
        $table_name = $table_prefix.SLIDER_TABLE;
@@ -25,6 +25,8 @@ if (isset($_POST['remove_posts_slider'])) {
 		   $wpdb->query($sql);
 	   }
    }
+}
+ if (isset ($_POST['remove_all'])) {
    if ($_POST['remove_all'] == __('Delete Slider','smooth-slider')) {
        $slider_id = $_POST['current_slider_id'];
        global $wpdb, $table_prefix;
@@ -45,6 +47,7 @@ if (isset($_POST['remove_posts_slider'])) {
 	   }
    }
 }
+}
 if (isset($_POST['create_new_slider'])) {
    $slider_name = $_POST['new_slider_name'];
    global $wpdb,$table_prefix;
@@ -63,6 +66,46 @@ if (isset($_POST['reorder_posts_slider'])) {
     $i++;
   }
 }
+/*Added for rename slider-2.6-start*/
+if ((isset ($_POST['rename_slider'])) and ($_POST['rename_slider'] == __('Rename','smooth-slider'))) {
+	$slider_name = $_POST['rename_slider_to'];
+	$slider_id=$_POST['current_slider_id'];
+	if( !empty($slider_name) ) {
+		global $wpdb,$table_prefix;
+		$slider_meta = $table_prefix.SLIDER_META;
+		$sql = 'UPDATE '.$slider_meta.' SET slider_name="'.$slider_name.'" WHERE slider_id='.$slider_id;
+		$wpdb->query($sql);
+	}
+}
+/*Added for rename slider-2.6-end*/
+
+/* Added for upload media save-2.6 */
+if ( isset($_POST['addSave']) and ($_POST['addSave']=='Save') ) {
+	$images=(isset($_POST['imgID']))?$_POST['imgID']:array();
+	$slider_id=$_POST['current_slider_id'];
+	$ids=array_reverse($images);
+	global $wpdb,$table_prefix;
+	foreach($ids as $id){
+		$title=(isset($_POST['title'][$id]))?$_POST['title'][$id]:'';
+		$desc=(isset($_POST['desc'][$id]))?$_POST['desc'][$id]:'';
+		$link=(isset($_POST['link'][$id]))?$_POST['link'][$id]:'';
+		$nolink=(isset($_POST['nolink'][$id]))?$_POST['nolink'][$id]:'';
+		$attachment = array(
+			'ID'           => $id,
+			'post_title'   => $title,
+			'post_content' => $desc
+		);
+		wp_update_post( $attachment );
+		update_post_meta($id, 'smooth_slide_redirect_url', $link);
+		update_post_meta($id, 'smooth_sslider_nolink', $nolink);
+		if(!slider($id,$slider_id)) {
+				$dt = date('Y-m-d H:i:s');
+				$sql = "INSERT INTO ".$table_prefix.SLIDER_TABLE." (post_id, date, slider_id) VALUES ('$id', '$dt', '$slider_id')";
+				$wpdb->query($sql);
+		}
+	}
+}
+/*   upload media end 2.6 */
 ?>
 <div style="clear:left"></div>
 <?php $url = sslider_admin_url( array( 'page' => 'smooth-slider-settings' ) );?>
@@ -80,11 +123,28 @@ if (isset($_POST['reorder_posts_slider'])) {
         </ul>
 
 <?php foreach($sliders as $slider){?>
-<div id="tabs-<?php echo $slider['slider_id'];?>" style="width:56% !important;">
+<div id="tabs-<?php echo $slider['slider_id'];?>" style="width:56%;">
 <strong>Quick Embed Shortcode:</strong>
 <div class="admin_shortcode">
 <pre style="padding: 10px 0;">[smoothslider id='<?php echo $slider['slider_id'];?>']</pre>
 </div>
+<!-- Add bulk images start 2.6-->
+<?php 
+if ( ! did_action( 'wp_enqueue_media' ) ) wp_enqueue_media();
+wp_enqueue_script( 'media-uploader', smooth_slider_plugin_url( 'js/media-uploader.js' ),array( 'jquery', 'iris' ), SMOOTH_SLIDER_VER, false);
+?>
+	<h3 class="sub-heading" style="margin-left:0px;"><?php _e('Add Images to','smooth-slider'); ?> <?php echo $slider['slider_name'];?> (Slider ID = <?php echo $slider['slider_id'];?>)</h3>
+
+	<div class="uploaded-images">
+		<form method="post" class="addImgForm">
+			<div style="clear:left;margin-top:20px;" class="image-uploader">
+				<input type="submit" class="upload-button slider_images_upload" name="slider_images_upload" value="Upload" />
+			</div>
+			<input type="hidden" name="current_slider_id" value="<?php echo $slider['slider_id'];?>" />
+			<input type="hidden" name="active_tab" class="smooth_activetab" value="0" />
+		</form>
+	</div>
+<!-- Add bulk images end 2.6-->
 <form action="" method="post">
 <?php settings_fields('smooth-slider-group'); ?>
 
@@ -94,7 +154,7 @@ if (isset($_POST['reorder_posts_slider'])) {
 <p><em><?php _e('Check the Post/Page and Press "Remove Selected" to remove them From','smooth-slider'); ?> <?php echo $slider['slider_name'];?>. <?php _e('Press "Remove All at Once" to remove all the posts from the','smooth-slider'); ?> <?php echo $slider['slider_name'];?>.</em></p>
 
     <table class="widefat">
-    <thead><tr><th><?php _e('Post/Page Title','smooth-slider'); ?></th><th><?php _e('Author','smooth-slider'); ?></th><th><?php _e('Post Date','smooth-slider'); ?></th><th><?php _e('Remove Post','smooth-slider'); ?></th></tr></thead><tbody>
+    <thead class="blue"><tr><th><?php _e('Post/Page Title','smooth-slider'); ?></th><th><?php _e('Author','smooth-slider'); ?></th><th><?php _e('Post Date','smooth-slider'); ?></th><th><?php _e('Remove Post','smooth-slider'); ?></th></tr></thead><tbody>
 
 <?php  
 	/*global $wpdb, $table_prefix;
@@ -108,19 +168,21 @@ if (isset($_POST['reorder_posts_slider'])) {
 <?php    $count = 0;	
 	foreach($slider_posts as $slider_post) {
 	  $slider_arr[] = $slider_post->post_id;
-	  $post = get_post($slider_post->post_id);	  
-	  if ( in_array($post->ID, $slider_arr) ) {
+	  $post = get_post($slider_post->post_id);
+		if(isset($post) and isset($slider_arr)){
+		if (in_array($post->ID, $slider_arr) ) {
 		  $count++;
 		  $sslider_author = get_userdata($post->post_author);
           $sslider_author_dname = $sslider_author->display_name;
 		  echo '<tr' . ($count % 2 ? ' class="alternate"' : '') . '><td><strong>' . $post->post_title . '</strong><a href="'.get_edit_post_link( $post->ID, $context = 'display' ).'" target="_blank"> '.__( '(Edit)', 'smooth-slider' ).'</a> <a href="'.get_permalink( $post->ID ).'" target="_blank"> '.__( '(View)', 'smooth-slider' ).' </a></td><td>By ' . $sslider_author_dname . '</td><td>' . date('l, F j. Y',strtotime($post->post_date)) . '</td><td><input type="checkbox" name="slider_posts[' . $post->ID . ']" value="1" /></td></tr>'; 
-	  }
+		  }
+		}
 	}
 		
 	if ($count == 0) {
 		echo '<tr><td colspan="4">'.__( 'No posts/pages have been added to the Slider - You can add respective post/page to slider on the Edit screen for that Post/Page', 'smooth-slider' ).'</td></tr>';
 	}
-	echo '</tbody><tfoot><tr><th>'.__( 'Post/Page Title', 'smooth-slider' ).'</th><th>'.__( 'Author', 'smooth-slider' ).'</th><th>'.__( 'Post Date', 'smooth-slider' ).'</th><th>'.__( 'Remove Post', 'smooth-slider' ).'</th></tr></tfoot></table>'; 
+	echo '</tbody><tfoot class="blue"><tr><th>'.__( 'Post/Page Title', 'smooth-slider' ).'</th><th>'.__( 'Author', 'smooth-slider' ).'</th><th>'.__( 'Post Date', 'smooth-slider' ).'</th><th>'.__( 'Remove Post', 'smooth-slider' ).'</th></tr></tfoot></table>'; 
     
 	echo '<div class="submit">';
 	
@@ -139,9 +201,9 @@ if (isset($_POST['reorder_posts_slider'])) {
  
  <form action="" method="post">
     <input type="hidden" name="reorder_posts_slider" value="1" />
-    <h3><?php _e('Reorder the Posts/Pages Added To','smooth-slider'); ?> <?php echo $slider['slider_name'];?>(Slider ID = <?php echo $slider['slider_id'];?>)</h3>
+    <h3 class="sub-heading" style="margin-left:0px;"><?php _e('Reorder the Posts/Pages Added To','smooth-slider'); ?> <?php echo $slider['slider_name'];?>(Slider ID = <?php echo $slider['slider_id'];?>)</h3>
     <p><em><?php _e('Click on and drag the post/page title to a new spot within the list, and the other items will adjust to fit.','smooth-slider'); ?> </em></p>
-    <ul id="sslider_sortable_<?php echo $slider['slider_id'];?>" style="color:#326078">    
+    <ul id="sslider_sortable_<?php echo $slider['slider_id'];?>" style="color:#326078;overflow: auto;">    
     <?php  
     /*global $wpdb, $table_prefix;
 	$table_name = $table_prefix.SLIDER_TABLE;*/
@@ -154,14 +216,16 @@ if (isset($_POST['reorder_posts_slider'])) {
     <?php    $count = 0;	
         foreach($slider_posts as $slider_post) {
           $slider_arr[] = $slider_post->post_id;
-          $post = get_post($slider_post->post_id);	  
+          $post = get_post($slider_post->post_id);
+	if(isset($post) and isset($slider_arr)){	  
           if ( in_array($post->ID, $slider_arr) ) {
               $count++;
               $sslider_author = get_userdata($post->post_author);
               $sslider_author_dname = $sslider_author->display_name;
-              echo '<li id="'.$post->ID.'"><input type="hidden" name="order[]" value="'.$post->ID.'" /><strong> &raquo; &nbsp; ' . $post->post_title . '</strong></li>'; 
-          }
-        }
+              echo '<li id="'.$post->ID.'" class="reorder"><input type="hidden" name="order[]" value="'.$post->ID.'" /><strong> &raquo; &nbsp; ' . $post->post_title . '</strong></li>'; 
+          		}
+        		}
+	}
             
         if ($count == 0) {
             echo '<li>'.__( 'No posts/pages have been added to the Slider - You can add respective post/page to slider on the Edit screen for that Post/Page', 'smooth-slider' ).'</li>';
@@ -176,6 +240,22 @@ if (isset($_POST['reorder_posts_slider'])) {
        </div>   
 	<input type="hidden" name="active_tab" class="smooth_activetab" value="0" />    
   </form>
+<!-- Added for rename slider -start -->
+	 <h3 class="sub-heading" style="margin:40px 0px 5px 0;"><?php _e('Rename Slider','smooth-slider'); ?></h3>
+	<form action="" method="post"> 
+		<table class="form-table">
+			<tr valign="top">
+			<th scope="row"><?php _e('Rename Slider to','smooth-slider'); ?></th>
+			<td><input type="text" name="rename_slider_to" class="regular-text" value="<?php echo $slider['slider_name'];?>" /></td>
+			</tr>
+		</table>
+		<input type="hidden" name="current_slider_id" value="<?php echo $slider_id;?>" />
+		<input type="submit" value="<?php _e('Rename','smooth-slider'); ?>"  name="<?php _e('rename_slider','smooth-slider'); ?>" />
+	
+		<input type="hidden" name="active_tab" class="smooth_activetab" value="0" />
+	
+	</form>
+<!-- Added for rename slider -end -->	
 </div> 
  
 <?php } ?>
@@ -197,7 +277,7 @@ if (isset($_POST['reorder_posts_slider'])) {
 </div>
 
 
-<div id="poststuff" class="metabox-holder has-right-sidebar" style="float:left;width:25%;max-width:300px;min-width:inherit;"> 
+<div id="poststuff" class="metabox-holder has-right-sidebar" style="float:left;width:25%;max-width:300px;margin-top:20px;"> 
 		
 		<div class="postbox"> 
 		<h3 class="hndle"><span><?php _e('About this Plugin:','smooth-slider'); ?></span></h3> 

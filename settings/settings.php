@@ -3,7 +3,6 @@ if ( is_admin() ){ // admin actions
   add_action('admin_menu', 'smooth_slider_settings');
   add_action( 'admin_init', 'register_mysettings' ); 
 } 
-
 // function for adding settings page to wp-admin
 function smooth_slider_settings() {
 	add_menu_page( 'Smooth Slider', 'Smooth Slider', 'manage_options','smooth-slider-admin', 'smooth_slider_create_multiple_sliders');
@@ -69,17 +68,40 @@ global $smooth_slider,$default_slider;
 //print_r($default_slider);
 //die("test");
 
+/* Skins settings File 2.6 */
+$directory = SMOOTH_SLIDER_CSS_DIR;
+if ($handle = opendir($directory)) {
+    while (false !== ($file = readdir($handle))) { 
+     if($file != '.' and $file != '..') { 
+	if($file != "sample")
+     require_once ( dirname( dirname(__FILE__) ) . '/css/skins/'.$file.'/settings.php'); 
+  
+	} }
+    closedir($handle);
+}
 //Reset Settings
 if (isset ($_POST['smooth_reset_settings_submit'])) {
 	if ( $_POST['smooth_reset_settings']!='n' ) {
-		  $smooth_reset_settings=$_POST['smooth_reset_settings'];
-		  $options='smooth_slider_options';
-		  $optionsvalue=get_option($options);
-		  if( $smooth_reset_settings == 'g' ){
+		$smooth_reset_settings=$_POST['smooth_reset_settings'];
+		$options='smooth_slider_options';
+		$optionsvalue=get_option($options);
+		if( $smooth_reset_settings == 'g' ){
 			$new_settings_value=$default_slider;
 			update_option($options,$new_settings_value);
-		  }
-	  
+		}
+		elseif(!is_numeric($smooth_reset_settings)) {
+			$skin=$smooth_reset_settings;
+			$new_settings_value=$default_slider;
+			$skin_defaults_str='default_settings_'.$skin;
+			global ${$skin_defaults_str};
+			if(count(${$skin_defaults_str})>0){
+				foreach(${$skin_defaults_str} as $key=>$value){
+					$new_settings_value[$key]=$value;	
+				}
+				$new_settings_value['stylesheet']=$skin;
+			}	
+			update_option($options,$new_settings_value);
+		}
 	}
 }
 $new_settings_msg='';
@@ -142,7 +164,7 @@ else
 <?php }?>
 <?php echo $new_settings_msg;?>
 
-<div class="frmdiv">
+<div id="smooth_settings">
 <form method="post" action="options.php" id="smooth_slider_form">
 <?php settings_fields('smooth-slider-group'); ?>
 
@@ -155,10 +177,26 @@ else
         </ul>
 
 <div id="basic">
-<div class="sub_settings">
-<h2 class="sub-heading"><?php _e('Basic Controls','smooth-slider'); ?></h2> 
+<div class="sub_settings toggle_settings">
+<h2 class="sub-heading"><?php _e('Basic Controls','smooth-slider'); ?><img src="<?php echo smooth_slider_plugin_url( 'images/close.png' ); ?>" class="toggle_img"> </h2> 
 <table class="form-table">
 
+<tr valign="top">
+<th scope="row"><?php _e('Select Skin','smooth-slider'); ?> </th>
+<td><select name="smooth_slider_options[stylesheet]" id="smooth_slider_stylesheet" onchange="return checkskin(this.value);">
+<?php 
+$directory = SMOOTH_SLIDER_CSS_DIR;
+if ($handle = opendir($directory)) {
+    while (false !== ($file = readdir($handle))) { 
+     if($file != '.' and $file != '..') { ?>
+      <option value="<?php echo $file;?>" <?php if ($smooth_slider['stylesheet'] == $file){ echo "selected";}?> ><?php echo $file;?></option>
+ <?php  } }
+    closedir($handle);
+}
+?>
+</select>
+</td>
+</tr>
 <tr valign="top">
 <th scope="row"><label for="smooth_slider_autostep"><?php _e(' Enable autostepping of slides','smooth-slider'); ?></label></th>
 <td> 
@@ -187,7 +225,7 @@ else
 
 <tr valign="top">
 <th scope="row"><?php _e('Slide Pause Interval','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[speed]" id="smooth_slider_speed" class="small-text" value="<?php echo $smooth_slider['speed']; ?>" /> &nbsp;<?php _e('(in secs)','smooth-slider'); ?> 
+<td><input type="number" name="smooth_slider_options[speed]" id="smooth_slider_speed" class="small-text" value="<?php echo $smooth_slider['speed']; ?>" min="1" /> &nbsp;<?php _e('(in secs)','smooth-slider'); ?> 
 <span class="moreInfo">
 	&nbsp; <span class="trigger"> ? </span>
 	<div class="tooltip">
@@ -199,7 +237,7 @@ else
 
 <tr valign="top">
 <th scope="row"><?php _e('Slide Animation Length','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[transition]" id="smooth_slider_transition" class="small-text" value="<?php echo $smooth_slider['transition']; ?>" />
+<td><input type="number" name="smooth_slider_options[transition]" id="smooth_slider_transition" class="small-text" value="<?php echo $smooth_slider['transition']; ?>" min="1" />
 <span class="moreInfo">
 	&nbsp; <span class="trigger"> ? </span>
 	<div class="tooltip">
@@ -211,30 +249,30 @@ else
 
 <tr valign="top">
 <th scope="row"><?php _e('Number of Posts in the Slideshow','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[no_posts]" id="smooth_slider_no_posts" class="small-text" value="<?php echo $smooth_slider['no_posts']; ?>" />
+<td><input type="number" name="smooth_slider_options[no_posts]" id="smooth_slider_no_posts" class="small-text" value="<?php echo $smooth_slider['no_posts']; ?>" min="1" />
 </td>
 </tr>
 
 <tr valign="top">
-<th scope="row"><?php _e('Background Color','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[bg_color]" id="color_value_1" value="<?php echo $smooth_slider['bg_color']; ?>" />&nbsp; <img id="color_picker_1" src="<?php echo smooth_slider_plugin_url( 'images/color_picker.png' ); ?>" alt="<?php _e('Pick the color of your choice','smooth-slider'); ?>" /><div class="color-picker-wrap" id="colorbox_1"></div> &nbsp; &nbsp; &nbsp; 
+<th scope="row"><?php _e('Slide Background Color','smooth-slider'); ?></th>
+<td><input type="text" name="smooth_slider_options[bg_color]" id="smooth_slider_bg_color" value="<?php echo$smooth_slider['bg_color']; ?>" class="wp-color-picker-field" data-default-color="#ffffff" /></div></div></br></br>
 <label for="smooth_slider_bg"><input name="smooth_slider_options[bg]" type="checkbox" id="smooth_slider_bg" value="1" <?php checked('1', $smooth_slider['bg']); ?>  /><?php _e(' Use Transparent Background','smooth-slider'); ?></label> </td>
 </tr>
  
 <tr valign="top">
 <th scope="row"><?php _e('Min. Slider Height','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[height]" id="smooth_slider_height" class="small-text" value="<?php echo $smooth_slider['height']; ?>" />&nbsp;<?php _e('px','smooth-slider'); ?></td>
+<td><input type="number" name="smooth_slider_options[height]" id="smooth_slider_height" class="small-text" value="<?php echo $smooth_slider['height']; ?>" min="1" />&nbsp;<?php _e('px','smooth-slider'); ?></td>
 </tr>
 
 
 <tr valign="top">
 <th scope="row"><?php _e('Slider Width','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[width]" id="smooth_slider_width" class="small-text" value="<?php echo $smooth_slider['width']; ?>" />&nbsp;<?php _e('px','smooth-slider'); ?></td>
+<td><input type="number" name="smooth_slider_options[width]" id="smooth_slider_width" class="small-text" value="<?php echo $smooth_slider['width']; ?>" min="1" />&nbsp;<?php _e('px','smooth-slider'); ?></td>
 </tr>
 
 <tr valign="top">
 <th scope="row"><?php _e('Border Thickness','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[border]" id="smooth_slider_border" class="small-text" value="<?php echo $smooth_slider['border']; ?>" />
+<td><input type="number" min="0" name="smooth_slider_options[border]" id="smooth_slider_border" class="small-text" value="<?php echo $smooth_slider['border']; ?>" />
 <span class="moreInfo">
 	&nbsp; <span class="trigger"> ? </span>
 	<div class="tooltip">
@@ -246,7 +284,7 @@ else
 
 <tr valign="top">
 <th scope="row"><?php _e('Border Color','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[brcolor]" id="color_value_6" value="<?php echo $smooth_slider['brcolor']; ?>" />&nbsp; <img id="color_picker_6" src="<?php echo smooth_slider_plugin_url( 'images/color_picker.png' ); ?>" alt="<?php _e('Pick the color of your choice','smooth-slider'); ?>" /><div class="color-picker-wrap" id="colorbox_6"></div></td>
+<td><input type="text" name="smooth_slider_options[brcolor]" id="smooth_slider_brcolor" value="<?php echo $smooth_slider['brcolor']; ?>" class="wp-color-picker-field" data-default-color="#dddddd" /></td>
 </tr>
 
 <tr valign="top"> 
@@ -258,7 +296,7 @@ else
 <label for="smooth_slider_goto_slide"><?php _e('Show go to slide number links or images','smooth-slider'); ?></label><br />
 <input name="smooth_slider_options[goto_slide]" type="radio" id="smooth_slider_goto_slide" value="0" <?php checked('0', $smooth_slider['goto_slide']); ?>  /> <?php _e('None ','smooth-slider'); ?><br /> 
 <input name="smooth_slider_options[goto_slide]" type="radio" id="smooth_slider_goto_slide" value="1" <?php checked('1', $smooth_slider['goto_slide']); ?>  /> <?php _e('Numbers','smooth-slider'); ?> <br /> 
-<input name="smooth_slider_options[goto_slide]" type="radio" id="smooth_slider_goto_slide" value="2" <?php checked('2', $smooth_slider['goto_slide']); ?>  /> <?php _e('Custom Images for Navigation','smooth-slider'); ?> <br /> <input name="smooth_slider_options[goto_slide]" type="radio" id="smooth_slider_goto_slide" value="4" <?php checked('4', $smooth_slider['goto_slide']); ?>  /> <?php _e('Fixed Images for Navigation','smooth-slider'); ?> <br /> &nbsp; &nbsp; &nbsp; <?php _e('Image Width: ','smooth-slider'); ?><input type="text" name="smooth_slider_options[navimg_w]" id="smooth_slider_navimg_w" class="small-text" value="<?php echo $smooth_slider['navimg_w']; ?>" /> <?php _e('px','smooth-slider'); ?> <br /> &nbsp; &nbsp; &nbsp; <?php _e('Height: ','smooth-slider'); ?><input type="text" name="smooth_slider_options[navimg_ht]" id="smooth_slider_navimg_ht" class="small-text" value="<?php echo $smooth_slider['navimg_ht']; ?>" /> <?php _e('px','smooth-slider'); ?><br /> 
+<input name="smooth_slider_options[goto_slide]" type="radio" id="smooth_slider_goto_slide" value="2" <?php checked('2', $smooth_slider['goto_slide']); ?>  /> <?php _e('Custom Images for Navigation','smooth-slider'); ?> <br /> <input name="smooth_slider_options[goto_slide]" type="radio" id="smooth_slider_goto_slide" value="4" <?php checked('4', $smooth_slider['goto_slide']); ?>  /> <?php _e('Fixed Images for Navigation','smooth-slider'); ?> <br /> &nbsp; &nbsp; &nbsp; <?php _e('Size: ','smooth-slider'); ?><input type="number" name="smooth_slider_options[navimg_w]" id="smooth_slider_navimg_w" class="small-text" value="<?php echo $smooth_slider['navimg_w']; ?>" min="1" />&nbsp;X&nbsp;<input type="number" name="smooth_slider_options[navimg_ht]" id="smooth_slider_navimg_ht" class="small-text" value="<?php echo $smooth_slider['navimg_ht']; ?>" min="1" /> <?php _e('px','smooth-slider'); ?><br /> 
 <input name="smooth_slider_options[goto_slide]" type="radio" id="smooth_slider_goto_slide" value="3" <?php checked('3', $smooth_slider['goto_slide']); ?>  /> <?php _e('Enter Custom Text or HTML','smooth-slider'); ?>  
 <input type="text" name="smooth_slider_options[custom_nav]" class="regular-text code" value="<?php echo htmlentities($smooth_slider['custom_nav'], ENT_QUOTES); ?>" />
 </fieldset></td> 
@@ -270,8 +308,8 @@ else
 </p>
 </div>
 
-<div class="sub_settings_m">
-<h2 class="sub-heading"><?php _e('Miscellaneous','smooth-slider'); ?></h2> 
+<div class="sub_settings_m toggle_settings">
+<h2 class="sub-heading"><?php _e('Miscellaneous','smooth-slider'); ?><img src="<?php echo smooth_slider_plugin_url( 'images/close.png' ); ?>" class="toggle_img"></h2> 
 
 <table class="form-table">
 
@@ -281,7 +319,7 @@ else
 <span class="moreInfo">
 	&nbsp; <span class="trigger"> ? </span>
 	<div class="tooltip">
-	<?php _e('(read','smooth-slider'); ?> <a href="http://guides.slidervilla.com/smooth-slider/" title="<?php _e('how to retain html like line breaks and links in the Smooth Slider','smooth-slider'); ?>" target="_blank"><?php _e('Usage section of the plugin page','smooth-slider'); ?></a> <?php _e('to know more','smooth-slider'); ?>)
+	<?php _e('Put the tags like &lt;br&gt;&lt;a&gt;&ltp&gt; to retain them.Do not separate them using commas, neither use ⁄ anywhere.','smooth-slider'); ?>
 	</div>
 </span>
 </td>
@@ -293,8 +331,9 @@ else
 
 <tr valign="top">
 <th scope="row"><?php _e('Color of "Continue Reading Text"','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[readmorecolor]" id="color_value_7" value="<?php echo $smooth_slider['readmorecolor']; ?>" />&nbsp; <img id="color_picker_7" src="<?php echo smooth_slider_plugin_url( 'images/color_picker.png' ); ?>" alt="<?php _e('Pick the color of your choice','smooth-slider'); ?>" /><div class="color-picker-wrap" id="colorbox_7"></div></td>
+<td><input type="text" name="smooth_slider_options[readmorecolor]" id="smooth_slider_readmorecolor" value="<?php echo$smooth_slider['readmorecolor']; ?>" class="wp-color-picker-field" data-default-color="#3F4C6B" /></div></td>
 </tr>
+	
 
 <tr valign="top">
 <th scope="row"><?php _e('Minimum User Level to add Post to the Slider','smooth-slider'); ?></th>
@@ -327,23 +366,6 @@ else
 <tr valign="top" style="display:none;">
 <th scope="row"><?php _e('Add Shortcode Support','smooth-slider'); ?></th>
 <td><input name="smooth_slider_options[shortcode]" type="checkbox" value="1" <?php checked('1', $smooth_slider['shortcode']); ?>  />&nbsp;<?php _e('check this if you want to use Smooth Slider Shortcode i.e [smoothslider]','smooth-slider'); ?></td>
-</tr>
-
-<tr valign="top">
-<th scope="row"><?php _e('Smooth Slider Styles to Use on Other than Post/Pages','smooth-slider'); ?> <small><?php _e('(i.e. for index.php,category.php,archive.php etc)','smooth-slider'); ?></small></th>
-<td><select name="smooth_slider_options[stylesheet]" >
-<?php 
-$directory = SMOOTH_SLIDER_CSS_DIR;
-if ($handle = opendir($directory)) {
-    while (false !== ($file = readdir($handle))) { 
-     if($file != '.' and $file != '..') { ?>
-      <option value="<?php echo $file;?>" <?php if ($smooth_slider['stylesheet'] == $file){ echo "selected";}?> ><?php echo $file;?></option>
- <?php  } }
-    closedir($handle);
-}
-?>
-</select>
-</td>
 </tr>
 
 <tr valign="top">
@@ -383,8 +405,8 @@ if ($handle = opendir($directory)) {
 </div><!--#basics-->
 
 <div id="slides">
-<div class="sub_settings">
-<h2 class="sub-heading"><?php _e('Slider Title','smooth-slider'); ?></h2> 
+<div class="sub_settings toggle_settings">
+<h2 class="sub-heading"><?php _e('Slider Title','smooth-slider'); ?><img src="<?php echo smooth_slider_plugin_url( 'images/close.png' ); ?>" class="toggle_img"></h2> 
 <p><?php _e('Customize the looks of the main title of the Slideshow from here','smooth-slider'); ?></p> 
 <table class="form-table">
 
@@ -428,12 +450,11 @@ if ($handle = opendir($directory)) {
 
 <tr valign="top">
 <th scope="row"><?php _e('Font Color','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[title_fcolor]" id="color_value_2" value="<?php echo $smooth_slider['title_fcolor']; ?>" />&nbsp; <img id="color_picker_2" src="<?php echo smooth_slider_plugin_url( 'images/color_picker.png' ); ?>" alt="<?php _e('Pick the color of your choice','smooth-slider'); ?>" /><div class="color-picker-wrap" id="colorbox_2"></div></td>
+<td><input type="text" name="smooth_slider_options[title_fcolor]" id="smooth_slider_title_fcolor" value="<?php echo$smooth_slider['title_fcolor']; ?>" class="wp-color-picker-field" data-default-color="#000000" /></div></td>
 </tr>
-
 <tr valign="top">
 <th scope="row"><?php _e('Font Size','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[title_fsize]" id="smooth_slider_title_fsize" class="small-text" value="<?php echo $smooth_slider['title_fsize']; ?>" />&nbsp;<?php _e('px','smooth-slider'); ?></td>
+<td><input type="number" name="smooth_slider_options[title_fsize]" id="smooth_slider_title_fsize" class="small-text" value="<?php echo $smooth_slider['title_fsize']; ?>" min="1" />&nbsp;<?php _e('px','smooth-slider'); ?></td>
 </tr>
 
 <tr valign="top">
@@ -452,8 +473,8 @@ if ($handle = opendir($directory)) {
 </p>
 </div>
 
-<div class="sub_settings_m">
-<h2 class="sub-heading"><?php _e('Post Title','smooth-slider'); ?></h2> 
+<div class="sub_settings_m toggle_settings">
+<h2 class="sub-heading"><?php _e('Post Title','smooth-slider'); ?><img src="<?php echo smooth_slider_plugin_url( 'images/close.png' ); ?>" class="toggle_img"></h2> 
 <p><?php _e('Customize the looks of the title of each of the sliding post here','smooth-slider'); ?></p> 
 <table class="form-table">
 
@@ -483,12 +504,12 @@ if ($handle = opendir($directory)) {
 
 <tr valign="top">
 <th scope="row"><?php _e('Font Color','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[ptitle_fcolor]" id="color_value_3" value="<?php echo $smooth_slider['ptitle_fcolor']; ?>" />&nbsp; <img id="color_picker_3" src="<?php echo smooth_slider_plugin_url( 'images/color_picker.png' ); ?>" alt="<?php _e('Pick the color of your choice','smooth-slider'); ?>" /><div class="color-picker-wrap" id="colorbox_3"></div></td>
+<td><input type="text" name="smooth_slider_options[ptitle_fcolor]" id="smooth_slider_ptitle_fcolor" value="<?php echo$smooth_slider['ptitle_fcolor']; ?>" class="wp-color-picker-field" data-default-color="#000000" /></div></td>
 </tr>
 
 <tr valign="top">
 <th scope="row"><?php _e('Font Size','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[ptitle_fsize]" id="smooth_slider_ptitle_fsize" class="small-text" value="<?php echo $smooth_slider['ptitle_fsize']; ?>" />&nbsp;<?php _e('px','smooth-slider'); ?></td>
+<td><input type="number" name="smooth_slider_options[ptitle_fsize]" id="smooth_slider_ptitle_fsize" class="small-text" value="<?php echo $smooth_slider['ptitle_fsize']; ?>" min="1" />&nbsp;<?php _e('px','smooth-slider'); ?></td>
 </tr>
 
 <tr valign="top">
@@ -507,20 +528,19 @@ if ($handle = opendir($directory)) {
 </p>
 </div>
 
-<div class="sub_settings_m">
-<h2 class="sub-heading"><?php _e('Thumbnail Image','smooth-slider'); ?></h2> 
+<div class="sub_settings_m toggle_settings">
+<h2 class="sub-heading"><?php _e('Thumbnail Image','smooth-slider'); ?><img src="<?php echo smooth_slider_plugin_url( 'images/close.png' ); ?>" class="toggle_img"></h2> 
 <p><?php _e('Customize the looks of the thumbnail image for each of the sliding post here','smooth-slider'); ?></p> 
 <table class="form-table">
 
 <tr valign="top"> 
 <th scope="row"><?php _e('Image Pick Preferences','smooth-slider'); ?> <small><?php _e('(The first one is having priority over second, the second having priority on third and so on)','smooth-slider'); ?></small></th> 
 <td><fieldset><legend class="screen-reader-text"><span><?php _e('Image Pick Sequence','smooth-slider'); ?> <small><?php _e('(The first one is having priority over second, the second having priority on third and so on)','smooth-slider'); ?></small> </span></legend> 
-<input name="smooth_slider_options[img_pick][0]" type="checkbox" value="1" <?php checked('1', $smooth_slider['img_pick'][0]); ?>  /> <?php _e('Use Custom Field/Key','smooth-slider'); ?> &nbsp; &nbsp; 
-<input type="text" name="smooth_slider_options[img_pick][1]" class="text" value="<?php echo $smooth_slider['img_pick'][1]; ?>" /> <?php _e('Name of the Custom Field/Key','smooth-slider'); ?>
-<br />
-<input name="smooth_slider_options[img_pick][2]" type="checkbox" value="1" <?php checked('1', $smooth_slider['img_pick'][2]); ?>  /> <?php _e('Use Featured Post/Thumbnail (Wordpress 3.0 +  feature)','smooth-slider'); ?>&nbsp; <br />
-<input name="smooth_slider_options[img_pick][3]" type="checkbox" value="1" <?php checked('1', $smooth_slider['img_pick'][3]); ?>  /> <?php _e('Consider Images attached to the post','smooth-slider'); ?> &nbsp; &nbsp; 
-<input type="text" name="smooth_slider_options[img_pick][4]" class="small-text" value="<?php echo $smooth_slider['img_pick'][4]; ?>" /> <?php _e('Order of the Image attachment to pick','smooth-slider'); ?> &nbsp; <br />
+<input name="smooth_slider_options[img_pick][0]" type="checkbox" value="1" <?php checked('1', $smooth_slider['img_pick'][0]); ?>  /> <?php _e('Use Custom Field/Key','smooth-slider'); ?> &nbsp; &nbsp; <br/> <br/>
+<?php _e('Name of the Custom Field/Key','smooth-slider'); ?><input type="text" name="smooth_slider_options[img_pick][1]" class="text" value="<?php echo $smooth_slider['img_pick'][1]; ?>" /><br /> <br/>
+<input name="smooth_slider_options[img_pick][2]" type="checkbox" value="1" <?php checked('1', $smooth_slider['img_pick'][2]); ?>  /> <?php _e('Use Featured Post/Thumbnail (Wordpress 3.0 +  feature)','smooth-slider'); ?>&nbsp; <br /> <br/>
+<input name="smooth_slider_options[img_pick][3]" type="checkbox" value="1" <?php checked('1', $smooth_slider['img_pick'][3]); ?>  /> <?php _e('Consider Images attached to the post','smooth-slider'); ?> &nbsp; &nbsp; <br/><br/>
+<?php _e('Order of the Image attachment to pick','smooth-slider'); ?><input type="text" name="smooth_slider_options[img_pick][4]" class="small-text" value="<?php echo $smooth_slider['img_pick'][4]; ?>" /> &nbsp; <br /><br/>
 <input name="smooth_slider_options[img_pick][5]" type="checkbox" value="1" <?php checked('1', $smooth_slider['img_pick'][5]); ?>  /> <?php _e('Scan images from the post, in case there is no attached image to the post','smooth-slider'); ?>&nbsp; 
 </fieldset></td> 
 </tr> 
@@ -568,13 +588,13 @@ if ($handle = opendir($directory)) {
 <br />
 <input name="smooth_slider_options[img_size]" type="radio" value="1" <?php checked('1', $smooth_slider['img_size']); ?>  /> <?php _e('Custom Size:','smooth-slider'); ?>&nbsp; 
 <label for="smooth_slider_options[img_width]"><?php _e('Width','smooth-slider'); ?></label>
-<input type="text" name="smooth_slider_options[img_width]" class="small-text" value="<?php echo $smooth_slider['img_width']; ?>" />&nbsp;<?php _e('px','smooth-slider'); ?> &nbsp;&nbsp; 
+<input type="number" name="smooth_slider_options[img_width]" class="small-text" value="<?php echo $smooth_slider['img_width']; ?>" min="1" />&nbsp;<?php _e('px','smooth-slider'); ?> &nbsp;&nbsp; 
 </fieldset></td> 
 </tr> 
 
 <tr valign="top">
 <th scope="row"><?php _e('Maximum Height of the Image','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[img_height]" class="small-text" value="<?php echo $smooth_slider['img_height']; ?>" />&nbsp;<?php _e('px','smooth-slider'); ?>
+<td><input type="number" name="smooth_slider_options[img_height]" class="small-text" value="<?php echo $smooth_slider['img_height']; ?>" min="1" />&nbsp;<?php _e('px','smooth-slider'); ?>
 <span class="moreInfo">
 	&nbsp; <span class="trigger"> ? </span>
 	<div class="tooltip">
@@ -586,7 +606,7 @@ if ($handle = opendir($directory)) {
 
 <tr valign="top">
 <th scope="row"><?php _e('Border Thickness','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[img_border]" id="smooth_slider_img_border" class="small-text" value="<?php echo $smooth_slider['img_border']; ?>" />
+<td><input type="number" min="0" name="smooth_slider_options[img_border]" id="smooth_slider_img_border" class="small-text" value="<?php echo $smooth_slider['img_border']; ?>" />
 <span class="moreInfo">
 	&nbsp; <span class="trigger"> ? </span>
 	<div class="tooltip">
@@ -598,7 +618,7 @@ if ($handle = opendir($directory)) {
 
 <tr valign="top">
 <th scope="row"><?php _e('Border Color','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[img_brcolor]" id="color_value_4" value="<?php echo $smooth_slider['img_brcolor']; ?>" />&nbsp; <img id="color_picker_4" src="<?php echo smooth_slider_plugin_url( 'images/color_picker.png' ); ?>" alt="<?php _e('Pick the color of your choice','smooth-slider'); ?>" /><div class="color-picker-wrap" id="colorbox_4"></div></td>
+<td><input type="text" name="smooth_slider_options[img_brcolor]" id="smooth_slider_img_brcolor" value="<?php echo$smooth_slider['img_brcolor']; ?>" class="wp-color-picker-field" data-default-color="#000000" /></div></td>
 </tr>
 
 <tr valign="top">
@@ -620,8 +640,8 @@ if ($handle = opendir($directory)) {
 
 </div>
 
-<div class="sub_settings_m">
-<h2 class="sub-heading"><?php _e('Slider Content','smooth-slider'); ?></h2> 
+<div class="sub_settings_m toggle_settings">
+<h2 class="sub-heading"><?php _e('Slider Content','smooth-slider'); ?><img src="<?php echo smooth_slider_plugin_url( 'images/close.png' ); ?>" class="toggle_img"></h2> 
 <p><?php _e('Customize the looks of the content of each of the sliding post here','smooth-slider'); ?></p> 
 <table class="form-table">
 <tr valign="top">
@@ -650,12 +670,12 @@ if ($handle = opendir($directory)) {
 
 <tr valign="top">
 <th scope="row"><?php _e('Font Color','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[content_fcolor]" id="color_value_5" value="<?php echo $smooth_slider['content_fcolor']; ?>" />&nbsp; <img id="color_picker_5" src="<?php echo smooth_slider_plugin_url( 'images/color_picker.png' ); ?>" alt="Pick the color of your choice','smooth-slider'); ?>" /><div class="color-picker-wrap" id="colorbox_5"></div></td>
+<td><input type="text" name="smooth_slider_options[content_fcolor]" id="smooth_slider_content_fcolor" value="<?php echo$smooth_slider['content_fcolor']; ?>" class="wp-color-picker-field" data-default-color="#333333" /></div></td>
 </tr>
 
 <tr valign="top">
 <th scope="row"><?php _e('Font Size','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[content_fsize]" id="smooth_slider_content_fsize" class="small-text" value="<?php echo $smooth_slider['content_fsize']; ?>" />&nbsp;<?php _e('px','smooth-slider'); ?></td>
+<td><input type="number" name="smooth_slider_options[content_fsize]" id="smooth_slider_content_fsize" class="small-text" value="<?php echo $smooth_slider['content_fsize']; ?>" min="1" />&nbsp;<?php _e('px','smooth-slider'); ?></td>
 </tr>
 
 <tr valign="top">
@@ -681,7 +701,7 @@ if ($handle = opendir($directory)) {
 
 <tr valign="top">
 <th scope="row"><?php _e('Maximum content size (in words)','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[content_limit]" id="smooth_slider_content_limit" class="small-text" value="<?php echo $smooth_slider['content_limit']; ?>" />
+<td><input type="number" name="smooth_slider_options[content_limit]" id="smooth_slider_content_limit" class="small-text" value="<?php echo $smooth_slider['content_limit']; ?>" min="1" />
 <span class="moreInfo">
 	&nbsp; <span class="trigger"> ? </span>
 	<div class="tooltip">
@@ -693,7 +713,7 @@ if ($handle = opendir($directory)) {
 
 <tr valign="top">
 <th scope="row"><?php _e('Maximum content size (in characters)','smooth-slider'); ?></th>
-<td><input type="text" name="smooth_slider_options[content_chars]" id="smooth_slider_content_chars" class="small-text" value="<?php echo $smooth_slider['content_chars']; ?>" />&nbsp;<?php _e('characters','smooth-slider'); ?> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</td>
+<td><input type="number" name="smooth_slider_options[content_chars]" id="smooth_slider_content_chars" class="small-text" value="<?php echo $smooth_slider['content_chars']; ?>" min="1" />&nbsp;<?php _e('characters','smooth-slider'); ?> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</td>
 </tr>
 
 </table>
@@ -702,8 +722,8 @@ if ($handle = opendir($directory)) {
 </div><!--#slides-->
 
 <div id="preview">
-<div class="sub_settings">
-<h2 class="sub-heading"><?php _e('Preview on Settings Panel','smooth-slider'); ?></h2> 
+<div class="sub_settings toggle_settings">
+<h2 class="sub-heading"><?php _e('Preview on Settings Panel','smooth-slider'); ?><img src="<?php echo smooth_slider_plugin_url( 'images/close.png' ); ?>" class="toggle_img"></h2> 
 
 <table class="form-table">
 
@@ -721,25 +741,51 @@ if ($handle = opendir($directory)) {
 </tr>
 
 <tr valign="top">
-<th scope="row"><?php _e('Smooth Template Tag for Preview','smooth-slider'); ?></th>
-<td><select name="smooth_slider_options[preview]" id="smooth_slider_preview">
+<th scope="row"><?php _e('Type of Smooth Slider','smooth-slider'); ?></th>
+<td><select name="smooth_slider_options[preview]" id="smooth_slider_preview" id="smooth_slider_preview" onchange="checkpreview(this.value);">
 <option value="2" <?php if ($smooth_slider['preview'] == "2"){ echo "selected";}?> ><?php _e('Recent Posts Slider','smooth-slider'); ?></option>
 <option value="1" <?php if ($smooth_slider['preview'] == "1"){ echo "selected";}?> ><?php _e('Category Slider','smooth-slider'); ?></option>
-<option value="0" <?php if ($smooth_slider['preview'] == "0"){ echo "selected";}?> ><?php _e('Custom Slider with Slider ID','smooth-slider'); ?></option>
+<option value="0" <?php if ($smooth_slider['preview'] == "0"){ echo "selected";}?> ><?php _e('Custom Slider','smooth-slider'); ?></option>
 </select>
 </td>
 </tr>
+<?php  
+ /* Added for category selection in Meta Box 2.6*/
+//category slug
+$categories = get_categories();
+$scat_html='<option value="" selected >Select the Category</option>';
 
-<tr valign="top"> 
+foreach ($categories as $category) { 
+ if($category->slug==$smooth_slider['catg_slug']){$selected = 'selected';} else{$selected='';}
+ $scat_html =$scat_html.'<option value="'.$category->slug.'" '.$selected.'>'. $category->name .'</option>';
+} 
+//fetching slider names 2.6
+global $smooth_slider;
+if($smooth_slider['multiple_sliders'] == '1') {	
+			$slider_id = $smooth_slider['slider_id'];	
+			$sliders = ss_get_sliders();
+			$sname_html='<option value="0" selected >Select the Slider</option>';
+	 		
+		  foreach ($sliders as $slider) { 
+			 if($slider['slider_id']==$slider_id){$selected = 'selected';} else{$selected='';}
+			 $sname_html =$sname_html.'<option value="'.$slider['slider_id'].'" '.$selected.'>'.$slider['slider_name'].'</option>';
+		  } 
+}
+?> 
+
+<!-- Added for category selection in Meta Box 2.6-->
+<tr valign="top" class="smooth_slider_params"> 
 <th scope="row"><?php _e('Preview Slider Params','smooth-slider'); ?></th> 
 <td><fieldset><legend class="screen-reader-text"><span><?php _e('Preview Slider Params','smooth-slider'); ?></span></legend> 
-<label for="smooth_slider_options[slider_id]" style="width:45%;"><?php _e('Slider ID in case of Custom Slider','smooth-slider'); ?></label>
-<input type="text" name="smooth_slider_options[slider_id]" id="smooth_slider_id" class="regular-text code" value="<?php echo $smooth_slider['slider_id']; ?>" style="width:45%;" /> 
-<br />  <br />
-<label for="smooth_slider_options[catg_slug]" style="width:45%;"><?php _e('Category Slug in case of Category Slider','smooth-slider'); ?></label>
-<input type="text" name="smooth_slider_options[catg_slug]" id="smooth_slider_catslug" class="regular-text code" style="width:100px;" value="<?php echo $smooth_slider['catg_slug']; ?>" style="width:45%;" /> 
+
+<label for="smooth_slider_options[slider_id]" class="smooth_sid"><?php _e('Select Slider Name','smooth-slider'); ?></label>
+<select id="smooth_slider_id" name="smooth_slider_options[slider_id]" class="smooth_sid"><?php echo $sname_html;?></select>
+
+<label for="smooth_slider_options[catg_slug]" class="smooth_catslug"><?php _e('Select Category','smooth-slider'); ?></label>
+<select id="smooth_slider_catslug" name="smooth_slider_options[catg_slug]" class="smooth_catslug"><?php echo $scat_html;?></select>
 </fieldset></td> 
 </tr> 
+
 
 </table>
 <p class="submit">
@@ -747,22 +793,21 @@ if ($handle = opendir($directory)) {
 </p>
 </div>
 
-<div class="sub_settings_m">
-<h2 class="sub-heading"><?php _e('Shortcode','smooth-slider'); ?></h2> 
-<p><?php _e('Paste the below shortcode on Page/Post Edit Panel to get the slider as shown in the above Preview','smooth-slider'); ?></p><br />
-<?php 
-if ($smooth_slider['preview'] == "0") 
+<div class="sub_settings_m toggle_settings">
+<h2 class="sub-heading"><?php _e('Shortcode','smooth-slider'); ?><img src="<?php echo smooth_slider_plugin_url( 'images/close.png' ); ?>" class="toggle_img"></h2> 
+<p><?php _e('Paste the below shortcode on Page/Post Edit Panel to get the slider as shown in the above Preview','smooth-slider'); ?></p>
+<?php if ($smooth_slider['preview'] == "0") 
 	$preview='[smoothslider id="'.$smooth_slider['slider_id'].'"]';
 elseif($smooth_slider['preview'] == "1")
 	$preview='[smoothcategory catg_slug="'.$smooth_slider['catg_slug'].'"]';
 else
 	$preview='[smoothrecent]';
-echo $preview;
+echo "<p>".$preview."</p>";
 ?>
 </div>
 
-<div class="sub_settings_m">
-<h2 class="sub-heading"><?php _e('Template Tag','smooth-slider'); ?></h2> 
+<div class="sub_settings_m toggle_settings">
+<h2 class="sub-heading"><?php _e('Template Tag','smooth-slider'); ?><img src="<?php echo smooth_slider_plugin_url( 'images/close.png' ); ?>" class="toggle_img"></h2> 
 <p><?php _e('Paste the below template tag in your theme template file like index.php or page.php at required location to get the slider as shown in the above Preview','smooth-slider'); ?></p><br />
 <?php 
 if ($smooth_slider['preview'] == "0")
@@ -822,6 +867,18 @@ else
 <td><select name="smooth_reset_settings" id="smooth_slider_reset_settings" >
 <option value="n" selected ><?php _e('None','smooth-slider'); ?></option>
 <option value="g" ><?php _e('Global Default','smooth-slider'); ?></option>
+<?php 
+$directory = SMOOTH_SLIDER_CSS_DIR;
+if ($handle = opendir($directory)) {
+    while (false !== ($file = readdir($handle))) { 
+     if($file != '.' and $file != '..') { 
+	if($file!="default" && $file!="sample")      
+	{?>
+      <option value="<?php echo $file;?>"><?php echo "'".$file."' skin";?></option>
+ <?php } } }
+    closedir($handle);
+}
+?>
 </select>
 </td>
 </tr>
@@ -846,7 +903,28 @@ else
 </div> <!--end of float left -->
 <!-- Added for validations - start -->
 <script type="text/javascript">
-
+<?php 
+/* To fetch Skin Specific attributes 2.6 */
+$directory = SMOOTH_SLIDER_CSS_DIR;
+if ($handle = opendir($directory)) {
+    while (false !== ($file = readdir($handle))) { 
+     if($file != '.' and $file != '..') { 
+	$default_settings_str='default_settings_'.$file;
+	global ${$default_settings_str};
+      	echo 'var '.$default_settings_str.' = '.json_encode(${$default_settings_str}).';';
+ } }
+    closedir($handle);
+}
+?>
+/* To populate Skin Specific attributes 2.6 */
+function checkskin(skin){ 
+	var skin_array = window['default_settings_'+skin];       
+	for (var key in skin_array) {
+		var html_element='smooth_slider_'+key;
+		document.getElementById(html_element).value = skin_array[key];
+	}
+	
+}
 jQuery(document).ready(function($) {
 <?php if(isset($_GET['settings-updated'])) { if($_GET['settings-updated'] == 'true' and $smooth_slider['popup'] == '1' ) { 
 ?>
@@ -861,76 +939,29 @@ jQuery('#saveResult').html("<div id='popup'><div class='modal_shortcode'>Quick E
 
 <?php }} ?>
 
-	jQuery('#smooth_slider_form').submit(function(event) { 
-			
-			var slide_animationlen=jQuery("#smooth_slider_transition").val();
-			if(slide_animationlen=='' || slide_animationlen <= 0 || isNaN(slide_animationlen)) {
-				alert("Slide Animation Length should be a number greater than 0!"); 
-				jQuery("#smooth_slider_transition").addClass('error');
-				jQuery("html,body").animate({scrollTop:jQuery('#smooth_slider_transition').offset().top-50}, 600);
-				return false;
-			}
-			var slider_speed=jQuery("#smooth_slider_speed").val();
-			if(slider_speed=='' || slider_speed <= 0 || isNaN(slider_speed)) {
-				alert("Slide Pause Interval should be a number greater than 0!"); 
-				jQuery("#smooth_slider_speed").addClass('error');
-				jQuery("html,body").animate({scrollTop:jQuery('#smooth_slider_speed').offset().top-50}, 600);
-				return false;
-			}
-			var slider_posts=jQuery("#smooth_slider_no_posts").val();
-			if(slider_posts=='' || slider_posts <= 0 || isNaN(slider_posts)) {
-				alert("Number of Posts in the Slideshow should be a number greater than 0!"); 
-				jQuery("#smooth_slider_no_posts").addClass('error');
-				jQuery("html,body").animate({scrollTop:jQuery('#smooth_slider_no_posts').offset().top-50}, 600);
-				return false;
-			}			
-			var slider_width=jQuery("#smooth_slider_width").val();
-			if(slider_width=='' || slider_width <= 0 || isNaN(slider_width)) {
-				alert("Slider Width should be a number greater than 0!"); 
-				jQuery("#smooth_slider_width").addClass('error');
-				jQuery("html,body").animate({scrollTop:jQuery('#smooth_slider_width').offset().top-50}, 600);
-				return false;
-			}	
-			var slider_height=jQuery("#smooth_slider_height").val();
-			if(slider_height=='' || slider_height <= 0 || isNaN(slider_height)) {
-				alert("Slider Height should be a number greater than 0!"); 
-				jQuery("#smooth_slider_height").addClass('error');
-				jQuery("html,body").animate({scrollTop:jQuery('#smooth_slider_height').offset().top-50}, 600);
-				return false;
-			}
-			
+	/* jquery code moved to admin.js -2.6 */
 	
-			var prev=jQuery("#smooth_slider_preview").val(),
-			    hiddenpreview=jQuery("#hidden_preview").val(),
-			    hiddencatslug=jQuery("#hidden_category").val(),
-			    hiddensliderid=jQuery("#hidden_sliderid").val(),
-			    slider_id = jQuery("#smooth_slider_id").val(),			
-			    slider_catslug=jQuery("#smooth_slider_catslug").val();				
-			if(prev == "0" && slider_id == ''){
-				alert("Slider id should be mentioned");
-				jQuery("#smooth_slider_id").addClass('error');
-				jQuery("html,body").animate({scrollTop:jQuery('#smooth_slider_id').offset().top-50}, 600);
-				return false;
-			}
-			if(prev == "1" && slider_catslug == ''){
-				alert("Category slug should be mentioned whose posts you want to display in slider");
-				jQuery("#smooth_slider_catslug").addClass('error');
-				jQuery("html,body").animate({scrollTop:jQuery('#smooth_slider_catslug').offset().top-50}, 600);
-				return false;
-			}
-			if(hiddenpreview != prev || slider_id != hiddensliderid || slider_catslug != hiddencatslug ) jQuery('#smoothpopup').val("1");					
-			else jQuery('#smoothpopup').val("0");	
-		});
+/* Added for settings tab collapse and expand - 2.6 start */
+	jQuery(this).find(".sub-heading").on("click", function(){
+		var wrap=jQuery(this).parent('.toggle_settings'),
+		tabcontent=wrap.find("p, table, code");
+		tabcontent.toggle();
+		var imgclass=wrap.find(".toggle_img");
+		if (tabcontent.css('display') == 'none') {
+			imgclass.attr("src", imgclass.attr("src").replace("<?php echo smooth_slider_plugin_url( 'images/close.png' ); ?>", "<?php echo smooth_slider_plugin_url( 'images/info.png' ); ?>"));
+		} else {
+			imgclass.attr("src", imgclass.attr("src").replace("<?php echo smooth_slider_plugin_url( 'images/info.png' ); ?>", "<?php echo smooth_slider_plugin_url( 'images/close.png' ); ?>"));
+		}
 	});
+	/* Added for settings tab collapse and expand - 2.6 end */
 
+		
+	});
 </script>
 <!-- Added for validation - end -->
-
-                   
-
 </div> <!--end of float wrap -->
 
-<div id="poststuff" class="metabox-holder has-right-sidebar" style="float:left;width:28%;max-width:300px;min-width:inherit;"> 
+<div id="poststuff" class="metabox-holder has-right-sidebar" style="float:left;width:100%;max-width:300px;min-width:inherit;"> 
         <div class="postbox" style="margin:0 0 10px 0;"> 
 	<h3 class="hndle"><span></span><?php _e('Quick Embed Shortcode','smooth-slider'); ?></h3> 
 	<div class="inside" id="shortcodeview">
@@ -999,6 +1030,8 @@ jQuery('#saveResult').html("<div id='popup'><div class='modal_shortcode'>Quick E
 </div> 
 
  </div> <!--end of poststuff --> 
+
+
 
 <?php	
 }

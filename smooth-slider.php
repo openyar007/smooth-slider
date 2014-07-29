@@ -3,7 +3,7 @@
 Plugin Name: Smooth Slider
 Plugin URI: http://slidervilla.com/smooth-slider/
 Description: Smooth slider adds a responsive featured content on image slider using shortcode, widget and template tags. Create and embed featured content slider, recent post slider, category slider in less than 60 seconds.
-Version: 2.5.1	
+Version: 2.6	
 Author: SliderVilla
 Author URI: http://slidervilla.com/
 Wordpress version supported: 2.9 and above
@@ -30,12 +30,12 @@ Wordpress version supported: 2.9 and above
 //defined global variables and constants here
 global $smooth_slider,$default_slider,$smooth_db_version;
 $smooth_slider = get_option('smooth_slider_options');
-$smooth_db_version='2.5.1'; //current version of smooth slider database 
+$smooth_db_version='2.6'; //current version of smooth slider database 
 define('SLIDER_TABLE','smooth_slider'); //Slider TABLE NAME
 define('PREV_SLIDER_TABLE','slider'); //Slider TABLE NAME
 define('SLIDER_META','smooth_slider_meta'); //Meta TABLE NAME
 define('SLIDER_POST_META','smooth_slider_postmeta'); //Meta TABLE NAME
-define("SMOOTH_SLIDER_VER","2.5.1",false);//Current Version of Smooth Slider
+define("SMOOTH_SLIDER_VER","2.6",false);//Current Version of Smooth Slider
 if ( ! defined( 'SMOOTH_SLIDER_PLUGIN_BASENAME' ) )
 	define( 'SMOOTH_SLIDER_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 if ( ! defined( 'SMOOTH_SLIDER_CSS_DIR' ) ){
@@ -300,11 +300,7 @@ global $smooth_slider;
 			$wpdb->query($sql);
 		  }
 	}
-	$slider_style = get_post_meta($post_id,'_smooth_slider_style',true);
-	$post_slider_style=$_POST['_smooth_slider_style'];
-	if($slider_style != $post_slider_style) {
-	  update_post_meta($post_id, '_smooth_slider_style', $_POST['_smooth_slider_style']);	
-	}
+	
 	
 	$thumbnail_key = $smooth_slider['img_pick'][1];
 	$sslider_thumbnail = get_post_meta($post_id,$thumbnail_key,true);
@@ -337,7 +333,11 @@ global $smooth_slider;
 	if($smooth_sslider_eshortcode != $post_smooth_sslider_eshortcode) {
 	  update_post_meta($post_id, '_smooth_embed_shortcode', $post_smooth_sslider_eshortcode);	
 	}
-	
+	$slider_style = get_post_meta($post_id,'_smooth_slider_style',true);
+	$post_slider_style=$_POST['_smooth_slider_style'];
+	if($slider_style != $post_slider_style) {
+	  update_post_meta($post_id, '_smooth_slider_style', $_POST['_smooth_slider_style']);	
+	}
 	/* Added for embed shortcode -end */
 	
   } //sldr_verify
@@ -446,7 +446,38 @@ function add_to_slider_checkbox() {
 		}
 		
 		$sliders = ss_get_sliders();
-?>
+		$sslider_link= get_post_meta($post_id, 'slide_redirect_url', true);  
+		$sslider_nolink=get_post_meta($post_id, 'sslider_nolink', true);
+		$thumbnail_key = $smooth_slider['img_pick'][1];
+                    $sslider_thumbnail= get_post_meta($post_id, $thumbnail_key, true); 
+		$sslider_disable_image=get_post_meta($post_id, '_disable_image', true);
+		$smooth_embed_shortcode=get_post_meta($post_id, '_smooth_embed_shortcode', true);
+?>	
+	  <?php	/* start tab 2.6 */ ?>	
+             <script type="text/javascript">
+		jQuery(document).ready(function($) {
+			jQuery("#smooth_basic").css({"background":"#222222","color":"#ffffff"});
+			jQuery("#smooth_basic").on("click", function(){ 
+				jQuery("#smooth_basic_tab").fadeIn("fast");
+				jQuery("#smooth_advaced_tab").fadeOut("fast");
+				jQuery(this).css({"background":"#222222","color":"#ffffff"});
+				jQuery("#smooth_advanced").css({"background":"buttonface","color":"#222222"});
+			});
+			jQuery("#smooth_advanced").on("click", function(){
+				jQuery("#smooth_basic_tab").fadeOut("fast");
+				jQuery("#smooth_advaced_tab").fadeIn("fast");
+				jQuery(this).css({"background":"#222222","color":"#ffffff"});
+				jQuery("#smooth_basic").css({"background":"buttonface","color":"#222222"});
+				
+			});
+		}); 
+		</script>
+	    <?php	/* End tab 2.6 */ ?>
+	<div style="border-bottom: 1px solid #ccc;padding-bottom: 0;padding-left: 10px;">
+		<button type="button" id="smooth_basic" style="padding:5px 30px 5px 30px;margin: 0;cursor:pointer;border:0;outline:none;">Basic</button>
+		<button type="button" id="smooth_advanced" style="padding:5px 30px 5px 30px;margin:0 0 0 10px;cursor:pointer;border:0;outline:none">Advanced</button>
+		</div>
+	<div id="smooth_basic_tab">
 		<div id="slider_checkbox">
 		<table class="form-table">
 		<tr valign="top">
@@ -457,21 +488,31 @@ function add_to_slider_checkbox() {
                   <option value="<?php echo $slider['slider_id'];?>" <?php if(in_array($slider['slider_id'],$post_slider_arr)){echo 'selected';} ?>><?php echo $slider['slider_name'];?></option>
                 <?php } ?>
                 </select></td></tr>
+	
+	<tr valign="top">
+		 <th scope="row"><label for="sslider_link"><?php _e('Slide Link URL ','smooth-slider'); ?></label></th>
+                <td><input type="text" name="sslider_link" class="sslider_link" value="<?php echo $sslider_link;?>" size="50" /><small><?php _e('If left empty, it will be by default linked to the permalink.','smooth-slider'); ?></small> </td></tr>
                 
-         <?php if($smooth_slider['multiple_sliders'] == '1') {?>
+	<tr valign="top">
+		 <th scope="row"><label for="sslider_nolink"> <?php _e('Do not link this slide to any page(url)','smooth-slider'); ?></label></th>
+                <td><input type="checkbox" name="sslider_nolink" class="sslider_nolink" value="1" <?php if($sslider_nolink=='1'){echo "checked";}?>  /> </td></tr>
+		</table>
+                  </div>
+	</div>
+	<div id="smooth_advaced_tab" style="display:none;">   
+		<div class="slider_checkbox">
+		<table class="form-table">
+            <?php if($smooth_slider['multiple_sliders'] == '1') {?>
                 <tr valign="top">
-		<th scope="row"><input type="checkbox" class="sldr_post" name="display_slider" value="1" <?php if(ss_slider_on_this_post($post_id)){echo "checked";}?> /><label for="display_slider"><?php _e('Display ','smooth-slider'); ?></th>
-		<td><select name="display_slider_name">
+		<th scope="row"><label for="display_slider"><?php _e('Display ','smooth-slider'); ?>
+		<select name="display_slider_name">
                 <?php foreach ($sliders as $slider) { ?>
                   <option value="<?php echo $slider['slider_id'];?>" <?php if(ss_post_on_slider($post_id,$slider['slider_id'])){echo 'selected';} ?>><?php echo $slider['slider_name'];?></option>
                 <?php } ?>
-                </select> <?php _e('on this Post/Page (you need to add the Smooth Slider template tag manually on your page.php/single.php or whatever page template file)','smooth-slider'); ?></label></td></tr>
+                </select><?php _e('on this Post/Page','smooth-slider'); ?></th> 
+		<td><input type="checkbox" class="sldr_post" name="display_slider" value="1" <?php if(ss_slider_on_this_post($post_id)){echo "checked";}?> /><?php _e('(Add the Smooth Slider template tag manually on your page.php/single.php or whatever page template file)'); ?></label></td></tr>
           <?php } ?>
-          
-				<input type="hidden" name="sldr-verify" id="sldr-verify" value="<?php echo wp_create_nonce('SmoothSlider');?>" />
-	   
-    
-
+		  
 		<tr valign="top">
 		 <th scope="row"><label for="_smooth_slider_style"><?php _e('Stylesheet to use if slider is displayed on this Post/Page','smooth-slider'); ?> </label></th>
     <?php
@@ -489,30 +530,18 @@ function add_to_slider_checkbox() {
             }
             ?>
         </select> </td></tr>
-        
-  <?php         $thumbnail_key = $smooth_slider['img_pick'][1];
-                $sslider_thumbnail= get_post_meta($post_id, $thumbnail_key, true); 
-		$sslider_link= get_post_meta($post_id, 'slide_redirect_url', true);  
-		$sslider_nolink=get_post_meta($post_id, 'sslider_nolink', true);
-		$sslider_disable_image=get_post_meta($post_id, '_disable_image', true);
-		$smooth_embed_shortcode=get_post_meta($post_id, '_smooth_embed_shortcode', true);
-  ?>
-                <tr valign="top">
+          
+	<input type="hidden" name="sldr-verify" id="sldr-verify" value="<?php echo wp_create_nonce('SmoothSlider');?>" />
+	   	 <tr valign="top">
 		 <th scope="row"><label for="sslider_thumbnail"><?php _e('Custom Thumbnail Image(url)','smooth-slider'); ?></label></th>
-                <td><input type="text" name="sslider_thumbnail" class="sslider_thumbnail" value="<?php echo $sslider_thumbnail;?>" size="50" />
+                	<td><input type="text" name="sslider_thumbnail" class="sslider_thumbnail" value="<?php echo $sslider_thumbnail;?>" size="50" />
                 </td></tr>
-              
-                <tr valign="top">
-		 <th scope="row"><label for="sslider_link"><?php _e('Slide Link URL ','smooth-slider'); ?></label></th>
-                <td><input type="text" name="sslider_link" class="sslider_link" value="<?php echo $sslider_link;?>" size="50" /><small><?php _e('If left empty, it will be by default linked to the permalink.','smooth-slider'); ?></small> </td></tr>
-                <tr valign="top">
-		 <th scope="row"><label for="sslider_nolink"> <?php _e('Do not link this slide to any page(url)','smooth-slider'); ?></label></th>
-                <td><input type="checkbox" name="sslider_nolink" class="sslider_nolink" value="1" <?php if($sslider_nolink=='1'){echo "checked";}?>  /> </td></tr>
-                 
 		<tr valign="top">
 		<th scope="row"><label for="disable_image"><?php _e('Disable Thumbnail Image','smooth-slider'); ?> </label></th>
 		<td><input type="checkbox" name="disable_image" value="1" <?php if($sslider_disable_image=='1'){echo "checked";}?>  /> </td>
 		</tr>
+              
+                
 		<!-- Added for video - Start -->
 		<tr valign="top">
 		<th scope="row"><label for="embed_shortcode"><?php _e('Embed Shortcode','smooth-slider'); ?> </label><br><br><div style="font-weight:normal;border:1px dashed #ccc;padding:5px;color:#666;line-height:20px;font-size:13px;">You can embed any type of shortcode e.g video shortcode or button shortcode which you want to be overlaid on the slide.</div></th>
@@ -522,6 +551,7 @@ function add_to_slider_checkbox() {
 		<!-- Added for video - End -->
 
                  </div>
+    </div>
         
 <?php }
 }
@@ -553,7 +583,6 @@ function smooth_slider_plugin_url( $path = '' ) {
 	}
 	return plugins_url( $path, __FILE__ );
 }
-
 function get_string_limit($output, $max_char)
 {
     $output = str_replace(']]>', ']]&gt;', $output);

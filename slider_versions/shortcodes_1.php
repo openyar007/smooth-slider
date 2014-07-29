@@ -8,10 +8,11 @@ function return_global_smooth_slider($slider_handle,$r_array,$slider_id='',$echo
 function return_smooth_slider($slider_id='',$offset='0') {
 	global $smooth_slider; 
 	$slider_html='';
-	if($smooth_slider['multiple_sliders'] == '1' and is_singular() and (empty($slider_id) or !isset($slider_id))){
+	if($smooth_slider['multiple_sliders'] == '1' and is_singular()){
 		global $post;
 		$post_id = $post->ID;
-		$slider_id = get_slider_for_the_post($post_id);
+		if(ss_slider_on_this_post($post_id))
+			$slider_id = get_slider_for_the_post($post_id);
 	}
 	if((!is_singular() or $smooth_slider['multiple_sliders'] != '1') and (empty($slider_id) or !isset($slider_id))){
 		$slider_id = '1';

@@ -6,7 +6,7 @@ Smooth Slider default styles*/
 .smooth_slider .sldr_title{margin:5px 0 10px 0;}
 .smooth_slider span{display:inline;overflow:hidden;margin: 10px auto;line-height:18px;}
 .smooth_slider .smooth_sliderb{position:relative;}
-.smooth_slider .smooth_slideri{position:absolute;width:100% !important;height:auto !important;word-break:break-all;}
+.smooth_slider .smooth_slideri{position:absolute;width:100% !important;height:auto !important;}
 .smooth_slider .smooth_slider_thumbnail{position:relative;max-width:100%;}
 .smooth_slider a{text-decoration:none !important;}
 .smooth_slider h2{clear:none;display:block;padding:0px;}
@@ -22,8 +22,8 @@ Smooth Slider default styles*/
 
 /*Navigation */
 /* Next and Previous navigational arrows */
-.smooth_slider .smooth_next {position: absolute;right: 0px;top:45%; width: 24px; height: 24px; cursor: pointer; background: transparent url(buttons/default/next.png) no-repeat 0 0;}
-.smooth_slider .smooth_prev { position: absolute;left: 0px;top:45%; width: 24px; height: 24px; cursor: pointer; background: transparent url(buttons/default/prev.png) no-repeat 0 0;}
+.smooth_slider .smooth_next {position: absolute;right: 0px;top:45%; width: 24px; height: 24px; cursor: pointer; background: transparent url(buttons/default/next.png) no-repeat 0 0;z-index:10;}
+.smooth_slider .smooth_prev { position: absolute;left: 0px;top:45%; width: 24px; height: 24px; cursor: pointer; background: transparent url(buttons/default/prev.png) no-repeat 0 0;z-index:10;}
 
 /*Navigation numbers*/
 .smooth_slider .smooth_nav { position:absolute;bottom:0px;text-align:center;margin: 10px auto;}
@@ -42,3 +42,4 @@ Smooth Slider default styles*/
 /*Added for responsiveness*/
 .smooth_slider .smoothNone{float:none !important;}
 .smooth_slider .smoothLeft{float:left !important;}
+.smooth_slider .smoothRight{float:right !important;}

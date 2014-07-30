@@ -46,7 +46,7 @@ function get_global_smooth_slider($slider_handle,$r_array,$slider_id='',$echo='1
 	$get_processor_fn='smooth_slider_get_'.$skin;
 	if(!function_exists($get_processor_fn))$get_processor_fn='smooth_slider_get_default';
 	
-	$r_array=$get_processor_fn($slider_handle,$r_array,$slider_id,$echo='1');
+	$r_array=$get_processor_fn($slider_handle,$r_array,$slider_id,$echo);
 	return $r_array;	
 }
 //Basic Smooth Slider

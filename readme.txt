@@ -4,7 +4,7 @@ Tags: slider, slideshow, wordpress slider, content slider, posts slider,image sl
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 3.0
 Tested up to: 3.9.1
-Stable tag: 2.6
+Stable tag: 2.6.1
 License: GPLv2 or later
 
 Most Popular Responsive WordPress Slider for Featured Content, Videos and Media Images
@@ -136,6 +136,12 @@ Check the other FAQs on Smooth [Slider Documetation on SliderVilla](http://guide
 
 
 == Changelog ==
+
+Version 2.6.1 (07/30/2014)
+
+1. Fix: Smooth Slider coming before content in case of shortcode
+2. Fix: Words breaking improperly in the slider content area
+3. Fix: JS conflict with ShareThis plugin
 
 Version 2.6 (07/29/2014)
 

@@ -243,7 +243,8 @@ function smooth_slider_get_default($slider_handle,$r_array,$slider_id='',$echo='
 		$html.='jQuery("#'.$slider_handle.'").smoothSlider({
 					sliderWidth		:'.$smooth_slider['width'].',
 					sliderHeight		:'.$smooth_slider['height'].',
-					navArr			:'.$navArr.'
+					navArr			:'.$navArr.',
+					img_align		:"'.$smooth_slider['img_align'].'"
 			});';
 		
 			

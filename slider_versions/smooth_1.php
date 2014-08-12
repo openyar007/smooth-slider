@@ -1,5 +1,22 @@
 <?php 
-function smooth_global_posts_processor( $posts, $smooth_slider,$out_echo ){   
+function smooth_global_data_processor( $slides, $smooth_slider, $out_echo, $set='',$data=array()){
+	//If no Skin specified, consider Default
+	$skin='default';
+	if(isset($smooth_slider['stylesheet'])) $skin=$smooth_slider['stylesheet'];
+	if(empty($skin))$skin='default';
+	
+	//Always include Default Skin
+	require_once ( dirname( dirname(__FILE__) ) . '/css/skins/default/functions.php');
+	//Include Skin function file
+	if($skin!='default' and file_exists(dirname( dirname(__FILE__) ) . '/css/skins/'.$skin.'/functions.php'))require_once ( dirname( dirname(__FILE__) ) . '/css/skins/'.$skin.'/functions.php');
+	
+	//Skin specific data processor and html generation
+	$data_processor_fn='smooth_data_processor_'.$skin;
+	if(!function_exists($data_processor_fn))$data_processor_fn='smooth_data_processor_default';
+	$r_array=$data_processor_fn($slides, $smooth_slider,$out_echo);
+	return $r_array;	
+}
+function smooth_global_posts_processor( $posts, $smooth_slider, $out_echo, $set='',$data=array() ){   
 	//If no Skin specified, consider Default
 	 /* Added function call to skin for 2.6 */
 	$skin='default';
@@ -17,12 +34,13 @@ function smooth_global_posts_processor( $posts, $smooth_slider,$out_echo ){
 	$r_array=$post_processor_fn($posts, $smooth_slider,$out_echo);
 	return $r_array;	
 }
-function get_global_smooth_slider($slider_handle,$r_array,$slider_id='',$echo='1'){
+function get_global_smooth_slider($slider_handle,$r_array,$smooth_slider, $set='', $echo='1', $data=array()){
 	//If no Skin specified, consider Default
 	 /* Added function for call to skin 2.6*/ 
 	$skin='default';
 	global $smooth_slider,$post;
 	$smooth_slider_style='';
+	$slider_id=isset($data['slider_id'])?$data['slider_id']:'';
 	if(is_singular()) {	
 		$smooth_slider_style = get_post_meta($post->ID,'_smooth_slider_style',true);
 		//for compatibility with lower versions of Smooth Slider
@@ -50,7 +68,7 @@ function get_global_smooth_slider($slider_handle,$r_array,$slider_id='',$echo='1
 	return $r_array;	
 }
 //Basic Smooth Slider
-function carousel_posts_on_slider($max_posts, $offset=0, $slider_id = '1',$out_echo = '1') {
+function carousel_posts_on_slider($max_posts, $offset=0, $slider_id = '1',$out_echo = '1', $set='', $data=array() ) {
     global $smooth_slider,$default_slider;
 	foreach($default_slider as $key=>$value){
 		if(!isset($smooth_slider[$key])) $smooth_slider[$key]='';
@@ -71,7 +89,7 @@ function carousel_posts_on_slider($max_posts, $offset=0, $slider_id = '1',$out_e
 								 WHERE (b.post_status = 'publish' OR (b.post_type='attachment' AND b.post_status = 'inherit')) AND a.slider_id = '$slider_id' 
 	                             ORDER BY ".$orderby." LIMIT $offset, $max_posts", OBJECT);
 	
-	$r_array=smooth_global_posts_processor( $posts, $smooth_slider, $out_echo );
+	$r_array=smooth_global_posts_processor( $posts, $smooth_slider, $out_echo, $set, $data );
 	return $r_array;
 }
 function get_smooth_slider($slider_id='',$offset=0) {
@@ -85,14 +103,17 @@ function get_smooth_slider($slider_id='',$offset=0) {
 	}
 	if(empty($slider_id) or !isset($slider_id))  $slider_id = '1';
 	if(!empty($slider_id)){
-		$r_array = carousel_posts_on_slider($smooth_slider['no_posts'], $offset, $slider_id, '0'); 
+		$set='';
+		$data=array();
+		$data['slider_id']=$slider_id;
 		$slider_handle='smooth_slider_'.$slider_id;
-		get_global_smooth_slider($slider_handle,$r_array,$slider_id,$echo='1');
+		$data['slider_handle']=$slider_handle;
+		$r_array = carousel_posts_on_slider($smooth_slider['no_posts'], $offset, $slider_id, '0', $set, $data ); 
+		get_global_smooth_slider($slider_handle,$r_array,$smooth_slider,$set,$echo='1',$data);
 	} //end of not empty slider_id condition
 }
-
 //For displaying category specific posts in chronologically reverse order, from Smooth Slider 2.3.3
-function carousel_posts_on_slider_category($max_posts='5', $catg_slug='', $offset=0, $out_echo = '1') {
+function carousel_posts_on_slider_category($max_posts='5', $catg_slug='', $offset=0, $out_echo = '1', $set='', $data=array()) {
     global $smooth_slider,$default_slider;
 	foreach($default_slider as $key=>$value){
 		if(!isset($smooth_slider[$key])) $smooth_slider[$key]='';
@@ -117,17 +138,20 @@ function carousel_posts_on_slider_category($max_posts='5', $catg_slug='', $offse
 	//extract posts
 	$posts = get_posts('numberposts='.$max_posts.'&offset='.$offset.'&category='.$slider_cat.$orderby);
 	
-	$r_array=smooth_global_posts_processor( $posts, $smooth_slider, $out_echo );
+	$r_array=smooth_global_posts_processor( $posts, $smooth_slider, $out_echo, $set, $data );
 	return $r_array;
 }
 function get_smooth_slider_category($catg_slug,$offset=0) {
 	global $smooth_slider; 
-	$r_array = carousel_posts_on_slider_category($smooth_slider['no_posts'], $catg_slug, $offset, '0'); 
-	$slider_handle='smooth_slider_'.$catg_slug;
-	get_global_smooth_slider($slider_handle,$r_array,$slider_id='',$echo='1');
+	$set='';
+	$data=array();
+	$slider_handle='foto_slider_'.$catg_slug;
+    $data['slider_handle']=$slider_handle;
+	$r_array = carousel_posts_on_slider_category($smooth_slider['no_posts'], $catg_slug, $offset, '0', $set, $data); 
+	get_global_smooth_slider($slider_handle,$r_array,$smooth_slider,$set,$echo='1',$data);
 } 
 //For displaying recent posts in chronologically reverse order, from Smooth Slider 2.4
-function carousel_posts_on_slider_recent($max_posts='5', $offset=0, $out_echo = '1') {
+function carousel_posts_on_slider_recent($max_posts='5', $offset=0, $out_echo = '1', $set='', $data=array()) {
     global $smooth_slider;
 	$rand = isset($smooth_slider['rand'])?$smooth_slider['rand']:'';
 	if(isset($rand) and $rand=='1'){
@@ -139,14 +163,17 @@ function carousel_posts_on_slider_recent($max_posts='5', $offset=0, $out_echo = 
 	//extract posts data
 	$posts = get_posts('numberposts='.$max_posts.'&offset='.$offset.$orderby);
 	
-	$r_array=smooth_global_posts_processor( $posts, $smooth_slider, $out_echo );
+	$r_array=smooth_global_posts_processor( $posts, $smooth_slider, $out_echo, $set,$data );
 	return $r_array;
 }
 function get_smooth_slider_recent($offset=0) {
 	global $smooth_slider;  
-	$r_array = carousel_posts_on_slider_recent($smooth_slider['no_posts'], $offset, '0');
+	$set='';
+	$data=array();
 	$slider_handle='smooth_slider_recent';
-	get_global_smooth_slider($slider_handle,$r_array,$slider_id='',$echo='1');
+	$data['slider_handle']=$slider_handle;
+	$r_array = carousel_posts_on_slider_recent($smooth_slider['no_posts'], $offset, '0', $set,$data);
+	get_global_smooth_slider($slider_handle,$r_array,$smooth_slider,$set,$echo='1',$data);
 }
 require_once (dirname (__FILE__) . '/shortcodes_1.php');
 require_once (dirname (__FILE__) . '/widgets_1.php');
@@ -333,7 +360,7 @@ function smooth_get_inline_css($echo='0'){
 		$style_start= ($echo=='0') ? 'style="':'';
 		$style_end= ($echo=='0') ? '"':'';
 	//smooth_slider
-		$smooth_slider_css['smooth_slider']=$style_start.'max-width:'.$smooth_slider['width'].'px;min-height:'.$smooth_slider['height'].'px;background-color:'. ( ($smooth_slider['bg'] == '1') ? "transparent" : $smooth_slider['bg_color'] ) .';border:'. $smooth_slider['border'].'px solid '.$smooth_slider['brcolor'].';'.$style_end;
+		$smooth_slider_css['smooth_slider']=$style_start.'max-width:'.$smooth_slider['width'].'px;height:'.$smooth_slider['height'].'px;background-color:'. ( ($smooth_slider['bg'] == '1') ? "transparent" : $smooth_slider['bg_color'] ) .';border:'. $smooth_slider['border'].'px solid '.$smooth_slider['brcolor'].';'.$style_end;
 		
 		if ($smooth_slider['title_fstyle'] == "bold" or $smooth_slider['title_fstyle'] == "bold italic" ){$slider_title_font = "bold";} else { $slider_title_font = "normal"; }
 		if ($smooth_slider['title_fstyle'] == "italic" or $smooth_slider['title_fstyle'] == "bold italic" ){$slider_title_style = "italic";} else {$slider_title_style = "normal";}

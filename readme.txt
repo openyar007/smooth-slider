@@ -3,15 +3,15 @@ Contributors: internet techies, slidervilla
 Tags: slider, slideshow, wordpress slider, content slider, posts slider,image slider, responsive slideshow, image Rotator, jquery slider, Photo Slider, nivo slider, slider plugin, javascript slider, coin slider, responsive slider, featured-content-slider, Horizontal slider, carousel slider, wp slider, vertical slider, best slider plugin, content slideshow, javascript slideshow, slideshow manager, slideshow plugin, image slideshow, jquery slideshow, wordpress slideshow, vertical slides, responsive, nivoslider, flex slider, coinslider, carousel, post, posts, plugin, slider widget, widget slider, widget slideshow, widget, widgets, seo, wordpress seo, media, page, slide, slides
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 3.0
-Tested up to: 3.9.1
-Stable tag: 2.6.1
+Tested up to: 3.9.2
+Stable tag: 2.6.2
 License: GPLv2 or later
 
 Most Popular Responsive WordPress Slider for Featured Content, Videos and Media Images
 
 == Description ==
 
-In less than 50 seconds, embed a recent posts, category specific or featured posts slider using Smooth Slider. It creates a dynamic slideshow/s for featured Posts, Pages, Media Images and Custom Post Types on a WordPress site. With live preview on admin panel, one can customize the slider before implementation. At <a href="http://slidervilla.com/" rel="friend" title="SliderVilla Premium WordPress Sliders">SliderVilla</a> , we develop only sliders and we know the requirements very well. Smooth Slider is a basic slider WordPress plugin but is capable of adding a nice carousel in no time. With shortcode, widgets and template tag, one can embed Smooth SLider anywhere in the site. 
+In less than 50 seconds, embed a recent posts, category specific or featured posts slider using Smooth Slider. It creates a dynamic slideshow/s for featured Posts, Pages, Media Images and Custom Post Types on a WordPress site. With live preview on admin panel, one can customize the slider before implementation. At SliderVilla - <a href="http://slidervilla.com/" rel="friend" title="Best WordPress Slider Store">Best WordPress Slider Store</a> , we develop only sliders and we know the requirements very well. Smooth Slider is a basic slider WordPress plugin but is capable of adding a nice carousel in no time. With shortcode, widgets and template tag, one can embed Smooth SLider anywhere in the site. 
 
 = Features =
 
@@ -26,7 +26,8 @@ In less than 50 seconds, embed a recent posts, category specific or featured pos
 * No Need Of Knowledge of PHP, HTML or CSS. But for those having knowledge of CSS, you can create your own stylesheet.
 * Slides can be removed from the slider in single click thru 'Sliders' admin panel
 
-= <a href="http://slidervilla.com/sliders-list-view/" rel="friend" title="SliderVilla Premium WordPress Sliders">Premium Versions</a> =
+= Premium Sliders =
+= <a href="http://slidervilla.com/sliders-list-view/" rel="friend" title="Premium WordPress Sliders">15+ Premium WordPress Sliders</a> =
 
 * Create Unlimited Settings Panels
 * Created Unlimited Custom Sliders
@@ -38,13 +39,28 @@ In less than 50 seconds, embed a recent posts, category specific or featured pos
 * Google Web Fonts option on Settings Panel
 * Very Prompt Support and Lifetime Upgrades
 
+Checkout Our Premium Responsive Sliders such as,
+
+* Placid Slider - <a href="http://slidervilla.com/placid" rel="friend" title="Best Logo and Client Brand Slider">Best Logo and Client Brand Slider</a>
+* Pointelle Slider - <a href="http://slidervilla.com/pointelle" rel="friend" title="Best WordPress Slider Design for Homepage">Best WordPress Slider Design for Homepage</a>
+* Glam Slider - <a href="http://slidervilla.com/glam" rel="friend" title="Full Page Slider with Partial Visible Slides">Full Page Slider with Partial Visible Slides</a>
+* Featured Slider - <a href="http://slidervilla.com/featured-slider" rel="friend" title="Awesome WordPress Slider to Show Featured Content">Awesome WordPress Slider to Show Featured Content</a>
+* Listic Slider - <a href="http://slidervilla.com/listic" rel="friend" title="Best List View Slider for WordPress">Best List View Slider for WordPress</a>
+* Roster Slider - <a href="http://slidervilla.com/roster" rel="friend" title="Best Horizontal Carousal for WordPress">Best Horizontal Carousal for WordPress</a>
+* Pinwheel Slider - <a href="http://slidervilla.com/pinwheel" rel="friend" title="Ultimate rotator with responsive design">Ultimate rotator with responsive design</a>
+* Akkord Slider - <a href="http://slidervilla.com/akkord" rel="friend" title="Premium Accordion Slider for WordPress">Premium Accordion Slider for WordPress</a>
+* Foto Slider - <a href="http://slidervilla.com/foto-slider" rel="friend" title="Best Gallery View Slider for WordPress">Best Gallery View Slider for WordPress</a>
+and many more
+
 <a href="http://slidervilla.com/smooth-slider/" rel="friend" >Plugin Home Page</a> | 
 [Plugin Documentation](http://guides.slidervilla.com/smooth-slider/) 
 
 **Smooth Slider is now <a href="http://slidervilla.com/add-ons/" rel="friend">Add-ons</a> compatible. **
 
 1. Taxonomy Add-on
-2. Gallery Add-on
+2. Post Attachments Add-on
+3. RSS Feed Add-on
+4. NextGEN Gallery Add-on
 
 
 == Installation ==
@@ -136,6 +152,11 @@ Check the other FAQs on Smooth [Slider Documetation on SliderVilla](http://guide
 
 
 == Changelog ==
+
+Version 2.6.2 (08/12/2014)
+
+1. New: RSS Feed Add-on compatibility
+2. Fix: Slider height not properly set initially for center aligned (large) images slider. Fixed the issue.
 
 Version 2.6.1 (07/30/2014)
 

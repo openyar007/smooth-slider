@@ -157,12 +157,14 @@ function smooth_post_processor_default( $posts, $smooth_slider,$out_echo){
 				<p class="smooth_more"><a href="'.$permalink.'" '.$smooth_slider_css['smooth_slider_p_more'].'>'.$smooth_slider['more'].'</a></p>
 			
 				<!-- /smooth_slideri -->
-			</div>'; }
+			</div>'; 
+		   }
 		   else{
 		   $html .= '<h2 '.$smooth_slider_css['smooth_slider_h2'].'>'.$post_title.'</h2><span '.$smooth_slider_css['smooth_slider_span'].'> '.$slider_excerpt.'</span>
 				<!-- /smooth_slideri -->
-			</div>';    }
-		}
+			</div>';    
+		   }
+	      }
 	}
 	if($out_echo == '1') {
 	   echo $html;
@@ -279,5 +281,182 @@ function smooth_slider_get_default($slider_handle,$r_array,$slider_id='',$echo='
 	$html.='<script type="text/javascript">'.$fouc_dom.'</script>';
 	if($echo == '1')  {echo $html; }
 	else { return $html; }
+}
+function smooth_data_processor_default($slides, $smooth_slider,$out_echo){
+  	$skin='default'; 
+	global $smooth_slider,$data,$default_slider;
+	$smooth_slider_css = smooth_get_inline_css();
+	$html = '';
+	$smooth_sldr_j = 0;
+	$i=0;
+	if(is_array($data)) extract($data,EXTR_PREFIX_ALL,'data');
+	
+  	foreach($default_slider as $key=>$value){
+		        if(!isset($smooth_slider[$key])) $smooth_slider[$key]='';
+	}
+	$slider_handle='';
+	if ( !empty($data_slider_handle) ) {
+		$slider_handle=$data_slider_handle;
+	}
+	foreach($slides as $slide) {
+		$id = $post_id = '';
+		if (isset ($slide->ID)) {$id = $post_id = $slide->ID;}
+		$post_title = stripslashes($slide->post_title);
+		$post_title = str_replace('"', '', $post_title);
+		//filter hook
+		if (isset ($id)) $post_title=apply_filters('smooth_post_title',$post_title,$id,$smooth_slider,$smooth_slider_css);
+		$slider_content = $slide->post_content;
+		$smooth_slide_redirect_url = $slide->redirect_url;
+		$smooth_sslider_nolink = $slide->nolink;
+		trim($smooth_slide_redirect_url);
+		if(!empty($smooth_slide_redirect_url) and isset($smooth_slide_redirect_url)) {
+		   $permalink = $smooth_slide_redirect_url;
+		}
+		else{
+		   $permalink = $slide->url;
+		}
+		if($smooth_sslider_nolink=='1'){
+		  $permalink='';
+		}
+		
+		$smooth_sldr_j++;
+		$html .= '<div class="smooth_slideri" '.$smooth_slider_css['smooth_slideri'].'>
+			<!-- smooth_slideri -->';
+		if ($smooth_slider['content_from'] == "slider_content") {
+			$slider_content = $slide->post_content;
+		}
+		if ($smooth_slider['content_from'] == "excerpt") {
+			$slider_content = $slide->post_excerpt;
+		}
+
+		$slider_content = strip_shortcodes( $slider_content );
+
+		$slider_content = stripslashes($slider_content);
+		$slider_content = str_replace(']]>', ']]&gt;', $slider_content);
+
+		$slider_content = str_replace("\n","<br />",$slider_content);
+		$slider_content = strip_tags($slider_content, $smooth_slider['allowable_tags']);
+		
+		if(!$smooth_slider['content_limit'] or $smooth_slider['content_limit'] == '' or $smooth_slider['content_limit'] == ' ') 
+		  $slider_excerpt = substr($slider_content,0,$smooth_slider['content_chars']);
+		else 
+		  $slider_excerpt = smooth_slider_word_limiter( $slider_content, $limit = $smooth_slider['content_limit'] );
+		  $slider_excerpt=apply_filters('smooth_slide_excerpt',$slider_excerpt,$post_id,$smooth_slider,$smooth_slider_css);
+		  $slider_excerpt='<span '.$smooth_slider_css['smooth_slider_span'].'> '.$slider_excerpt.'</span>';
+	
+		//filter hook
+		$slider_excerpt=apply_filters('smooth_slide_excerpt_html',$slider_excerpt,$post_id,$smooth_slider,$smooth_slider_css);
+		
+		//For media images
+		if (isset ($slide->media)) $smooth_media = $slide->media;
+		if (isset ($slide->media_image)) $smooth_media_image = $slide->media_image;
+		$data_image_class=(!empty($data_image_class)?$data_image_class:'');
+		$data_default_image=(!empty($data_default_image)?$data_default_image:'');	
+		if( ((empty($smooth_media) or $smooth_media=='' or !($smooth_media)) and (empty($smooth_media_image) or $smooth_media_image=='' or !($smooth_media_image)) ) or $data_media!='1' ) {
+			$width = $smooth_slider['img_width'];
+			$height = $smooth_slider['img_height'];
+			if($smooth_slider['crop'] == '0'){
+			 $extract_size = 'full';
+			}
+			elseif($smooth_slider['crop'] == '1'){
+			 $extract_size = 'large';
+			}
+			elseif($smooth_slider['crop'] == '2'){
+			 $extract_size = 'medium';
+			}
+			else{
+			 $extract_size = 'thumbnail';
+			}
+			
+			$classes[] = $extract_size;
+			$classes[] = 'smooth_slider_thumbnail';
+			$classes[] = $data_image_class;
+			$class = join( ' ', array_unique( $classes ) );
+	
+			preg_match_all( '|<img.*?src=[\'"](.*?)[\'"].*?>|i', $slide->content_for_image, $matches );
+				
+			$img_url=$data_default_image;
+	
+			/* If there is a match for the image, return its URL. */
+			$order_of_image='';
+			if(isset($data_order)) $order_of_image=$data_order;
+			
+			if($order_of_image > 0) $order_of_image=$order_of_image; 
+			else $order_of_image = 0;
+				
+			if ( isset( $matches ) && count($matches[1])<=$order_of_image) $order_of_image=count($matches[1]);
+			
+			if ( isset( $matches ) && $matches[1][$order_of_image] )
+				$img_url = $matches[1][$order_of_image];
+			
+			$width = ( ( $width ) ? ' width="' . esc_attr( $width ) . '"' : '' );
+			$height = ( ( $height ) ? ' height="' . esc_attr( $height ) . '"' : '' );
+			
+			$img_html = '<img src="' . $img_url . '" class="' . esc_attr( $class ) . '"' . $width . $height . $smooth_slider_css['smooth_slider_thumbnail'] .' />';
+			$smooth_large_image=$img_html;
+		}
+		else{
+			$width = $smooth_slider['img_width'];
+			$height = $smooth_slider['img_height'];
+			$width = ( ( $width ) ? ' width="' . esc_attr( $width ) . '"' : '' );
+			$height = ( ( $height ) ? ' height="' . esc_attr( $height ) . '"' : '' );
+			
+			if($smooth_slider['crop'] == '0'){
+			 $extract_size = 'full';
+			}
+			elseif($smooth_slider['crop'] == '1'){
+			 $extract_size = 'large';
+			}
+			elseif($smooth_slider['crop'] == '2'){
+			 $extract_size = 'medium';
+			}
+			else{
+			 $extract_size = 'thumbnail';
+			}
+			
+			$classes[] = $extract_size;
+			$classes[] = 'smooth_slider_thumbnail';
+			$classes[] = $data_image_class;
+			$class = join( ' ', array_unique( $classes ) );
+			if(!empty($smooth_media_image)) {
+				$smooth_large_image='<img src="'.$smooth_media_image.'" class="' . esc_attr( $class ) . '"' . $width . $height . '/>';
+				$img_url=$smooth_media_image;
+			}
+			else {
+				$smooth_large_image='<img src="'.$data_default_image.'" class="' . esc_attr( $class ) . '"' . $width . $height . '/>';
+				$img_url=$data_default_image;
+			}
+		}
+		
+		if($permalink!='') {
+		  $smooth_large_image = '<a href="' . $permalink . '" title="'.$post_title.'">' . $smooth_large_image . '</a>';
+		}	
+		//filter hook
+		$smooth_large_image=apply_filters('smooth_large_image',$smooth_large_image,$post_id,$smooth_slider,$smooth_slider_css);
+		$html.= $smooth_large_image;
+		if ($smooth_slider['image_only'] == '1') { 
+			$html .= '<!-- /smooth_slideri -->
+			</div>';
+		}
+		else {
+			if($permalink!='') {
+			$html .= '<h2 '.$smooth_slider_css['smooth_slider_h2'].'><a '.$smooth_slider_css['smooth_slider_h2_a'].' href="'.$permalink.'">'.$post_title.'</a></h2><span '.$smooth_slider_css['smooth_slider_span'].'> '.$slider_excerpt.'</span>
+				<p class="smooth_more"><a href="'.$permalink.'" '.$smooth_slider_css['smooth_slider_p_more'].'>'.$smooth_slider['more'].'</a></p>
+				<!-- /smooth_slideri -->
+			</div>'; 
+			}
+			else{
+			$html .= '<h2 '.$smooth_slider_css['smooth_slider_h2'].'>'.$post_title.'</h2><span '.$smooth_slider_css['smooth_slider_span'].'> '.$slider_excerpt.'</span>
+				<!-- /smooth_slideri -->
+				</div>';    
+			}
+		}
+	}
+	if($out_echo == '1') {
+	   echo $html;
+	}
+	$r_array = array( $smooth_sldr_j, $html);
+	$r_array=apply_filters('smooth_r_array',$r_array,$slides, $smooth_slider);
+	return $r_array;
 }
 ?>

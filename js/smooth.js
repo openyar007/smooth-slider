@@ -11,6 +11,7 @@
 			var wrapWidth=this.width();
 			var slideri=this.find('.smooth_slideri');
 			var slideriW;
+			var self=this;
 			//calculate max-width of slideri
 			if(options.navArr==0) slideriW=wrapWidth;
 			else slideriW=wrapWidth-(48+10); //48px for arrows and 10 for additional margin for text
@@ -35,12 +36,18 @@
 			this.find(".smooth_slideri").each(function(idx,el){
 				if(jQuery(el).outerHeight(true)>iht)iht=jQuery(el).outerHeight(true);
 			});
-			var ht=iht + this.find(".sldr_title").outerHeight(true) + this.find(".smooth_nav").outerHeight(true);
+			var eHt=this.find(".sldr_title").outerHeight(true) + this.find(".smooth_nav").outerHeight(true);
+			var ht=iht + eHt;
 			this.height(ht);
+			this.find(".smooth_slider_thumbnail").on('load',function(e){
+				var pHt=jQuery(this).parents(".smooth_slideri").outerHeight(true)+eHt;
+				if(pHt > ht)ht=pHt;		
+				self.height(ht);		
+			});
 			return this;
 		};
 		this.smoothSliderSize();
-		var self=this;
+		
 		//On Window Resize
 		jQuery(window).resize(function() { 
 			self.smoothSliderSize();

@@ -4,7 +4,7 @@ Tags: slider, slideshow, wordpress slider, content slider, posts slider,image sl
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 3.0
 Tested up to: 3.9.2
-Stable tag: 2.6.2
+Stable tag: 2.6.3
 License: GPLv2 or later
 
 Most Popular Responsive WordPress Slider for Featured Content, Videos and Media Images
@@ -41,15 +41,15 @@ In less than 50 seconds, embed a recent posts, category specific or featured pos
 
 Checkout Our Premium Responsive Sliders such as,
 
-* Placid Slider - <a href="http://slidervilla.com/placid" rel="friend" title="Best Logo and Client Brand Slider">Best Logo and Client Brand Slider</a>
-* Pointelle Slider - <a href="http://slidervilla.com/pointelle" rel="friend" title="Best WordPress Slider Design for Homepage">Best WordPress Slider Design for Homepage</a>
-* Glam Slider - <a href="http://slidervilla.com/glam" rel="friend" title="Full Page Slider with Partial Visible Slides">Full Page Slider with Partial Visible Slides</a>
-* Featured Slider - <a href="http://slidervilla.com/featured-slider" rel="friend" title="Awesome WordPress Slider to Show Featured Content">Awesome WordPress Slider to Show Featured Content</a>
-* Listic Slider - <a href="http://slidervilla.com/listic" rel="friend" title="Best List View Slider for WordPress">Best List View Slider for WordPress</a>
-* Roster Slider - <a href="http://slidervilla.com/roster" rel="friend" title="Best Horizontal Carousal for WordPress">Best Horizontal Carousal for WordPress</a>
-* Pinwheel Slider - <a href="http://slidervilla.com/pinwheel" rel="friend" title="Ultimate rotator with responsive design">Ultimate rotator with responsive design</a>
-* Akkord Slider - <a href="http://slidervilla.com/akkord" rel="friend" title="Premium Accordion Slider for WordPress">Premium Accordion Slider for WordPress</a>
-* Foto Slider - <a href="http://slidervilla.com/foto-slider" rel="friend" title="Best Gallery View Slider for WordPress">Best Gallery View Slider for WordPress</a>
+* Placid Slider - <a href="http://slidervilla.com/placid/" rel="friend" title="Best Logo and Client Brand Slider">Best Logo and Client Brand Slider</a>
+* Pointelle Slider - <a href="http://slidervilla.com/pointelle/" rel="friend" title="Best WordPress Slider Design for Homepage">Best WordPress Slider Design for Homepage</a>
+* Glam Slider - <a href="http://slidervilla.com/glam/" rel="friend" title="Full Page Slider with Partial Visible Slides">Full Page Slider with Partial Visible Slides</a>
+* Featured Slider - <a href="http://slidervilla.com/featured-slider/" rel="friend" title="Awesome WordPress Slider to Show Featured Content">Awesome WordPress Slider to Show Featured Content</a>
+* Listic Slider - <a href="http://slidervilla.com/listic/" rel="friend" title="Best List View Slider for WordPress">Best List View Slider for WordPress</a>
+* Roster Slider - <a href="http://slidervilla.com/roster/" rel="friend" title="Best Horizontal Carousal for WordPress">Best Horizontal Carousal for WordPress</a>
+* Pinwheel Slider - <a href="http://slidervilla.com/pinwheel/" rel="friend" title="Ultimate rotator with responsive design">Ultimate rotator with responsive design</a>
+* Akkord Slider - <a href="http://slidervilla.com/akkord/" rel="friend" title="Premium Accordion Slider for WordPress">Premium Accordion Slider for WordPress</a>
+* Foto Slider - <a href="http://slidervilla.com/foto-slider/" rel="friend" title="Best Gallery View Slider for WordPress">Best Gallery View Slider for WordPress</a>
 and many more
 
 <a href="http://slidervilla.com/smooth-slider/" rel="friend" >Plugin Home Page</a> | 
@@ -121,6 +121,7 @@ For more documentation go to [Smooth Slider Documentation](http://guides.sliderv
 **Find More Advanced Slider Styles at [SliderVilla](http://www.slidervilla.com/)**
 
 == Upgrade Notice ==
+If you have Smooth Slider 2.6 or plus, kindly update to 2.6.3 for proper height calcualtion for responsiveness.
 
 = Before Upgrading =
 
@@ -129,8 +130,6 @@ For more documentation go to [Smooth Slider Documentation](http://guides.sliderv
 * Recheck the Slider Title, Post Title and the Slider Content fonts on the Settings Panel.
 
 [Get older versions](http://wordpress.org/extend/plugins/smooth-slider/download/)
-
-!!IMP!! If you have highly customized Smooth Slider, Before upgrading to 2.4, save your CSS and Settings. You may lose some CSS formatting as in the new versions the slider javascript is changed and is different from previous versions.
 
 == Frequently Asked Questions ==
 
@@ -152,6 +151,9 @@ Check the other FAQs on Smooth [Slider Documetation on SliderVilla](http://guide
 
 
 == Changelog ==
+Version 2.6.3 (08/13/2014)
+
+1. Fix: Slider was causing page to hide initially and appear on document ready. Resolved this issue. Now slider is workig perfectly for responsive heights.
 
 Version 2.6.2 (08/12/2014)
 

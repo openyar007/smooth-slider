@@ -186,11 +186,11 @@ function smooth_slider_get_default($slider_handle,$r_array,$slider_id='',$echo='
 	
 	wp_enqueue_script( 'jquery.cycle', smooth_slider_plugin_url( 'js/jcycle.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
 	wp_enqueue_script( 'smooth-slider', smooth_slider_plugin_url( 'js/smooth.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
-/* Changed fouc code start 2.6 */	
+/* Changed fouc code start 2.6 - Bug fix in 2.6.2.1 */	
 	if(!isset($smooth_slider['fouc']) or $smooth_slider['fouc']=='' or $smooth_slider['fouc']=='0' ){
-			$fouc_dom='jQuery("html").addClass("smooth_slider_fouc");jQuery(".smooth_slider_fouc").hide();';
+			$fouc_dom='jQuery("html").addClass("smooth_slider_fouc");jQuery(".smooth_slider_fouc .smooth_slider").hide();';
 			$fouc_ready='jQuery(document).ready(function() {
-		   		jQuery(".smooth_slider_fouc").show();
+		   		jQuery(".smooth_slider_fouc .smooth_slider").show();
 			});';
 		}	
 		else{

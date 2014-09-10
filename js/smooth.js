@@ -7,11 +7,11 @@
 				img_align		:'left'
 		}
 		options=jQuery.extend({},defaults,args);
+		var self=this;
 		this.smoothSliderSize=function(){
 			var wrapWidth=this.width();
 			var slideri=this.find('.smooth_slideri');
-			var slideriW;
-			var self=this;
+			var slideriW;			
 			//calculate max-width of slideri
 			if(options.navArr==0) slideriW=wrapWidth;
 			else slideriW=wrapWidth-(48+10); //48px for arrows and 10 for additional margin for text

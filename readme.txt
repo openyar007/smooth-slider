@@ -3,8 +3,8 @@ Contributors: internet techies, slidervilla
 Tags: slider, slideshow, wordpress slider, content slider, posts slider,image slider, responsive slideshow, image Rotator, jquery slider, Photo Slider, nivo slider, slider plugin, javascript slider, coin slider, responsive slider, featured-content-slider, Horizontal slider, carousel slider, wp slider, vertical slider, best slider plugin, content slideshow, javascript slideshow, slideshow manager, slideshow plugin, image slideshow, jquery slideshow, wordpress slideshow, vertical slides, responsive, nivoslider, flex slider, coinslider, carousel, post, posts, plugin, slider widget, widget slider, widget slideshow, widget, widgets, seo, wordpress seo, media, page, slide, slides
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 3.0
-Tested up to: 3.9.2
-Stable tag: 2.6.3
+Tested up to: 4.0
+Stable tag: 2.6.4
 License: GPLv2 or later
 
 Most Popular Responsive WordPress Slider for Featured Content, Videos and Media Images
@@ -151,6 +151,12 @@ Check the other FAQs on Smooth [Slider Documetation on SliderVilla](http://guide
 
 
 == Changelog ==
+
+Version 2.6.4 (09/10/2014)
+
+1. Fix: In case of multisite WordPress installation there was an issue while saving setting set.
+2. Fix: jquery.js was loaded in footer, should be loaded before the slider js (head section)
+
 Version 2.6.3 (08/13/2014)
 
 1. Fix: Slider was causing page to hide initially and appear on document ready. Resolved this issue. Now slider is workig perfectly for responsive heights.
@@ -323,7 +329,7 @@ Version 1.2 (09/22/2009)
 Version 1.1 (09/14/2009)
 
 1. New - Active Slide in the slideshow will now be highlighted with bolder and bigger navigation number
-2. Fixed - Added No Script tag brosers not supporting JavaScript for showing the slideshow
+2. Fixed - Added No Script tag browsers not supporting JavaScript for showing the slideshow
 3. Fixed - Issues with WordPress MU Smooth Slider Options update from setting page
 
 Visit the plugin page to see the changelog and release notes.

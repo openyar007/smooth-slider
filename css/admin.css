@@ -127,7 +127,7 @@ code {word-break:break-all;line-height:22px;background:#f3f3f3;}
 .ImgDetails div{margin-top:0;}
 .ImgDetails .fL{float:left;width:50%;}
 .ImgDetails .fR{float:right;width:50%;}
-.ImgDetails span{width:100%%;display:inline-block;vertical-align:top;margin-bottom:10px;line-height:16px;}
+.ImgDetails span{width:100%;display:inline-block;vertical-align:top;margin-bottom:10px;line-height:16px;}
 .ImgDetails span textarea{width:95%;}
 .ImgDetails span input,.ImgDetails span textarea{box-shadow:none;max-width:100%;}
 .ImgDetails span.imgTitle input{width:25em;max-width:98%;}

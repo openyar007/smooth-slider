@@ -3,7 +3,7 @@
 Plugin Name: Smooth Slider
 Plugin URI: http://slidervilla.com/smooth-slider/
 Description: Smooth slider adds a responsive featured content on image slider using shortcode, widget and template tags. Create and embed featured content slider, recent post slider, category slider in less than 60 seconds.
-Version: 2.6.3	
+Version: 2.6.4	
 Author: SliderVilla
 Author URI: http://slidervilla.com/
 Wordpress version supported: 2.9 and above
@@ -30,12 +30,12 @@ Wordpress version supported: 2.9 and above
 //defined global variables and constants here
 global $smooth_slider,$default_slider,$smooth_db_version,$default_smooth_slider_settings;
 $smooth_slider = get_option('smooth_slider_options');
-$smooth_db_version='2.6.3'; //current version of smooth slider database 
+$smooth_db_version='2.6.4'; //current version of smooth slider database 
 define('SLIDER_TABLE','smooth_slider'); //Slider TABLE NAME
 define('PREV_SLIDER_TABLE','slider'); //Slider TABLE NAME
 define('SLIDER_META','smooth_slider_meta'); //Meta TABLE NAME
 define('SLIDER_POST_META','smooth_slider_postmeta'); //Meta TABLE NAME
-define("SMOOTH_SLIDER_VER","2.6.3",false);//Current Version of Smooth Slider
+define("SMOOTH_SLIDER_VER","2.6.4",false);//Current Version of Smooth Slider
 if ( ! defined( 'SMOOTH_SLIDER_PLUGIN_BASENAME' ) )
 	define( 'SMOOTH_SLIDER_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 if ( ! defined( 'SMOOTH_SLIDER_CSS_DIR' ) ){
@@ -111,7 +111,7 @@ load_plugin_textdomain('smooth-slider', false, dirname( plugin_basename( __FILE_
 
 function install_smooth_slider() {
 	global $wpdb, $table_prefix,$smooth_db_version;
-	$installed_ver = get_site_option( "smooth_db_version" );
+	$installed_ver = get_option( "smooth_db_version" );
 	if( $installed_ver != $smooth_db_version ) {
 		$table_name = $table_prefix.SLIDER_TABLE;
 		if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
@@ -226,14 +226,14 @@ function install_smooth_slider() {
 		  
 		   delete_option('smooth_slider_options');	  
 		   update_option('smooth_slider_options',$smooth_slider);
-		   update_site_option( "smooth_db_version", $smooth_db_version );
+		   update_option( "smooth_db_version", $smooth_db_version );
 	}
 }
 register_activation_hook( __FILE__, 'install_smooth_slider' );
 /* Added for auto update - start */
 function smooth_update_db_check() {
     global $smooth_db_version;
-    if (get_site_option('smooth_db_version') != $smooth_db_version) {
+    if (get_option('smooth_db_version') != $smooth_db_version) {
         install_smooth_slider();
     }
 }

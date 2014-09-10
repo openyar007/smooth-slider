@@ -142,10 +142,15 @@ function smooth_post_processor_default( $posts, $smooth_slider,$out_echo){
 		}	
 		/* Added for embeding any shortcode on slide - end */
 
-		if(!$smooth_slider['content_limit'] or $smooth_slider['content_limit'] == '' or $smooth_slider['content_limit'] == ' ') 
-		  $slider_excerpt = substr($slider_content,0,$smooth_slider['content_chars']);
-		else 
-		  $slider_excerpt = smooth_slider_word_limiter( $slider_content, $limit = $smooth_slider['content_limit'] );
+			$content_limit=$smooth_slider['content_limit'];
+			$content_chars=$smooth_slider['content_chars'];
+			if(empty($content_limit) && !empty($content_chars)){ 
+				$slider_excerpt = substr($slider_content,0,$content_chars);
+			}
+			else{ 
+				$slider_excerpt = smooth_slider_word_limiter( $slider_content, $limit = $content_limit);
+			}
+			if(!isset($slider_excerpt))$slider_excerpt='';
 		  		
 		if ($smooth_slider['image_only'] == '1') { 
 			$html .= '<!-- /smooth_slideri -->
@@ -329,18 +334,21 @@ function smooth_data_processor_default($slides, $smooth_slider,$out_echo){
 			$slider_content = $slide->post_excerpt;
 		}
 
-		$slider_content = strip_shortcodes( $slider_content );
-
 		$slider_content = stripslashes($slider_content);
 		$slider_content = str_replace(']]>', ']]&gt;', $slider_content);
 
 		$slider_content = str_replace("\n","<br />",$slider_content);
 		$slider_content = strip_tags($slider_content, $smooth_slider['allowable_tags']);
 		
-		if(!$smooth_slider['content_limit'] or $smooth_slider['content_limit'] == '' or $smooth_slider['content_limit'] == ' ') 
-		  $slider_excerpt = substr($slider_content,0,$smooth_slider['content_chars']);
-		else 
-		  $slider_excerpt = smooth_slider_word_limiter( $slider_content, $limit = $smooth_slider['content_limit'] );
+		$content_limit=$smooth_slider['content_limit'];
+			$content_chars=$smooth_slider['content_chars'];
+			if(empty($content_limit) && !empty($content_chars)){ 
+				$slider_excerpt = substr($slider_content,0,$content_chars);
+			}
+			else{ 
+				$slider_excerpt = smooth_slider_word_limiter( $slider_content, $limit = $content_limit);
+			}
+			if(!isset($slider_excerpt))$slider_excerpt='';
 		  $slider_excerpt=apply_filters('smooth_slide_excerpt',$slider_excerpt,$post_id,$smooth_slider,$smooth_slider_css);
 		  $slider_excerpt='<span '.$smooth_slider_css['smooth_slider_span'].'> '.$slider_excerpt.'</span>';
 	

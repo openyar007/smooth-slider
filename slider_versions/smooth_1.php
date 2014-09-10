@@ -178,6 +178,11 @@ function get_smooth_slider_recent($offset=0) {
 require_once (dirname (__FILE__) . '/shortcodes_1.php');
 require_once (dirname (__FILE__) . '/widgets_1.php');
 
+function smooth_slider_enqueue_scripts() {
+	wp_enqueue_script( 'jquery');
+}
+add_action( 'init', 'smooth_slider_enqueue_scripts' );
+
 //admin settings
 function smooth_slider_admin_scripts() {
 global $smooth_slider;
@@ -223,7 +228,7 @@ if ( is_admin() ){ // admin actions
 		            jQuery("#sslider_sortable_<?php echo $slider['slider_id'];?>").sortable();
 		            jQuery("#sslider_sortable_<?php echo $slider['slider_id'];?>").disableSelection();
 				    <?php } ?>
-			  jQuery( ".uploaded-images" ).sortable({ items: ".addedImg" }).disableSelection();
+			  jQuery( ".uploaded-images" ).sortable({ items: ".addedImg" });
 
 		});
 			</script> <?php
@@ -360,7 +365,7 @@ function smooth_get_inline_css($echo='0'){
 		$style_start= ($echo=='0') ? 'style="':'';
 		$style_end= ($echo=='0') ? '"':'';
 	//smooth_slider
-		$smooth_slider_css['smooth_slider']=$style_start.'max-width:'.$smooth_slider['width'].'px;height:'.$smooth_slider['height'].'px;background-color:'. ( ($smooth_slider['bg'] == '1') ? "transparent" : $smooth_slider['bg_color'] ) .';border:'. $smooth_slider['border'].'px solid '.$smooth_slider['brcolor'].';'.$style_end;
+		$smooth_slider_css['smooth_slider']=$style_start.'max-width:'.$smooth_slider['width'].'px;height:'.$smooth_slider['height'].'px;min-height:'.$smooth_slider['height'].'px;background-color:'. ( ($smooth_slider['bg'] == '1') ? "transparent" : $smooth_slider['bg_color'] ) .';border:'. $smooth_slider['border'].'px solid '.$smooth_slider['brcolor'].';'.$style_end;
 		
 		if ($smooth_slider['title_fstyle'] == "bold" or $smooth_slider['title_fstyle'] == "bold italic" ){$slider_title_font = "bold";} else { $slider_title_font = "normal"; }
 		if ($smooth_slider['title_fstyle'] == "italic" or $smooth_slider['title_fstyle'] == "bold italic" ){$slider_title_style = "italic";} else {$slider_title_style = "normal";}

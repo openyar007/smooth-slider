@@ -4,7 +4,7 @@ Smooth Slider default styles*/
 .smooth_slider div,.smooth_slider p,.smooth_slider span,.smooth_slider img,.smooth_slider h2{list-style:none;vertical-align:baseline;}
 .smooth_slider ul{list-style:disc;vertical-align:baseline;list-style-position:inside;}
 .smooth_slider li{vertical-align:baseline;}
-.smooth_slider{padding:0 5px;width:100%;}
+.smooth_slider{padding:0 5px;width:100%;box-sizing: border-box;}
 .smooth_slider .sldr_title{margin:5px 0 10px 0;}
 .smooth_slider span{display:inline;overflow:hidden;margin: 10px auto;line-height:18px;}
 .smooth_slider .smooth_sliderb{position:relative;}

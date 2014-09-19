@@ -189,8 +189,8 @@ function smooth_slider_get_default($slider_handle,$r_array,$slider_id='',$echo='
 	$smooth_slider_css = smooth_get_inline_css();
 	$html='';
 	
-	wp_enqueue_script( 'jquery.cycle', smooth_slider_plugin_url( 'js/jcycle.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
-	wp_enqueue_script( 'smooth-slider', smooth_slider_plugin_url( 'js/smooth.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
+	wp_enqueue_script( 'smooth', smooth_slider_plugin_url( 'js/smooth.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
+	wp_enqueue_script( 'smooth-dim', smooth_slider_plugin_url( 'js/dim.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
 /* Changed fouc code start 2.6 - Bug fix in 2.6.2.1 */	
 	if(!isset($smooth_slider['fouc']) or $smooth_slider['fouc']=='' or $smooth_slider['fouc']=='0' ){
 			$fouc_dom='jQuery("html").addClass("smooth_slider_fouc");jQuery(".smooth_slider_fouc .smooth_slider").hide();';
@@ -205,7 +205,7 @@ function smooth_slider_get_default($slider_handle,$r_array,$slider_id='',$echo='
 	$html.='<script type="text/javascript">';
 	$html.=$fouc_ready;
 	$html.='jQuery(document).ready(function() {
-		jQuery("#'.$slider_handle.'").cycle({ 
+		jQuery("#'.$slider_handle.'").smooth({ 
 			fx: "'.$smooth_slider['fx'].'",
 			speed:"'.$smooth_slider['transition'] * 100 .'",
 			timeout: '. ( ($smooth_slider['autostep'] == '1') ? ( $smooth_slider['speed'] * 1000 ) :  0 ) .',';

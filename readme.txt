@@ -4,7 +4,7 @@ Tags: slider, slideshow, wordpress slider, content slider, posts slider,image sl
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 3.0
 Tested up to: 4.0
-Stable tag: 2.6.4
+Stable tag: 2.6.5
 License: GPLv2 or later
 
 Most Popular Responsive WordPress Slider for Featured Content, Videos and Media Images
@@ -151,6 +151,12 @@ Check the other FAQs on Smooth [Slider Documetation on SliderVilla](http://guide
 
 
 == Changelog ==
+
+Version 2.6.5 (09/19/2014)
+
+1. Fix: Conflict with Pointelle Slider
+2. Fix: Conflict with Logo Slider
+3. Fix: Small issue with Reposiveness on resizing Smooth Slider with border specified
 
 Version 2.6.4 (09/10/2014)
 

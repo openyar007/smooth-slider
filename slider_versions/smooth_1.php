@@ -192,8 +192,7 @@ global $smooth_slider;
 	wp_register_script('jquery', false, false, false, false);
 	wp_enqueue_script( 'jquery-ui-tabs' );
 	wp_enqueue_script( 'jquery-ui-core' );
-          wp_enqueue_script( 'jquery-ui-sortable' );
-	//wp_enqueue_script( 'jquery.cycle', smooth_slider_plugin_url( 'js/jcycle.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
+    wp_enqueue_script( 'jquery-ui-sortable' );
 	wp_enqueue_script( 'smooth_slider_admin_js', smooth_slider_plugin_url( 'js/admin.js' ),
 		array('jquery'), SMOOTH_SLIDER_VER, false); 
 	wp_enqueue_script( 'jquery.bpopup.min', smooth_slider_plugin_url( 'js/jquery.bpopup.min.js' ),'', SMOOTH_SLIDER_VER, false);

@@ -3,7 +3,7 @@ Contributors: internet techies, slidervilla
 Tags: slider, slideshow, wordpress slider, content slider, posts slider,image slider, responsive slideshow, image Rotator, jquery slider, Photo Slider, nivo slider, slider plugin, javascript slider, coin slider, responsive slider, featured-content-slider, Horizontal slider, carousel slider, wp slider, vertical slider, best slider plugin, content slideshow, javascript slideshow, slideshow manager, slideshow plugin, image slideshow, jquery slideshow, wordpress slideshow, vertical slides, responsive, nivoslider, flex slider, coinslider, carousel, post, posts, plugin, slider widget, widget slider, widget slideshow, widget, widgets, seo, wordpress seo, media, page, slide, slides
 Donate link: http://www.clickonf5.org/go/smooth-slider/ 
 Requires at least: 3.0
-Tested up to: 4.0
+Tested up to: 4.2
 Stable tag: 2.6.5
 License: GPLv2 or later
 

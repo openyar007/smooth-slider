@@ -89,14 +89,21 @@ if (current_user_can( $smooth_slider['user_level'] )) {
 	if(isset($attachment['slider']) and !isset($attachment['slider_name'])) {
 	  $slider_id = '1';
 	  if(is_post_on_any_slider($post_id)){
-	     $sql = "DELETE FROM $table_name where post_id = '$post_id'";
-		 $wpdb->query($sql);
+	    	 $wpdb->delete( $table_name, array( 'post_id' => $post_id ), array( '%d' ) );
 	  }
 	  
 	  if(isset($attachment['slider']) and $attachment['slider'] == "slider" and !slider($post_id,$slider_id)) {
 		$dt = date('Y-m-d H:i:s');
-		$sql = "INSERT INTO $table_name (post_id, date, slider_id) VALUES ('$post_id', '$dt', '$slider_id')";
-		$wpdb->query($sql);
+		$wpdb->query( 
+			$wpdb->prepare( 
+				"INSERT INTO $table_name
+				(post_id, date, slider_id)
+				VALUES ( %d, %s, %d )", 
+				$post_id,
+				$dt,
+				$slider_id
+			) 
+		);
 	  }
 	}
 	if(isset($attachment['slider']) and $attachment['slider'] == "slider" and isset($attachment['slider_name'])){
@@ -105,16 +112,23 @@ if (current_user_can( $smooth_slider['user_level'] )) {
 	  
 	  foreach($post_sliders_data as $post_slider_data){
 		if(!in_array($post_slider_data['slider_id'],$slider_id_arr)) {
-		  $sql = "DELETE FROM $table_name where post_id = '$post_id'";
-		  $wpdb->query($sql);
+			$wpdb->delete( $table_name, array( 'post_id' => $post_id ), array( '%d' ) );
 		}
 	  }
     
 		foreach($slider_id_arr as $slider_id) {
 			if(!slider($post_id,$slider_id)) {
 				$dt = date('Y-m-d H:i:s');
-				$sql = "INSERT INTO $table_name (post_id, date, slider_id) VALUES ('$post_id', '$dt', '$slider_id')";
-				$wpdb->query($sql);
+				$wpdb->query( 
+					$wpdb->prepare( 
+						"INSERT INTO $table_name
+						(post_id, date, slider_id)
+						VALUES ( %d, %s, %d )", 
+						$post_id,
+						$dt,
+						$slider_id
+					) 
+				);
 			}
 		}
 	}

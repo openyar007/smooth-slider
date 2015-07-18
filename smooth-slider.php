@@ -3,7 +3,7 @@
 Plugin Name: Smooth Slider
 Plugin URI: http://slidervilla.com/smooth-slider/
 Description: Smooth slider adds a responsive featured content on image slider using shortcode, widget and template tags. Create and embed featured content slider, recent post slider, category slider in less than 60 seconds.
-Version: 2.6.5	
+Version: 2.7	
 Author: SliderVilla
 Author URI: http://slidervilla.com/
 Wordpress version supported: 2.9 and above
@@ -30,12 +30,12 @@ Wordpress version supported: 2.9 and above
 //defined global variables and constants here
 global $smooth_slider,$default_slider,$smooth_db_version,$default_smooth_slider_settings;
 $smooth_slider = get_option('smooth_slider_options');
-$smooth_db_version='2.6.5'; //current version of smooth slider database 
+$smooth_db_version='2.7'; //current version of smooth slider database 
 define('SLIDER_TABLE','smooth_slider'); //Slider TABLE NAME
 define('PREV_SLIDER_TABLE','slider'); //Slider TABLE NAME
 define('SLIDER_META','smooth_slider_meta'); //Meta TABLE NAME
 define('SLIDER_POST_META','smooth_slider_postmeta'); //Meta TABLE NAME
-define("SMOOTH_SLIDER_VER","2.6.5",false);//Current Version of Smooth Slider
+define("SMOOTH_SLIDER_VER","2.7",false);//Current Version of Smooth Slider
 if ( ! defined( 'SMOOTH_SLIDER_PLUGIN_BASENAME' ) )
 	define( 'SMOOTH_SLIDER_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 if ( ! defined( 'SMOOTH_SLIDER_CSS_DIR' ) ){
@@ -46,66 +46,66 @@ if ( ! defined( 'SMOOTH_SLIDER_CSS_DIR' ) ){
 // Need to delete the previously created options in old versions and create only one option field for Smooth Slider
 $default_smooth_slider_settings=$default_slider = array();
 $default_smooth_slider_settings=$default_slider = array('speed'=>'7', 
-	                       'no_posts'=>'5', 
-						   'bg_color'=>'#ffffff', 
-						   'height'=>'250',
-						   'width'=>'450',
-						   'border'=>'0',
-						   'brcolor'=>'#dddddd',
-						   'prev_next'=>'0',
-						   'goto_slide'=>'1',
-						   'title_text'=>'Featured Posts',
-						   'title_from'=>'0',
-						   'title_font'=>'Georgia',
-						   'title_fsize'=>'20',
-						   'title_fstyle'=>'bold',
-						   'title_fcolor'=>'#000000',
-						   'ptitle_font'=>'Trebuchet MS',
-						   'ptitle_fsize'=>'14',
-						   'ptitle_fstyle'=>'bold',
-						   'ptitle_fcolor'=>'#000000',
-						   'img_align'=>'left',
-						   'img_height'=>'120',
-						   'img_width'=>'165',
-						   'img_border'=>'1',
-						   'img_brcolor'=>'#000000',
-						   'content_font'=>'Verdana',
-						   'content_fsize'=>'12',
-						   'content_fstyle'=>'normal',
-						   'content_fcolor'=>'#333333',
-						   'content_from'=>'content',
-						   'content_chars'=>'300',
-						   'bg'=>'0',
-						   'image_only'=>'0',
-						   'allowable_tags'=>'',
-						   'more'=>'Read More',
-						   'img_size'=>'1',
-						   'img_pick'=>array('1','slider_thumbnail','1','1','1','1'), //use custom field/key, name of the key, use post featured image, pick the image attachment, attachment order,scan images
-						   'user_level'=>'edit_others_posts',
-						   'custom_nav'=>'',
-						   'crop'=>'0',
-						   'transition'=>'5',
-						   'autostep'=>'1',
-						   'multiple_sliders'=>'1',
-						   'navimg_w'=>'8',
-						   'navimg_ht'=>'8',
-						   'content_limit'=>'20',
-						   'stylesheet'=>'default',
-						   'shortcode'=>'1',
-						   'rand'=>'0',
-						   'ver'=>'j',
-						   'fouc'=>'0',
-						   'fx'=>'scrollHorz',
-						   'css'=>'',
-						   'active_tab'=>'0',
-						   'disable_preview'=>'0',
-						   'preview'=>'2',
-						   'slider_id'=>'1',
-						   'catg_slug'=>'',
-						   'popup'=>'1',
-						   'readmorecolor'=>'#0092E4',
-						   'noscript'=>''
-			              );
+	'no_posts'=>'5', 
+	'bg_color'=>'#ffffff', 
+	'height'=>'250',
+	'width'=>'450',
+	'border'=>'0',
+	'brcolor'=>'#dddddd',
+	'prev_next'=>'0',
+	'goto_slide'=>'1',
+	'title_text'=>'Featured Posts',
+	'title_from'=>'0',
+	'title_font'=>'Georgia',
+	'title_fsize'=>'20',
+	'title_fstyle'=>'bold',
+	'title_fcolor'=>'#000000',
+	'ptitle_font'=>'Trebuchet MS',
+	'ptitle_fsize'=>'14',
+	'ptitle_fstyle'=>'bold',
+	'ptitle_fcolor'=>'#000000',
+	'img_align'=>'left',
+	'img_height'=>'120',
+	'img_width'=>'165',
+	'img_border'=>'1',
+	'img_brcolor'=>'#000000',
+	'content_font'=>'Verdana',
+	'content_fsize'=>'12',
+	'content_fstyle'=>'normal',
+	'content_fcolor'=>'#333333',
+	'content_from'=>'content',
+	'content_chars'=>'300',
+	'bg'=>'0',
+	'image_only'=>'0',
+	'allowable_tags'=>'',
+	'more'=>'Read More',
+	'img_size'=>'1',
+	'img_pick'=>array('1','slider_thumbnail','1','1','1','1'), //use custom field/key, name of the key, use post featured image, pick the image attachment, attachment order,scan images
+	'user_level'=>'edit_others_posts',
+	'custom_nav'=>'',
+	'crop'=>'0',
+	'transition'=>'5',
+	'autostep'=>'1',
+	'multiple_sliders'=>'1',
+	'navimg_w'=>'8',
+	'navimg_ht'=>'8',
+	'content_limit'=>'20',
+	'stylesheet'=>'default',
+	'shortcode'=>'1',
+	'rand'=>'0',
+	'ver'=>'j',
+	'fouc'=>'0',
+	'fx'=>'scrollHorz',
+	'css'=>'',
+	'active_tab'=>'0',
+	'disable_preview'=>'0',
+	'preview'=>'2',
+	'slider_id'=>'1',
+	'catg_slug'=>'',
+	'popup'=>'1',
+	'readmorecolor'=>'#0092E4',
+	'noscript'=>''
+);
 // Create Text Domain For Translations
 load_plugin_textdomain('smooth-slider', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/');
 
@@ -132,8 +132,16 @@ function install_smooth_slider() {
 					$prev_post_id = $prev_slider_row['id'];
 					$prev_date_time = $prev_slider_row['date'];
 					if ($prev_post_id) {
-						$sql = "INSERT INTO $table_name (post_id,date) VALUES('$prev_post_id','$prev_date_time');";
-						$result = $wpdb->query($sql);
+						$wpdb->query( 
+							$wpdb->prepare( 
+								"INSERT INTO $table_name
+								(post_id,date)
+								VALUES ( %d, %s )
+								", 
+								$prev_post_id,
+								$prev_date_time
+							) 
+						);
 					}
 				}
 			}
@@ -143,14 +151,21 @@ function install_smooth_slider() {
 	   	$meta_table_name = $table_prefix.SLIDER_META;
 		if($wpdb->get_var("show tables like '$meta_table_name'") != $meta_table_name) {
 			$sql = "CREATE TABLE $meta_table_name (
-						slider_id int(5) NOT NULL AUTO_INCREMENT,
-						slider_name varchar(100) NOT NULL default '',
-						UNIQUE KEY slider_id(slider_id)
-					);";
+					slider_id int(5) NOT NULL AUTO_INCREMENT,
+					slider_name varchar(100) NOT NULL default '',
+					UNIQUE KEY slider_id(slider_id)
+				);";
 			$rs2 = $wpdb->query($sql);
 		
-			$sql = "INSERT INTO $meta_table_name (slider_id,slider_name) VALUES('1','Smooth Slider');";
-			$rs3 = $wpdb->query($sql);
+			$wpdb->query( 
+				$wpdb->prepare( 
+					"INSERT INTO $meta_table_name
+					(slider_id,slider_name)
+					VALUES ( %d, %s )", 
+					1,
+					'Smooth Slider'
+				) 
+			);
 		}
 	
 		$slider_postmeta = $table_prefix.SLIDER_POST_META;
@@ -163,7 +178,7 @@ function install_smooth_slider() {
 			$rs4 = $wpdb->query($sql);
 		}
 	  
-		global $default_slider;
+			global $default_slider;
 	  
 		   $smooth_slider = get_option('smooth_slider_options');
 		   	   	   
@@ -189,10 +204,6 @@ function install_smooth_slider() {
 			   }
 		   }
 		   
-	/*	    if(is_array($img_pick) and (count($img_pick)<6 or count($img_pick)>6)) {
-			  $smooth_slider['img_pick'] = array('1',$cskey,'1','1','1','1');
-			}
-	*/	   
 		   if(!$smooth_slider) {
 		     $smooth_slider = array();
 		   }
@@ -252,14 +263,21 @@ global $smooth_slider;
 	if(isset($_POST['slider']) and !isset($_POST['slider_name'])) { 
 	  $slider_id = '1';
 	  if(is_post_on_any_slider($post_id)){
-	     $sql = "DELETE FROM $table_name where post_id = '$post_id'";
-		 $wpdb->query($sql);
+	  	$wpdb->delete( $table_name, array( 'post_id' => $post_id ), array( '%d' ) );
 	  }
 	  
 	  if(isset($_POST['slider']) and $_POST['slider'] == "slider" and !slider($post_id,$slider_id)) {
 		$dt = date('Y-m-d H:i:s');
-		$sql = "INSERT INTO $table_name (post_id, date, slider_id) VALUES ('$post_id', '$dt', '$slider_id')";
-		$wpdb->query($sql);
+		$wpdb->query( 
+			$wpdb->prepare( 
+				"INSERT INTO $table_name
+				(post_id, date, slider_id)
+				VALUES ( %d, %s, %d )", 
+				$post_id,
+				$dt,
+				$slider_id
+			) 
+		);
 	  }
 	}
 	if(isset($_POST['slider']) and $_POST['slider'] == "slider" and isset($_POST['slider_name'])){
@@ -268,19 +286,22 @@ global $smooth_slider;
 	  
 	  foreach($post_sliders_data as $post_slider_data){
 		if(!in_array($post_slider_data['slider_id'],$slider_id_arr)) {
-		  $sql = "DELETE FROM $table_name where post_id = '$post_id'";
-		  $wpdb->query($sql);
+			$wpdb->delete( $table_name, array( 'post_id' => $post_id ), array( '%d' ) );
 		}
 	  }
-	    /*if(is_post_on_any_slider($post_id)){
-	     $sql = "DELETE FROM $table_name where post_id = '$post_id'";
-		 $wpdb->query($sql);
-	    }*/
-		foreach($slider_id_arr as $slider_id) {
+	  	foreach($slider_id_arr as $slider_id) {
 			if(!slider($post_id,$slider_id)) {
 				$dt = date('Y-m-d H:i:s');
-				$sql = "INSERT INTO $table_name (post_id, date, slider_id) VALUES ('$post_id', '$dt', '$slider_id')";
-				$wpdb->query($sql);
+				$wpdb->query( 
+					$wpdb->prepare( 
+						"INSERT INTO $table_name
+						(post_id, date, slider_id)
+						VALUES ( %d, %s, %d )", 
+						$post_id,
+						$dt,
+						$slider_id
+					) 
+				);
 			}
 		}
 	}
@@ -294,23 +315,29 @@ global $smooth_slider;
 	}
   	if(isset($_POST['display_slider'])){	
 		  if(!ss_post_on_slider($post_id,$slider_id)) {
-		    $sql = "DELETE FROM $table_name where post_id = '$post_id'";
-		    $wpdb->query($sql);
-			$sql = "INSERT INTO $table_name (post_id, slider_id) VALUES ('$post_id', '$slider_id')";
-			$wpdb->query($sql);
+		    	$wpdb->delete( $table_name, array( 'post_id' => $post_id ), array( '%d' ) );
+			$wpdb->query( 
+				$wpdb->prepare( 
+					"INSERT INTO $table_name
+					(post_id, slider_id)
+					VALUES ( %d, %d )", 
+					$post_id,
+					$slider_id
+				) 
+			);
 		  }
 	}
 	
 	
 	$thumbnail_key = $smooth_slider['img_pick'][1];
 	$sslider_thumbnail = get_post_meta($post_id,$thumbnail_key,true);
-	$post_slider_thumbnail=$_POST['sslider_thumbnail'];
+	$post_slider_thumbnail=isset($_POST['sslider_thumbnail'])?$_POST['sslider_thumbnail']:'';
 	if($sslider_thumbnail != $post_slider_thumbnail) {
-	  update_post_meta($post_id, $thumbnail_key, $_POST['sslider_thumbnail']);	
+	  update_post_meta($post_id, $thumbnail_key, $post_slider_thumbnail);	
 	}
 	
 	$sslider_link = get_post_meta($post_id,'slide_redirect_url',true);
-	$link=$_POST['sslider_link'];
+	$link=isset($_POST['sslider_link'])?$_POST['sslider_link']:'';
 	//$sldr_post=get_post($post_id);
 	//if((!isset($link) or empty($link)) and $sldr_post->post_status == 'publish'  ){$link=get_permalink($post_id);}//from 2.3.3
 	if($sslider_link != $link) {
@@ -318,25 +345,25 @@ global $smooth_slider;
 	}
 	
 	$sslider_nolink = get_post_meta($post_id,'sslider_nolink',true);
-	$post_sslider_nolink = $_POST['sslider_nolink'];
+	$post_sslider_nolink = isset($_POST['sslider_nolink'])?$_POST['sslider_nolink']:'';
 	if($sslider_nolink != $post_sslider_nolink) {
-	  update_post_meta($post_id, 'sslider_nolink', $_POST['sslider_nolink']);	
+	  update_post_meta($post_id, 'sslider_nolink', $post_sslider_nolink);	
 	}
 	/* Added for embed shortcode - start */
 	$disable_image = get_post_meta($post_id,'_disable_image',true);
-	$post_disable_image = $_POST['disable_image'];
+	$post_disable_image = isset($_POST['disable_image'])?$_POST['disable_image']:'';
 	if($disable_image != $post_disable_image ) {
 	  update_post_meta($post_id, '_disable_image', $post_disable_image );	
 	}
 	$smooth_sslider_eshortcode = get_post_meta($post_id,'_smooth_embed_shortcode',true);
-	$post_smooth_sslider_eshortcode = $_POST['smooth_sslider_eshortcode'];
+	$post_smooth_sslider_eshortcode = isset($_POST['smooth_sslider_eshortcode'])?$_POST['smooth_sslider_eshortcode']:'';
 	if($smooth_sslider_eshortcode != $post_smooth_sslider_eshortcode) {
 	  update_post_meta($post_id, '_smooth_embed_shortcode', $post_smooth_sslider_eshortcode);	
 	}
 	$slider_style = get_post_meta($post_id,'_smooth_slider_style',true);
-	$post_slider_style=$_POST['_smooth_slider_style'];
+	$post_slider_style=isset($_POST['_smooth_slider_style'])?$_POST['_smooth_slider_style']:'';
 	if($slider_style != $post_slider_style) {
-	  update_post_meta($post_id, '_smooth_slider_style', $_POST['_smooth_slider_style']);	
+	  update_post_meta($post_id, '_smooth_slider_style', $post_slider_style);	
 	}
 	/* Added for embed shortcode -end */
 	
@@ -345,40 +372,38 @@ global $smooth_slider;
 
 //Removes the post from the slider, if you uncheck the checkbox from the edit post screen
 function remove_from_slider($post_id) {
-	global $wpdb, $table_prefix;
-	$table_name = $table_prefix.SLIDER_TABLE;
+	if(isset($_POST['sldr-verify'])) {
+		global $wpdb, $table_prefix;
+		$table_name = $table_prefix.SLIDER_TABLE;
 	
-	// authorization
-	if (!current_user_can('edit_post', $post_id))
-		return $post_id;
-	// origination and intention
-	if (!wp_verify_nonce($_POST['sldr-verify'], 'SmoothSlider'))
-		return $post_id;
+		// authorization
+		if (!current_user_can('edit_post', $post_id))
+			return $post_id;
+		// origination and intention
+		if (!wp_verify_nonce($_POST['sldr-verify'], 'SmoothSlider'))
+			return $post_id;
 	
-    if(empty($_POST['slider']) and is_post_on_any_slider($post_id)) {
-		$sql = "DELETE FROM $table_name where post_id = '$post_id'";
-		$wpdb->query($sql);
-	}
+	    	if(isset($_POST['slider']) and empty($_POST['slider']) and is_post_on_any_slider($post_id)) {
+			$wpdb->delete( $table_name, array( 'post_id' => $post_id ), array( '%d' ) );
+		}
 	
-	$display_slider = $_POST['display_slider'];
-	$table_name = $table_prefix.SLIDER_POST_META;
-	if(empty($display_slider) and ss_slider_on_this_post($post_id)){
-	  $sql = "DELETE FROM $table_name where post_id = '$post_id'";
-		    $wpdb->query($sql);
+		$display_slider = isset($_POST['display_slider'])?$_POST['display_slider']:'';
+		$table_name = $table_prefix.SLIDER_POST_META;
+		if(empty($display_slider) and ss_slider_on_this_post($post_id)){
+		 	$wpdb->delete( $table_name, array( 'post_id' => $post_id ), array( '%d' ) );
+		}
 	}
 } 
   
 function delete_from_slider_table($post_id){
-    global $wpdb, $table_prefix;
+    	global $wpdb, $table_prefix;
 	$table_name = $table_prefix.SLIDER_TABLE;
-    if(is_post_on_any_slider($post_id)) {
-		$sql = "DELETE FROM $table_name where post_id = '$post_id'";
-		$wpdb->query($sql);
+    	if(is_post_on_any_slider($post_id)) {
+		$wpdb->delete( $table_name, array( 'post_id' => $post_id ), array( '%d' ) );
 	}
 	$table_name = $table_prefix.SLIDER_POST_META;
-    if(ss_slider_on_this_post($post_id)) {
-		$sql = "DELETE FROM $table_name where post_id = '$post_id'";
-		$wpdb->query($sql);
+    	if(ss_slider_on_this_post($post_id)) {
+		$wpdb->delete( $table_name, array( 'post_id' => $post_id ), array( '%d' ) );
 	}
 }
 
@@ -449,7 +474,7 @@ function add_to_slider_checkbox() {
 		$sslider_link= get_post_meta($post_id, 'slide_redirect_url', true);  
 		$sslider_nolink=get_post_meta($post_id, 'sslider_nolink', true);
 		$thumbnail_key = $smooth_slider['img_pick'][1];
-                    $sslider_thumbnail= get_post_meta($post_id, $thumbnail_key, true); 
+                $sslider_thumbnail= get_post_meta($post_id, $thumbnail_key, true); 
 		$sslider_disable_image=get_post_meta($post_id, '_disable_image', true);
 		$smooth_embed_shortcode=get_post_meta($post_id, '_smooth_embed_shortcode', true);
 ?>	

@@ -7,50 +7,43 @@ function ss_get_sliders(){
 	return $sliders;
 }
 function get_slider_posts_in_order($slider_id) {
-    global $wpdb, $table_prefix;
+    	global $wpdb, $table_prefix;
 	$table_name = $table_prefix.SLIDER_TABLE;
-	$slider_posts = $wpdb->get_results("SELECT * FROM $table_name WHERE slider_id = '$slider_id' ORDER BY slide_order ASC, date DESC", OBJECT);
+	$slider_posts = $wpdb->get_results($wpdb->prepare( "SELECT * FROM $table_name WHERE slider_id = %d ORDER BY slide_order ASC, date DESC",$slider_id ), OBJECT);
 	return $slider_posts;
 }
 function get_smooth_slider_name($slider_id) {
-    global $wpdb, $table_prefix;
-	
+    	global $wpdb, $table_prefix;
+    	$slider_name = '';
 	$table_name = $table_prefix.SLIDER_META;
-	$slider_obj = $wpdb->get_results("SELECT * FROM $table_name WHERE slider_id = '$slider_id'", OBJECT);
+	$slider_obj = $wpdb->get_results($wpdb->prepare( "SELECT * FROM $table_name WHERE slider_id = %d",$slider_id ), OBJECT);
 	if (isset ($slider_obj[0]))$slider_name = $slider_obj[0]->slider_name;
 	return $slider_name;
 }
 function ss_get_post_sliders($post_id){
-    global $wpdb,$table_prefix;
+    	global $wpdb,$table_prefix;
 	$slider_table = $table_prefix.SLIDER_TABLE; 
-	$sql = "SELECT * FROM $slider_table 
-	        WHERE post_id = '$post_id';";
-	$post_sliders = $wpdb->get_results($sql, ARRAY_A);
+	$post_sliders =$wpdb->get_results($wpdb->prepare( "SELECT * FROM $slider_table WHERE post_id = %d",$post_id ), ARRAY_A);
 	return $post_sliders;
 }
 function ss_get_prev_slider(){
-    global $wpdb,$table_prefix;
+    	global $wpdb,$table_prefix;
 	$slider_table = $table_prefix.PREV_SLIDER_TABLE; 
 	$sql = "SELECT * FROM $slider_table";
 	$prev_slider_data = $wpdb->get_results($sql, ARRAY_A);
 	return $prev_slider_data;
 }
 function ss_post_on_slider($post_id,$slider_id){
-    global $wpdb,$table_prefix;
+    	global $wpdb,$table_prefix;
 	$slider_postmeta = $table_prefix.SLIDER_POST_META;
-    $sql = "SELECT * FROM $slider_postmeta  
-	        WHERE post_id = '$post_id' 
-			AND slider_id = '$slider_id';";
-	$result = $wpdb->query($sql);
+    	$result = $wpdb->query($wpdb->prepare( "SELECT * FROM $slider_postmeta WHERE post_id = %d AND slider_id = %d",$post_id,$slider_id ));
 	if($result == 1) { return TRUE; }
 	else { return FALSE; }
 }
 function ss_slider_on_this_post($post_id){
-    global $wpdb,$table_prefix;
+    	global $wpdb,$table_prefix;
 	$slider_postmeta = $table_prefix.SLIDER_POST_META;
-    $sql = "SELECT * FROM $slider_postmeta  
-	        WHERE post_id = '$post_id';";
-	$result = $wpdb->query($sql);
+    	$result = $wpdb->query($wpdb->prepare( "SELECT * FROM $slider_postmeta WHERE post_id = %d",$post_id ));
 	if($result == 1) { return TRUE; }
 	else { return FALSE; }
 }
@@ -58,48 +51,42 @@ function ss_slider_on_this_post($post_id){
 function slider($post_id,$slider_id = '1') {
 	global $wpdb, $table_prefix;
 	$table_name = $table_prefix.SLIDER_TABLE;
-	$check = "SELECT id FROM $table_name WHERE post_id = '$post_id' AND slider_id = '$slider_id';";
-	$result = $wpdb->query($check);
+	$result = $wpdb->query($wpdb->prepare( "SELECT id FROM $table_name WHERE post_id = %d AND slider_id = %d",$post_id, $slider_id ));
 	if($result == 1) { return TRUE; }
 	else { return FALSE; }
 }
 function is_post_on_any_slider($post_id) {
 	global $wpdb, $table_prefix;
 	$table_name = $table_prefix.SLIDER_TABLE;
-	$check = "SELECT post_id FROM $table_name WHERE post_id = '$post_id' LIMIT 1;";
-	$result = $wpdb->query($check);
+	$result = $wpdb->query($wpdb->prepare( "SELECT * FROM $table_name WHERE post_id = %d LIMIT 1",$post_id ));
 	if($result == 1) { return TRUE; }
 	else { return FALSE; }
 }
 function is_slider_on_slider_table($slider_id) {
 	global $wpdb, $table_prefix;
 	$table_name = $table_prefix.SLIDER_TABLE;
-	$check = "SELECT * FROM $table_name WHERE slider_id = '$slider_id' LIMIT 1;";
-	$result = $wpdb->query($check);
+	$result = $wpdb->query($wpdb->prepare( "SELECT * FROM $table_name WHERE slider_id = %d LIMIT 1",$slider_id ));
 	if($result == 1) { return TRUE; }
 	else { return FALSE; }
 }
 function is_slider_on_meta_table($slider_id) {
 	global $wpdb, $table_prefix;
 	$table_name = $table_prefix.SLIDER_META;
-	$check = "SELECT * FROM $table_name WHERE slider_id = '$slider_id' LIMIT 1;";
-	$result = $wpdb->query($check);
+	$result = $wpdb->query($wpdb->prepare( "SELECT * FROM $table_name WHERE slider_id = %d LIMIT 1",$slider_id ));
 	if($result == 1) { return TRUE; }
 	else { return FALSE; }
 }
 function is_slider_on_postmeta_table($slider_id) {
 	global $wpdb, $table_prefix;
 	$table_name = $table_prefix.SLIDER_POST_META;
-	$check = "SELECT * FROM $table_name WHERE slider_id = '$slider_id' LIMIT 1;";
-	$result = $wpdb->query($check);
+	$result = $wpdb->query($wpdb->prepare( "SELECT * FROM $table_name WHERE slider_id = %d LIMIT 1",$slider_id ));
 	if($result == 1) { return TRUE; }
 	else { return FALSE; }
 }
 function get_slider_for_the_post($post_id) {
-    global $wpdb, $table_prefix;
+    	global $wpdb, $table_prefix;
 	$table_name = $table_prefix.SLIDER_POST_META;
-	$sql = "SELECT slider_id FROM $table_name WHERE post_id = '$post_id' LIMIT 1;";
-	$slider_postmeta = $wpdb->get_row($sql, ARRAY_A);
+	$slider_postmeta = $wpdb->get_row($wpdb->prepare( "SELECT slider_id FROM $table_name WHERE post_id = %d LIMIT 1",$post_id ), ARRAY_A);
 	$slider_id = $slider_postmeta['slider_id'];
 	return $slider_id;
 }
@@ -149,22 +136,22 @@ function smooth_slider_table_exists($table, $db) {
 	return FALSE;
 }
 function add_cf5_column_if_not_exist($table_name, $column_name, $create_ddl) {
-     global $wpdb, $debug;
-      foreach ($wpdb->get_col("DESC $table_name", 0) as $column ) {
-          if ($debug) echo("checking $column == $column_name<br />");
-          if ($column == $column_name) {
-              return true;
-          }
-     }
-      //didn't find it try to create it.
-      $q = $wpdb->query($create_ddl);
-      // we cannot directly tell that whether this succeeded!
-     foreach ($wpdb->get_col("DESC $table_name", 0) as $column ) {
-          if ($column == $column_name) {
-             return true;
-          }
-      }
-      return false;
+     	global $wpdb, $debug;
+      	foreach ($wpdb->get_col("DESC $table_name", 0) as $column ) {
+		if ($debug) echo("checking $column == $column_name<br />");
+		if ($column == $column_name) {
+			return true;
+		}
+     	}
+      	//didn't find it try to create it.
+      	$q = $wpdb->query($create_ddl);
+      	// we cannot directly tell that whether this succeeded!
+	foreach ($wpdb->get_col("DESC $table_name", 0) as $column ) {
+	  if ($column == $column_name) {
+	     return true;
+	  }
+	}
+      	return false;
 }
 
 ?>

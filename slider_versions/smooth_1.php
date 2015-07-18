@@ -84,10 +84,9 @@ function carousel_posts_on_slider($max_posts, $offset=0, $slider_id = '1',$out_e
 	  $orderby = 'a.slide_order ASC, a.date DESC';
 	}
 	$posts = $wpdb->get_results("SELECT b.* FROM 
-	                             $table_name a LEFT OUTER JOIN $post_table b 
-								 ON a.post_id = b.ID 
-								 WHERE (b.post_status = 'publish' OR (b.post_type='attachment' AND b.post_status = 'inherit')) AND a.slider_id = '$slider_id' 
-	                             ORDER BY ".$orderby." LIMIT $offset, $max_posts", OBJECT);
+	        $table_name a LEFT OUTER JOIN $post_table b 
+		ON a.post_id = b.ID 
+		WHERE (b.post_status = 'publish' OR (b.post_type='attachment' AND b.post_status = 'inherit')) AND a.slider_id = '$slider_id' ORDER BY ".$orderby." LIMIT $offset, $max_posts", OBJECT);
 	
 	$r_array=smooth_global_posts_processor( $posts, $smooth_slider, $out_echo, $set, $data );
 	return $r_array;

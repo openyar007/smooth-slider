@@ -108,7 +108,6 @@ $new_settings_msg='';
 //Import Settings
 if (isset ($_POST['import'])) {
 	if ($_POST['import']=='Import') {
-		global $wpdb;
 		$imported_settings_message='';
 		$csv_mimetypes = array('text/csv','text/x-csv','text/plain','application/csv','text/comma-separated-values','application/excel','application/vnd.ms-excel','application/vnd.msexcel','text/anytext','application/octet-stream','application/txt');
 		if ($_FILES['settings_file']['error'] == UPLOAD_ERR_OK && is_uploaded_file($_FILES['settings_file']['tmp_name']) && in_array($_FILES['settings_file']['type'], $csv_mimetypes) ) { 
@@ -550,7 +549,7 @@ if ($handle = opendir($directory)) {
 <td><select name="smooth_slider_options[img_align]" id="smooth_slider_img_align" >
 <option value="left" <?php if ($smooth_slider['img_align'] == "left"){ echo "selected";}?> ><?php _e('Left','smooth-slider'); ?></option>
 <option value="right" <?php if ($smooth_slider['img_align'] == "right"){ echo "selected";}?> ><?php _e('Right','smooth-slider'); ?></option>
-<option value="none" <?php if ($smooth_slider['img_align'] == "none"){ echo "selected";}?> ><?php _e('Center','smooth-slider'); ?></option>
+<option value="none" <?php if ($smooth_slider['img_align'] == "none"){ echo "selected";}?> ><?php _e('None','smooth-slider'); ?></option>
 </select>
 </td>
 </tr>

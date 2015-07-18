@@ -188,7 +188,7 @@ function smooth_slider_get_default($slider_handle,$r_array,$slider_id='',$echo='
 	$smooth_sldr_j = $r_array[0];
 	$smooth_slider_css = smooth_get_inline_css();
 	$html='';
-	
+	if(isset($smooth_sldr_j) && $smooth_sldr_j >= 1) : //is slider empty?	
 	wp_enqueue_script( 'smooth', smooth_slider_plugin_url( 'js/smooth.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
 	wp_enqueue_script( 'smooth-dim', smooth_slider_plugin_url( 'js/dim.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
 /* Changed fouc code start 2.6 - Bug fix in 2.6.2.1 */	
@@ -286,6 +286,7 @@ function smooth_slider_get_default($slider_handle,$r_array,$slider_id='',$echo='
 	$html.='<script type="text/javascript">'.$fouc_dom.'</script>';
 	if($echo == '1')  {echo $html; }
 	else { return $html; }
+	endif; //is slider empty?
 }
 function smooth_data_processor_default($slides, $smooth_slider,$out_echo){
   	$skin='default'; 

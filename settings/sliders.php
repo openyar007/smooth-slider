@@ -9,72 +9,105 @@ if (isset($_POST['remove_posts_slider'])) {
    if (isset($_POST['slider_posts']) ) {
        global $wpdb, $table_prefix;
        $table_name = $table_prefix.SLIDER_TABLE;
-	   $current_slider = $_POST['current_slider_id'];
+	   $current_slider = isset($_POST['current_slider_id'])?$_POST['current_slider_id']:'';
+	   $current_slider = intval($current_slider);
 	   foreach ( $_POST['slider_posts'] as $post_id=>$val ) {
-		   $sql = "DELETE FROM $table_name WHERE post_id = '$post_id' AND slider_id = '$current_slider' LIMIT 1";
-		   $wpdb->query($sql);
+		$wpdb->query( 
+			$wpdb->prepare( 
+				"
+				DELETE FROM $table_name
+				 WHERE post_id = %d
+				 AND slider_id = %d
+				",
+				$post_id, $current_slider
+			)
+		);
 	   }
    }
  if (isset ($_POST['remove_all'])) {
    if ($_POST['remove_all'] == __('Remove All at Once','smooth-slider')) {
        global $wpdb, $table_prefix;
        $table_name = $table_prefix.SLIDER_TABLE;
-	   $current_slider = $_POST['current_slider_id'];
+	   $current_slider = isset($_POST['current_slider_id'])?$_POST['current_slider_id']:'';
+	   $current_slider = intval($current_slider);
 	   if(is_slider_on_slider_table($current_slider)) {
-		   $sql = "DELETE FROM $table_name WHERE slider_id = '$current_slider';";
-		   $wpdb->query($sql);
+		   $wpdb->delete( $table_name, array( 'slider_id' => $current_slider ), array( '%d' ) );
 	   }
    }
 }
  if (isset ($_POST['remove_all'])) {
    if ($_POST['remove_all'] == __('Delete Slider','smooth-slider')) {
-       $slider_id = $_POST['current_slider_id'];
+       	$slider_id = isset($_POST['current_slider_id'])?$_POST['current_slider_id']:'';
+	$slider_id = intval($slider_id);
+       
        global $wpdb, $table_prefix;
        $slider_table = $table_prefix.SLIDER_TABLE;
        $slider_meta = $table_prefix.SLIDER_META;
 	   $slider_postmeta = $table_prefix.SLIDER_POST_META;
 	   if(is_slider_on_slider_table($slider_id)) {
-		   $sql = "DELETE FROM $slider_table WHERE slider_id = '$slider_id';";
-		   $wpdb->query($sql);
+		   $wpdb->delete( $slider_table, array( 'slider_id' => $slider_id ), array( '%d' ) );
 	   }
 	   if(is_slider_on_meta_table($slider_id)) {
-		   $sql = "DELETE FROM $slider_meta WHERE slider_id = '$slider_id';";
-		   $wpdb->query($sql);
+		   $wpdb->delete( $slider_meta, array( 'slider_id' => $slider_id ), array( '%d' ) );
 	   }
 	   if(is_slider_on_postmeta_table($slider_id)) {
-		   $sql = "DELETE FROM $slider_postmeta WHERE slider_id = '$slider_id';";
-		   $wpdb->query($sql);
+		   $wpdb->delete( $slider_postmeta, array( 'slider_id' => $slider_id ), array( '%d' ) );
 	   }
    }
 }
 }
 if (isset($_POST['create_new_slider'])) {
-   $slider_name = $_POST['new_slider_name'];
-   global $wpdb,$table_prefix;
-   $slider_meta = $table_prefix.SLIDER_META;
-   $sql = "INSERT INTO $slider_meta (slider_name) VALUES('$slider_name');";
-   $result = $wpdb->query($sql);
+   	$slider_name = $_POST['new_slider_name'];
+   	global $wpdb,$table_prefix;
+   	$slider_meta = $table_prefix.SLIDER_META;
+      	$wpdb->query( 
+		$wpdb->prepare( 
+			"INSERT INTO $slider_meta
+			(slider_name)
+			VALUES ( %s )", 
+			$slider_name
+		) 
+	);
 }
 if (isset($_POST['reorder_posts_slider'])) {
    $i=1;
    global $wpdb, $table_prefix;
    $table_name = $table_prefix.SLIDER_TABLE;
    foreach ($_POST['order'] as $slide_order) {
-    $slide_order = intval($slide_order);
-    $sql = 'UPDATE '.$table_name.' SET slide_order='.$i.' WHERE post_id='.$slide_order.'';
-    $wpdb->query($sql);
-    $i++;
+    	$slide_order = intval($slide_order);
+ 	$wpdb->update( 
+		$table_name, 
+		array( 
+			'slide_order' => $i
+		), 
+		array( 'post_id' => $slide_order ), 
+		array( 
+			'%d'
+		), 
+		array( '%d' ) 
+	);
+    	$i++;
   }
 }
 /*Added for rename slider-2.6-start*/
 if ((isset ($_POST['rename_slider'])) and ($_POST['rename_slider'] == __('Rename','smooth-slider'))) {
 	$slider_name = $_POST['rename_slider_to'];
-	$slider_id=$_POST['current_slider_id'];
+	$slider_id = isset($_POST['current_slider_id'])?$_POST['current_slider_id']:'';
+	$slider_id = intval($slider_id);
 	if( !empty($slider_name) ) {
 		global $wpdb,$table_prefix;
 		$slider_meta = $table_prefix.SLIDER_META;
-		$sql = 'UPDATE '.$slider_meta.' SET slider_name="'.$slider_name.'" WHERE slider_id='.$slider_id;
-		$wpdb->query($sql);
+		$wpdb->update( 
+			$slider_meta, 
+			array( 
+				'slider_name' => $slider_name
+			), 
+			array( 'slider_id' => $slider_id ), 
+			array( 
+				'%s'
+			), 
+			array( '%d' ) 
+		);
 	}
 }
 /*Added for rename slider-2.6-end*/
@@ -82,7 +115,8 @@ if ((isset ($_POST['rename_slider'])) and ($_POST['rename_slider'] == __('Rename
 /* Added for upload media save-2.6 */
 if ( isset($_POST['addSave']) and ($_POST['addSave']=='Save') ) {
 	$images=(isset($_POST['imgID']))?$_POST['imgID']:array();
-	$slider_id=$_POST['current_slider_id'];
+	$slider_id = isset($_POST['current_slider_id'])?$_POST['current_slider_id']:'';
+	$slider_id = intval($slider_id);
 	$ids=array_reverse($images);
 	global $wpdb,$table_prefix;
 	foreach($ids as $id){
@@ -100,8 +134,17 @@ if ( isset($_POST['addSave']) and ($_POST['addSave']=='Save') ) {
 		update_post_meta($id, 'smooth_sslider_nolink', $nolink);
 		if(!slider($id,$slider_id)) {
 				$dt = date('Y-m-d H:i:s');
-				$sql = "INSERT INTO ".$table_prefix.SLIDER_TABLE." (post_id, date, slider_id) VALUES ('$id', '$dt', '$slider_id')";
-				$wpdb->query($sql);
+				$table_name=$table_prefix.SLIDER_TABLE;
+				$wpdb->query( 
+					$wpdb->prepare( 
+						"INSERT INTO $table_name
+						(post_id, date, slider_id)
+						VALUES ( %d, %s, %d )", 
+						$id,
+						$dt,
+						$slider_id
+					) 
+				);
 		}
 	}
 }
@@ -205,11 +248,8 @@ wp_enqueue_script( 'media-uploader', smooth_slider_plugin_url( 'js/media-uploade
     <p><em><?php _e('Click on and drag the post/page title to a new spot within the list, and the other items will adjust to fit.','smooth-slider'); ?> </em></p>
     <ul id="sslider_sortable_<?php echo $slider['slider_id'];?>" style="color:#326078;overflow: auto;">    
     <?php  
-    /*global $wpdb, $table_prefix;
-	$table_name = $table_prefix.SLIDER_TABLE;*/
-	$slider_id = $slider['slider_id'];
-	//$slider_posts = $wpdb->get_results("SELECT post_id FROM $table_name WHERE slider_id = '$slider_id'", OBJECT); 
-    $slider_posts=get_slider_posts_in_order($slider_id);?>
+    	$slider_id = $slider['slider_id'];
+	$slider_posts=get_slider_posts_in_order($slider_id);?>
         
         <input type="hidden" name="current_slider_id" value="<?php echo $slider_id;?>" />
         

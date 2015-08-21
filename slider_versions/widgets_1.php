@@ -2,7 +2,7 @@
 class Smooth_Slider_Simple_Widget extends WP_Widget {
 	function Smooth_Slider_Simple_Widget() {
 		$widget_options = array('classname' => 'sslider_wclass', 'description' => 'Insert Smooth Slider' );
-		$this->WP_Widget('sslider_wid', 'Smooth Slider - Simple', $widget_options);
+		parent::__construct('sslider_wid', 'Smooth Slider - Simple', $widget_options);
 	}
 
 	function widget($args, $instance) {

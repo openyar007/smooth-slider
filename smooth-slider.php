@@ -3,8 +3,9 @@
 Plugin Name: Smooth Slider
 Plugin URI: http://slidervilla.com/smooth-slider/
 Description: Smooth slider adds a responsive featured content on image slider using shortcode, widget and template tags. Create and embed featured content slider, recent post slider, category slider in less than 60 seconds.
-Version: 2.7.1	
+Version: 2.8	
 Author: SliderVilla
+Text Domain: smooth-slider
 Author URI: http://slidervilla.com/
 Wordpress version supported: 2.9 and above
 */
@@ -30,12 +31,12 @@ Wordpress version supported: 2.9 and above
 //defined global variables and constants here
 global $smooth_slider,$default_slider,$smooth_db_version,$default_smooth_slider_settings;
 $smooth_slider = get_option('smooth_slider_options');
-$smooth_db_version='2.7.1'; //current version of smooth slider database 
+$smooth_db_version='2.8'; //current version of smooth slider database 
 define('SLIDER_TABLE','smooth_slider'); //Slider TABLE NAME
 define('PREV_SLIDER_TABLE','slider'); //Slider TABLE NAME
 define('SLIDER_META','smooth_slider_meta'); //Meta TABLE NAME
 define('SLIDER_POST_META','smooth_slider_postmeta'); //Meta TABLE NAME
-define("SMOOTH_SLIDER_VER","2.7.1",false);//Current Version of Smooth Slider
+define("SMOOTH_SLIDER_VER","2.8",false);//Current Version of Smooth Slider
 if ( ! defined( 'SMOOTH_SLIDER_PLUGIN_BASENAME' ) )
 	define( 'SMOOTH_SLIDER_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 if ( ! defined( 'SMOOTH_SLIDER_CSS_DIR' ) ){
@@ -104,7 +105,8 @@ $default_smooth_slider_settings=$default_slider = array('speed'=>'7',
 	'catg_slug'=>'',
 	'popup'=>'1',
 	'readmorecolor'=>'#0092E4',
-	'noscript'=>''
+	'noscript'=>'',
+	'reviewme'=>strtotime("+1 week")
 );
 // Create Text Domain For Translations
 load_plugin_textdomain('smooth-slider', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/');
@@ -147,12 +149,19 @@ function install_smooth_slider() {
 			}
 		}
 		add_cf5_column_if_not_exist($table_name, 'slide_order', "ALTER TABLE ".$table_name." ADD slide_order int(5) NOT NULL DEFAULT '0';");
+		if($wpdb->get_var("SHOW COLUMNS FROM $table_name LIKE 'expiry'") != 'expiry') {
+			$sql = "ALTER TABLE $table_name
+			ADD COLUMN expiry DATE DEFAULT NULL";
+			$rs1 = $wpdb->query($sql);
+		}
+		//add_cf5_column_if_not_exist($table_name, 'expiry', "ALTER TABLE ".$table_name." ADD expiry datetime NOT NULL DEFAULT 'NULL';");		
+
 
 	   	$meta_table_name = $table_prefix.SLIDER_META;
 		if($wpdb->get_var("show tables like '$meta_table_name'") != $meta_table_name) {
 			$sql = "CREATE TABLE $meta_table_name (
 					slider_id int(5) NOT NULL AUTO_INCREMENT,
-					slider_name varchar(100) NOT NULL default '',
+					slider_name varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL default '',
 					UNIQUE KEY slider_id(slider_id)
 				);";
 			$rs2 = $wpdb->query($sql);
@@ -167,7 +176,12 @@ function install_smooth_slider() {
 				) 
 			);
 		}
-	
+		else{
+			if($installed_ver<'2.8'){
+				$sql = "ALTER TABLE $meta_table_name CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci";
+				$rs3 = $wpdb->query($sql);
+			}
+		}
 		$slider_postmeta = $table_prefix.SLIDER_POST_META;
 		if($wpdb->get_var("show tables like '$slider_postmeta'") != $slider_postmeta) {
 			$sql = "CREATE TABLE $slider_postmeta (
@@ -265,20 +279,35 @@ global $smooth_slider;
 	  if(is_post_on_any_slider($post_id)){
 	  	$wpdb->delete( $table_name, array( 'post_id' => $post_id ), array( '%d' ) );
 	  }
-	  
+	  $expiry=get_post_meta($post_id,'_sslider_expiry',true);
 	  if(isset($_POST['slider']) and $_POST['slider'] == "slider" and !slider($post_id,$slider_id)) {
-		$dt = date('Y-m-d H:i:s');
+		$dt = date('Y-m-d H:i:s');		
 		$wpdb->query( 
 			$wpdb->prepare( 
 				"INSERT INTO $table_name
 				(post_id, date, slider_id)
-				VALUES ( %d, %s, %d )", 
+				VALUES ( %d, %s, %d, )", 
 				$post_id,
 				$dt,
 				$slider_id
 			) 
 		);
 	  }
+	}
+	if(isset($_POST['sslider_expiry']) ) {
+		if(!empty($_POST['sslider_expiry'])){
+			$date=$_POST['sslider_expiry'];
+			$dt = date("Y-m-d",strtotime($date));
+			$wpdb->update($table_name, array('expiry' => $dt), array('post_id' => $post_id), array('%s'), array('%s'));
+		        update_post_meta($post_id, '_sslider_expiry', $dt);
+		}
+		else {
+			//$wpdb->update($table_name, array('expiry' => NULL), array('post_id' => $post_id), array('%s'), array('%s'));
+			$sql = "UPDATE $table_name SET expiry = NULL WHERE post_id ='$post_id'";
+			$wpdb->query($sql);
+			update_post_meta($post_id, '_sslider_expiry', '');
+	    }
+
 	}
 	if(isset($_POST['slider']) and $_POST['slider'] == "slider" and isset($_POST['slider_name'])){
 	  $slider_id_arr = $_POST['slider_name'];
@@ -344,6 +373,12 @@ global $smooth_slider;
 	  update_post_meta($post_id, 'slide_redirect_url', $link);	
 	}
 	
+	$sslider_expiry = get_post_meta($post_id,'sslider_expiry',true);
+	$post_sslider_expiry = isset($_POST['sslider_expiry'])?$_POST['sslider_expiry']:'';
+	if($sslider_expiry != $post_sslider_expiry) {
+	  update_post_meta($post_id, '_sslider_expiry', $post_sslider_expiry);	
+	}	
+
 	$sslider_nolink = get_post_meta($post_id,'sslider_nolink',true);
 	$post_sslider_nolink = isset($_POST['sslider_nolink'])?$_POST['sslider_nolink']:'';
 	if($sslider_nolink != $post_sslider_nolink) {
@@ -471,16 +506,25 @@ function add_to_slider_checkbox() {
 		}
 		
 		$sliders = ss_get_sliders();
+		$wpDateFormat = get_option('date_format');
 		$sslider_link= get_post_meta($post_id, 'slide_redirect_url', true);  
 		$sslider_nolink=get_post_meta($post_id, 'sslider_nolink', true);
 		$thumbnail_key = $smooth_slider['img_pick'][1];
                 $sslider_thumbnail= get_post_meta($post_id, $thumbnail_key, true); 
 		$sslider_disable_image=get_post_meta($post_id, '_disable_image', true);
 		$smooth_embed_shortcode=get_post_meta($post_id, '_smooth_embed_shortcode', true);
+		$sslider_expiry=get_post_meta($post_id, '_sslider_expiry', true);
+		//wp_enqueue_style( 'smooth-meta-box', smooth_slider_plugin_url( 'css/css/smooth-metabox.css' ), false, SMOOTH_SLIDER_VER, 'all');
+		wp_enqueue_script( 'jquery-ui-datepicker', false,array('jquery','jQuery-ui-core'),SMOOTH_SLIDER_VER, true); 
+		wp_enqueue_style('jquery-style', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css');
+		$dtpicker = smooth_dateformat_PHP_to_jQueryUI($wpDateFormat);
 ?>	
 	  <?php	/* start tab 2.6 */ ?>	
              <script type="text/javascript">
 		jQuery(document).ready(function($) {
+			jQuery('#smooth_ExpiryDate').datepicker({
+				dateFormat : '<?php echo $dtpicker ?>'
+			});
 			jQuery("#smooth_basic").css({"background":"#222222","color":"#ffffff"});
 			jQuery("#smooth_basic").on("click", function(){ 
 				jQuery("#smooth_basic_tab").fadeIn("fast");
@@ -561,6 +605,12 @@ function add_to_slider_checkbox() {
 		 <th scope="row"><label for="sslider_thumbnail"><?php _e('Custom Thumbnail Image(url)','smooth-slider'); ?></label></th>
                 	<td><input type="text" name="sslider_thumbnail" class="sslider_thumbnail" value="<?php echo $sslider_thumbnail;?>" size="50" />
                 </td></tr>
+
+		<tr valign="top">
+		 <th scope="row"><label for="sslider_expiry"><?php _e('Expiry Date','smooth-slider'); ?></label></th>
+                	<td><input type="text" name="sslider_expiry" id="smooth_ExpiryDate" class="sslider_expiry" value="<?php echo $sslider_expiry;?>" size="20" />
+                </td></tr>
+
 		<tr valign="top">
 		<th scope="row"><label for="disable_image"><?php _e('Disable Thumbnail Image','smooth-slider'); ?> </label></th>
 		<td><input type="checkbox" name="disable_image" value="1" <?php if($sslider_disable_image=='1'){echo "checked";}?>  /> </td>
@@ -647,7 +697,6 @@ function sslider_plugin_action_links( $links, $file ) {
 
 	return $links;
 }
-
 require_once (dirname (__FILE__) . '/slider_versions/smooth_1.php');
 require_once (dirname (__FILE__) . '/settings/settings.php');
 require_once (dirname (__FILE__) . '/includes/media-images.php');

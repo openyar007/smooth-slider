@@ -755,8 +755,8 @@ $categories = get_categories();
 $scat_html='<option value="" selected >Select the Category</option>';
 
 foreach ($categories as $category) { 
- if($category->slug==$smooth_slider['catg_slug']){$selected = 'selected';} else{$selected='';}
- $scat_html =$scat_html.'<option value="'.$category->slug.'" '.$selected.'>'. $category->name .'</option>';
+ if(urldecode($category->slug)==$smooth_slider['catg_slug']){$selected = 'selected';} else{$selected='';}
+ $scat_html =$scat_html.'<option value="'.urldecode($category->slug).'" '.$selected.'>'. $category->name .'</option>';
 } 
 //fetching slider names 2.6
 global $smooth_slider;
@@ -849,6 +849,7 @@ else
 <input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
 </p>
 <input type="hidden" name="smooth_slider_options[active_tab]" id="smooth_activetab" value="<?php echo $smooth_slider['active_tab']; ?>" />
+<input type="hidden" name="smooth_slider_options[reviewme]" id="smooth_reviewme" value="<?php echo $smooth_slider['reviewme']; ?>" /> 
 <input type="hidden" name="smooth_slider_options[popup]" id="smoothpopup" value="<?php echo $smooth_slider['popup']; ?>" />
 <input type="hidden" name="hidden_preview" id="hidden_preview" value="<?php echo $smooth_slider['preview']; ?>" />
 <input type="hidden" name="hidden_category" id="hidden_category" value="<?php echo $smooth_slider['catg_slug']; ?>" />
@@ -899,6 +900,22 @@ if ($handle = opendir($directory)) {
 <input type="submit" value="Import" name="import"  onclick="return confirmSettingsImport()" title="<?php _e('Import Settings from a file','smooth-slider'); ?>" class="button-primary" />
 </form>
 </div>
+
+<?php 
+	$now=strtotime("now");
+	$reviewme=$smooth_slider['reviewme'];
+        if($reviewme!=0 and $reviewme<$now) {
+		echo "<div id='reviewme' style='border:1px solid #ccc;padding:10px;background:#fff;margin-top:2%;float: left;width: 95%;'>
+		<p>".__('Hey, I noticed you have created an awesome slider using Smooth Slider and using it for more than a week. Could you please do me a BIG favor and give it a 5-star rating on WordPress? Just to help us spread the word and boost our motivation.', 'smooth-slider')."</p>
+		<p>".__("~ Tejaswini from SliderVilla","smooth-slider")."</p>
+			<ul><li><a href='https://wordpress.org/support/view/plugin-reviews/smooth-slider?filter=5' target='_blank' title='".__('Please review and rate Smooth Slider on WordPress.org', 'smooth-slider')."'>".__('Ok, you deserve it', 'smooth-slider')."</a></li>
+			<li><a id='later' href='#' title='".__('Rate Smooth Slider at some other time!', 'smooth-slider')."'>".__('Nope, maybe later', 'smooth-slider')."</a></li>
+			<li><a id='already' href='#' title='".__('Click this if you have already rated us 5-star!', 'smooth-slider')."'>".__('I already did', 'smooth-slider'). "</a></li></ul></div>";
+   }
+?>
+
+
+
 </div> <!--end of float left -->
 <!-- Added for validations - start -->
 <script type="text/javascript">

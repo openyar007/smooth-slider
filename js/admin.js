@@ -1,5 +1,31 @@
+jQuery(document).ready(function(){
+  jQuery('#later').on("click", function(){
+	var r = jQuery('#smooth_reviewme').val();
+	var data = {};
+	data['reviewme'] = parseInt(r);
+	data['action'] = 'update_review_me';
+	jQuery.post(ajaxurl, data, function(response) {
+		if(response) {
+			alert(jQuery('#smooth_reviewme').val(response));
+			jQuery('#smooth_reviewme').val(response);
+		}
+		jQuery('#reviewme').remove();
+	 });
+     });
+  jQuery('#already').on("click", function(){
+	var data = {};
+	data['reviewme'] = 0;
+	data['action'] = 'update_review_me';
+	jQuery.post(ajaxurl, data, function(response) {
+		if(response) {
+			jQuery('#smooth_reviewme').val(response);
+		}
+		jQuery('#reviewme').remove();
+	 });
+   });
+});
 jQuery(function () {
-  jQuery('.moreInfo').each(function () {
+    jQuery('.moreInfo').each(function () {
     // options
     var distance = 10;
     var time = 250;

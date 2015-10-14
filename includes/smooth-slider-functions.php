@@ -6,6 +6,66 @@ function ss_get_sliders(){
  	$sliders = $wpdb->get_results($sql, ARRAY_A);
 	return $sliders;
 }
+function smooth_dateformat_PHP_to_jQueryUI($php_format)
+{
+    $SYMBOLS_MATCHING = array(
+        // Day
+        'd' => 'dd',
+        'D' => 'D',
+        'j' => 'd',
+        'l' => 'DD',
+        'N' => '',
+        'S' => '',
+        'w' => '',
+        'z' => 'o',
+        // Week
+        'W' => '',
+        // Month
+        'F' => 'MM',
+        'm' => 'mm',
+        'M' => 'M',
+        'n' => 'm',
+        't' => '',
+        // Year
+        'L' => '',
+        'o' => '',
+        'Y' => 'yy',
+        'y' => 'y',
+        // Time
+        'a' => '',
+        'A' => '',
+        'B' => '',
+        'g' => '',
+        'G' => '',
+        'h' => '',
+        'H' => '',
+        'i' => '',
+        's' => '',
+        'u' => ''
+    );
+    $jqueryui_format = "";
+    $escaping = false;
+    for($i = 0; $i < strlen($php_format); $i++)
+    {
+        $char = $php_format[$i];
+        if($char === '\\') // PHP date format escaping character
+        {
+            $i++;
+            if($escaping) $jqueryui_format .= $php_format[$i];
+            else $jqueryui_format .= '\'' . $php_format[$i];
+            $escaping = true;
+        }
+        else
+        {
+            if($escaping) { $jqueryui_format .= "'"; $escaping = false; }
+            if(isset($SYMBOLS_MATCHING[$char]))
+                $jqueryui_format .= $SYMBOLS_MATCHING[$char];
+            else
+                $jqueryui_format .= $char;
+        }
+    }
+    return $jqueryui_format;
+}
 function get_slider_posts_in_order($slider_id) {
     	global $wpdb, $table_prefix;
 	$table_name = $table_prefix.SLIDER_TABLE;
@@ -153,5 +213,18 @@ function add_cf5_column_if_not_exist($table_name, $column_name, $create_ddl) {
 	}
       	return false;
 }
-
+add_action( 'wp_ajax_update_review_me', 'update_review_me' );
+function update_review_me() {
+	$smooth_slider=array();
+	$smooth_slider = get_option('smooth_slider_options');
+	$reviewme=(isset($_POST['reviewme']))?($_POST['reviewme']):(strtotime("now"));
+	if($reviewme>0){
+		$updated_reviewme=$smooth_slider['reviewme']=strtotime("+1 week", $reviewme);
+	}
+	else{
+		$updated_reviewme=$smooth_slider['reviewme']=$reviewme;	
+	}
+	update_option('smooth_slider_options',$smooth_slider);
+	die();
+}
 ?>

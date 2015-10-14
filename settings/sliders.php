@@ -293,12 +293,30 @@ wp_enqueue_script( 'media-uploader', smooth_slider_plugin_url( 'js/media-uploade
 		<input type="submit" value="<?php _e('Rename','smooth-slider'); ?>"  name="<?php _e('rename_slider','smooth-slider'); ?>" />
 	
 		<input type="hidden" name="active_tab" class="smooth_activetab" value="0" />
+                <input type="hidden" name="smooth_slider_options[reviewme]" id="smooth_reviewme" value="<?php echo $smooth_slider['reviewme']; ?>" /> 
 	
 	</form>
+
+
+<?php 
+	$now=strtotime("now");
+	$reviewme=$smooth_slider['reviewme'];
+        if($reviewme!=0 and $reviewme<$now) {
+		echo "<div id='reviewme' style='border:1px solid #ccc;padding:10px;background:#fff;margin-top:2%;float: left;width: 95%;'>
+		<p>".__('Hey, I noticed you have created an awesome slider using Smooth Slider and using it for more than a week. Could you please do me a BIG favor and give it a 5-star rating on WordPress? Just to help us spread the word and boost our motivation.', 'smooth-slider')."</p>
+		<p>".__("~ Tejaswini from SliderVilla","smooth-slider")."</p>
+			<ul><li><a href='https://wordpress.org/support/view/plugin-reviews/smooth-slider?filter=5' target='_blank' title='".__('Please review and rate Smooth Slider on WordPress.org', 'smooth-slider')."'>".__('Ok, you deserve it', 'smooth-slider')."</a></li>
+			<li><a id='later' href='#' title='".__('Rate Smooth Slider at some other time!', 'smooth-slider')."'>".__('Nope, maybe later', 'smooth-slider')."</a></li>
+			<li><a id='already' href='#' title='".__('Click this if you have already rated us 5-star!', 'smooth-slider')."'>".__('I already did', 'smooth-slider'). "</a></li></ul></div>";
+   }
+?>
+
 <!-- Added for rename slider -end -->	
 </div> 
  
 <?php } ?>
+
+
 
 <?php if(isset($smooth_slider['multiple_sliders']) && $smooth_slider['multiple_sliders'] == '1') {?>
     <div id="new_slider" style="width:56%;">

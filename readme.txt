@@ -4,7 +4,7 @@ Donate link: http://www.clickonf5.org/go/smooth-slider/
 Tags: best slider plugin, carousel, carousel slider, coin slider, content slider, content slideshow, custom video slider, flex slider, free video slider, free video slideshow, Horizontal slider, Image Rotator, image slider, image slideshow, javascript slider, javascript slideshow, jquery slider, jquery slideshow, Photo Slider, posts slider, responsive slider, responsive slideshow, sidebar, slide, slide show, slider, slider plugin, slider widget, slides, slideshow,slideshow manager, slideshow plugin, vertical slider, video slider, video slideshow,vimeo slideshow, vimeo slider, widget slider, widget slideshow, wordpress slider, wordpress slideshow, wp slider, youtube slider, youtube slideshow, post slider, fullscreen Slider, css3 slider, responsive image slider, banner slider, social slider, cycle slider, text slider, revolution slider, thumbnail slider, touch slider, sliders, parallax slider, coinslider, featured-content-slider, image, images, picture, pictures, picture slider, responsive, shortcode, widget, vertical slides, autoplay, auto, jquery, rotate, flexslider, gallery, photo gallery, javascript, rotator, wordpress picture slider, wordpress responsive slider, animation, best slider, fullwidth slider, mobile slider, swipe, layer, layer slider, product slider, mp3, video
 Requires at least: 3.0
 Tested up to: 4.3.1
-Stable tag: 2.8
+Stable tag: 2.8.1
 License: GPLv2 or later
 
 Responsive WordPress Slider for Featured Content, Videos and Media Images
@@ -151,6 +151,10 @@ Check the other FAQs on Smooth [Slider Documetation on SliderVilla](http://guide
 
 
 == Changelog ==
+
+Version 2.8.1 (10/23/2015)
+
+1. New – Added touch swipe feature for tocu input on mobile devices 
 
 Version 2.8 (10/13/2015)
 

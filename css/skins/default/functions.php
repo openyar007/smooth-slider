@@ -191,6 +191,7 @@ function smooth_slider_get_default($slider_handle,$r_array,$slider_id='',$echo='
 	if(isset($smooth_sldr_j) && $smooth_sldr_j >= 1) : //is slider empty?	
 	wp_enqueue_script( 'smooth', smooth_slider_plugin_url( 'js/smooth.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
 	wp_enqueue_script( 'smooth-dim', smooth_slider_plugin_url( 'js/dim.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
+	wp_enqueue_script( 'jquery.touchwipe', smooth_slider_plugin_url( 'js/jquery.touchwipe.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
 /* Changed fouc code start 2.6 - Bug fix in 2.6.2.1 */	
 	if(!isset($smooth_slider['fouc']) or $smooth_slider['fouc']=='' or $smooth_slider['fouc']=='0' ){
 			$fouc_dom='jQuery("html").addClass("smooth_slider_fouc");jQuery(".smooth_slider_fouc .smooth_slider").hide();';
@@ -236,8 +237,16 @@ function smooth_slider_get_default($slider_handle,$r_array,$slider_id='',$echo='
 
 		$html.='pause: 1
 			,slideExpr: "div.smooth_slideri"
+		});
+		jQuery("#'.$slider_handle.'").touchwipe({
+			wipeLeft: function() {
+				jQuery("#'.$slider_handle.'").smooth("next");
+			},
+			wipeRight: function() {
+				jQuery("#'.$slider_handle.'").smooth("prev");
+			},
+			preventDefaultEvents: false
 		});';
-		
 		if ($smooth_slider['goto_slide'] == 2 or $smooth_slider['goto_slide'] == 4 ) { 
 			$html.='jQuery("head").append("<style type=\"text/css\">#'.$slider_handle.' .smooth_nav a.smooth_slider_inav.activeSlide{background-position:-'.$smooth_slider['navimg_w'].'px 0 !important;}</style>");';
 		}	

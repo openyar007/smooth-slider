@@ -3,7 +3,7 @@
 Plugin Name: Smooth Slider
 Plugin URI: http://slidervilla.com/smooth-slider/
 Description: Smooth slider adds a responsive featured content on image slider using shortcode, widget and template tags. Create and embed featured content slider, recent post slider, category slider in less than 60 seconds.
-Version: 2.8	
+Version: 2.8.1	
 Author: SliderVilla
 Text Domain: smooth-slider
 Author URI: http://slidervilla.com/
@@ -31,12 +31,12 @@ Wordpress version supported: 2.9 and above
 //defined global variables and constants here
 global $smooth_slider,$default_slider,$smooth_db_version,$default_smooth_slider_settings;
 $smooth_slider = get_option('smooth_slider_options');
-$smooth_db_version='2.8'; //current version of smooth slider database 
+$smooth_db_version='2.8.1'; //current version of smooth slider database 
 define('SLIDER_TABLE','smooth_slider'); //Slider TABLE NAME
 define('PREV_SLIDER_TABLE','slider'); //Slider TABLE NAME
 define('SLIDER_META','smooth_slider_meta'); //Meta TABLE NAME
 define('SLIDER_POST_META','smooth_slider_postmeta'); //Meta TABLE NAME
-define("SMOOTH_SLIDER_VER","2.8",false);//Current Version of Smooth Slider
+define("SMOOTH_SLIDER_VER","2.8.1",false);//Current Version of Smooth Slider
 if ( ! defined( 'SMOOTH_SLIDER_PLUGIN_BASENAME' ) )
 	define( 'SMOOTH_SLIDER_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 if ( ! defined( 'SMOOTH_SLIDER_CSS_DIR' ) ){

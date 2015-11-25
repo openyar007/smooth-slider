@@ -83,11 +83,25 @@ function carousel_posts_on_slider($max_posts, $offset=0, $slider_id = '1',$out_e
 	else {
 	  $orderby = 'a.slide_order ASC, a.date DESC';
 	}
+	//WPML
+	if( function_exists('icl_plugin_action_links') ) {
+		$tr_table = $table_prefix."icl_translations";
+		$posts = $wpdb->get_results("SELECT b.* FROM 
+                     $table_name a 
+		 LEFT OUTER JOIN $post_table b 
+			ON a.post_id = b.ID 
+		 LEFT OUTER JOIN $tr_table t 
+			ON a.post_id = t.element_id 
+		 WHERE ((b.post_status = 'publish' AND t.language_code = '".ICL_LANGUAGE_CODE."') OR (b.post_type='attachment' AND b.post_status = 'inherit'))
+		 AND a.slider_id = '$slider_id' AND (a.expiry IS NULL OR a.expiry='0000-00-00' OR DATE(a.expiry) >= DATE(NOW()))
+		 ORDER BY ".$orderby." LIMIT $offset, $max_posts", OBJECT);
+	}
+	else {
 	$posts = $wpdb->get_results("SELECT b.* FROM 
 	        $table_name a LEFT OUTER JOIN $post_table b 
 		ON a.post_id = b.ID 
-		WHERE (b.post_status = 'publish' OR (b.post_type='attachment' AND b.post_status = 'inherit')) AND a.slider_id = '$slider_id' AND (a.expiry IS NULL OR DATE(a.expiry) >= DATE(NOW()) ) ORDER BY ".$orderby." LIMIT $offset, $max_posts", OBJECT);
-	
+		WHERE (b.post_status = 'publish' OR (b.post_type='attachment' AND b.post_status = 'inherit')) AND a.slider_id = '$slider_id' AND (a.expiry IS NULL OR a.expiry='0000-00-00' OR DATE(a.expiry) >= DATE(NOW()) ) ORDER BY ".$orderby." LIMIT $offset, $max_posts", OBJECT);
+	}
 	$r_array=smooth_global_posts_processor( $posts, $smooth_slider, $out_echo, $set, $data );
 	return $r_array;
 }
@@ -127,7 +141,23 @@ function carousel_posts_on_slider_category($max_posts='5', $catg_slug='', $offse
 		$category = get_the_category();
 		$slider_cat = $category[0]->cat_ID;
 	}
-		$rand = $smooth_slider['rand'];
+	//WPML
+	if( function_exists('icl_plugin_action_links') ) {
+		$tr_table = $table_prefix."icl_translations";
+		$slider_cat = $wpdb->get_var("
+						SELECT element_id 
+						FROM $tr_table 
+						WHERE element_type = 'tax_category' 
+						AND language_code = '".ICL_LANGUAGE_CODE."' 
+						AND trid = ( 	SELECT trid 
+								FROM $tr_table 
+								WHERE element_type = 'tax_category' 
+								AND element_id = $slider_cat
+							)
+					");
+	}	
+	//WPML END
+	$rand = $smooth_slider['rand'];
 	if(isset($rand) and $rand=='1'){
 	  $orderby = '&orderby=rand';
 	}
@@ -159,9 +189,26 @@ function carousel_posts_on_slider_recent($max_posts='5', $offset=0, $out_echo = 
 	else {
 	  $orderby = '';
 	}
+	//WPML
+	if( function_exists('icl_plugin_action_links') ) {
+		global $wpdb, $table_prefix;
+		$post_table = $table_prefix."posts";
+		$tr_table = $table_prefix."icl_translations";
+		$posts=$wpdb->get_results("SELECT *
+			FROM $post_table AS p
+			LEFT OUTER JOIN $tr_table AS t 
+			ON p.ID = t.element_id 
+			WHERE t.element_type = 'post_post' 
+			AND t.language_code = '".ICL_LANGUAGE_CODE."' 
+			AND p.post_status = 'publish' 
+			ORDER BY p.post_date DESC 
+			LIMIT $offset, $max_posts
+		");
+	}
+	else {
 	//extract posts data
-	$posts = get_posts('numberposts='.$max_posts.'&offset='.$offset.$orderby);
-	
+		$posts = get_posts('numberposts='.$max_posts.'&offset='.$offset.$orderby);
+	}
 	$r_array=smooth_global_posts_processor( $posts, $smooth_slider, $out_echo, $set,$data );
 	return $r_array;
 }

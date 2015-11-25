@@ -1047,8 +1047,6 @@ jQuery('#saveResult').html("<div id='popup'><div class='modal_shortcode'>Quick E
 
  </div> <!--end of poststuff --> 
 
-
-
 <?php	
 }
 function register_mysettings() { // whitelist options

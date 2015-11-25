@@ -179,7 +179,7 @@ function smooth_post_processor_default( $posts, $smooth_slider,$out_echo){
 	return $r_array;
 	
 }
-function smooth_slider_get_default($slider_handle,$r_array,$slider_id='',$echo='1'){
+function smooth_slider_get_default($slider_handle,$r_array,$slider_id='',$echo='1') {
 	$skin='default';
 	global $smooth_slider,$default_slider; 
 	foreach($default_slider as $key=>$value){
@@ -188,7 +188,7 @@ function smooth_slider_get_default($slider_handle,$r_array,$slider_id='',$echo='
 	$smooth_sldr_j = $r_array[0];
 	$smooth_slider_css = smooth_get_inline_css();
 	$html='';
-	if(isset($smooth_sldr_j) && $smooth_sldr_j >= 1) : //is slider empty?	
+	if(isset($smooth_sldr_j) && $smooth_sldr_j >= 1) : //is slider empty?
 	wp_enqueue_script( 'smooth', smooth_slider_plugin_url( 'js/smooth.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
 	wp_enqueue_script( 'smooth-dim', smooth_slider_plugin_url( 'js/dim.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
 	wp_enqueue_script( 'jquery.touchwipe', smooth_slider_plugin_url( 'js/jquery.touchwipe.js' ),array('jquery'), SMOOTH_SLIDER_VER, false);
@@ -201,7 +201,7 @@ function smooth_slider_get_default($slider_handle,$r_array,$slider_id='',$echo='
 		}	
 		else{
 			$fouc_dom=$fouc_ready='';
-		}	
+		}
 /* Changed fouc code end 2.6 */		
 	$html.='<script type="text/javascript">';
 	$html.=$fouc_ready;

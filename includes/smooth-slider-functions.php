@@ -213,8 +213,8 @@ function add_cf5_column_if_not_exist($table_name, $column_name, $create_ddl) {
 	}
       	return false;
 }
-add_action( 'wp_ajax_update_review_me', 'update_review_me' );
-function update_review_me() {
+add_action( 'wp_ajax_smooth_update_review_me', 'smooth_update_review_me' );
+function smooth_update_review_me() {
 	$smooth_slider=array();
 	$smooth_slider = get_option('smooth_slider_options');
 	$reviewme=(isset($_POST['reviewme']))?($_POST['reviewme']):(strtotime("now"));

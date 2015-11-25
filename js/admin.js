@@ -3,7 +3,7 @@ jQuery(document).ready(function(){
 	var r = jQuery('#smooth_reviewme').val();
 	var data = {};
 	data['reviewme'] = parseInt(r);
-	data['action'] = 'update_review_me';
+	data['action'] = 'smooth_update_review_me';
 	jQuery.post(ajaxurl, data, function(response) {
 		if(response) {
 			alert(jQuery('#smooth_reviewme').val(response));
@@ -15,7 +15,7 @@ jQuery(document).ready(function(){
   jQuery('#already').on("click", function(){
 	var data = {};
 	data['reviewme'] = 0;
-	data['action'] = 'update_review_me';
+	data['action'] = 'smooth_update_review_me';
 	jQuery.post(ajaxurl, data, function(response) {
 		if(response) {
 			jQuery('#smooth_reviewme').val(response);

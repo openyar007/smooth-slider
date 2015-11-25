@@ -335,7 +335,7 @@ wp_enqueue_script( 'media-uploader', smooth_slider_plugin_url( 'js/media-uploade
 </div>
 
 
-<div id="poststuff" class="metabox-holder has-right-sidebar" style="float:left;width:25%;max-width:300px;margin-top:20px;"> 
+<div id="poststuff" class="metabox-holder has-right-sidebar" style="float:left;width:25%;max-width:300px;min-width: 255px;margin-top:20px;"> 
 		
 		<div class="postbox"> 
 		<h3 class="hndle"><span><?php _e('About this Plugin:','smooth-slider'); ?></span></h3> 

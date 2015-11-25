@@ -75,7 +75,7 @@ function return_smooth_slider_recent($offset=0, $data=array()) {
 
 function smooth_slider_recent_shortcode($atts) {
 	extract(shortcode_atts(array(
-		'offset' => '',
+		'offset' => '0',
 	), $atts));
 	return return_smooth_slider_recent($offset);
 }
